@@ -1,0 +1,763 @@
+% \iffalse meta-comment
+%
+% Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
+% -------------------------------------------------------
+% 
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 2 of the License, or (at
+% your option) any later version.
+% 
+% This program is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+% General Public License for more details.
+%         
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>
+% 
+% \fi
+%
+% \iffalse
+%<*driver>
+\ProvidesFile{sagetexpackage.dtx}
+%</driver>
+%<latex>\NeedsTeXFormat{LaTeX2e}
+%<latex>\ProvidesPackage{sagetex}
+%<*latex>
+    [2008/03/03 v1.0 embedding Sage into LaTeX documents]
+%</latex>
+%
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{sagetex}
+\usepackage{hyperref}
+\EnableCrossrefs         
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{sagetexpackage.dtx}
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \CheckSum{0}
+%
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%
+% \changes{v1.0}{2008/03/03}{Initial version}
+%
+% \GetFileInfo{sagetexpackage.dtx}
+%
+% \DoNotIndex{\newcommand,\newenvironment,\the}
+% 
+%
+% \title{The \textsf{sagetex} package\thanks{This document
+%   corresponds to \textsf{sagetex}~\fileversion, dated \filedate.}}
+% \author{Dan Drake (\texttt{ddrake@member.ams.org}) and others}
+%
+% \maketitle
+%
+% \section{Introduction}
+%
+% Why should the Haskell folks have all the fun? 
+%
+% \href{http://www.haskell.org/haskellwiki/Literate_programming}{Literate
+% Haskell} is a popular way to mix Haskell source code and \LaTeX{}
+% documents. (Well, actually any kind of text or document, but here
+% we're concerned only with \LaTeX.) You can even embed Haskell code in
+% your document that writes part of your document for you. 
+%
+% This package allows you to do (roughly) the same with Sage and \LaTeX.
+% As a simple example, imagine in your document you are writing about
+% how to count license plates with three letters and three digits. With
+% this package, you can write something like this:
+% \begin{quote}
+%  \texttt{There are \$26\$ choices for each letter, and \$10\$ choices
+%  for each digit, for a total of } \verb+$26^3*10^3 = \sage{26^3*10^3}$+
+%  \texttt{license plates.}
+% \end{quote}
+% and it will produce
+% \begin{quote}
+%   There are $26$ choices for each letter, and $10$ choices for each
+%   digit, for a total of $\sage{26^3 * 10^3}$ license plates.
+% \end{quote}
+% The great thing is, you don't have to do the multiplication. Sage does
+% it for you. This process mirrors one of the great aspects of
+% \LaTeX{}: when writing a \LaTeX{} document, you can concentrate on the
+% logical structure of the document and trust \LaTeX{} and its army of
+% packages to deal with the presentation and typesetting. Similarly,
+% with \textsf{sagetex}, you can concentrate on the mathematical
+% structure (``I need the product of $26^3$ and $10^3$'') and let Sage
+% deal with the base-$10$ presentation of the number.
+%
+% A less trivial, and perhaps more useful example is plotting. You can
+% include a plot of the sine curve without producing a plot, saving 
+% an eps or pdf file, and doing the \verb+\includegraphics+ business
+% yourself. If you write this:
+% \begin{quote}
+% \texttt{Here is a lovely graph of the sine curve:}
+%
+% \verb+\sageplot{plot(sin(x), x, 0, 2*pi)}+
+% \end{quote}
+% in your \LaTeX{} file, it produces
+% \begin{quote}
+% Here is a lovely graph of the sine curve:
+%
+% \sageplot{plot(sin(x), x, 0, 2*pi)}
+% \end{quote}
+% Again, you need only worry about the logical/mathematical structure of
+% your document (``I need a plot of the sine curve over the interval
+% $[0, 2\pi]$ here''), while \textsf{sagetex} takes care of the gritty
+% details of producing the file and sourcing it into your document.
+%
+% \section{Usage}
+% 
+% Let's begin with a rough description of how \textsf{sagetex} works.
+% When you use macros from this package and run \LaTeX{} on your file,
+% along with the usual zoo of auxiliary files, a |.sage| file is
+% written. This is a Sage source file that uses the Python module from
+% this package and when you run Sage on that file, it will produce a
+% |.sout| file. That file contains \LaTeX{} code which, when you run
+% \LaTeX{} on your source file again, will pull in all the results of
+% Sage's computation.
+%
+% All you really need to know is that to typeset your document, you need
+% to run \LaTeX, then run Sage, then run \LaTeX{} again. 
+%
+% Also keep in mind that everything you send to Sage is done within one
+% Sage session. This means you can define variables and reuse them
+% throughout your \LaTeX{} document; if you tell Sage that |foo| is
+% $12$, then anytime afterwards you can use |foo| in your Sage code and
+% Sage will remember that it's $12$---just like in a regular Sage
+% session.
+%
+% Now that you know that, let's describe what macros \textsf{sagetex}
+% provides and how to use them.\\
+%
+% \iffalse meta-comment
+% For some reason, getting a blackslash in a typewriter font to print
+% inside an fbox is really hard. This code works; it's copied out of
+% Scott Pakin's dtxtut.tex.
+% \fi
+% {\catcode`\|=0 \catcode`\\=12
+% |gdef|bslash{\}}
+%
+% \subsection{Inline Sage and plotting}
+%
+% \DescribeMacro{\sage}
+% \fbox{\texttt{\bslash sage}\marg{Sage code}}
+%
+% \noindent takes whatever Sage code you give it, runs Sage's |latex|
+% function on it, and puts the result into your document. 
+%
+% For example, if you do |\sage{matrix([[1, 2], [3,4]])^2}|, then that
+% macro will get replaced by
+% \begin{quote}
+% |\left(\begin{array}{rr}|\\
+% |7 & 10 \\|\\
+% |15 & 22|\\
+% |\end{array}\right)|
+% \end{quote}
+% in your document---that \LaTeX{} code is exactly exactly what you get
+% from doing
+% \begin{quote}
+% |latex(matrix([[1, 2], [3,4]])^2)|
+% \end{quote}
+% in Sage.
+%
+% Note that you can mix \LaTeX{} variables and Sage variables! If you
+% have defined the Sage variable |foo| to be $12$ (using, say, the
+% |sageblock| environment), then you can do something like this:
+% \begin{quote}
+% |The prime factorization of the current page plus foo is|\\
+% |$\sage{factor(foo + \thepage)}$|.
+% \end{quote}
+% Here, I'll do just that right now: the prime factorization of the
+% current page plus $12$ is $\sage{factor(\thepage + 12)}$.\\
+%
+% \noindent \DescribeMacro{\sageplot}
+% \fbox{\texttt{\bslash sageplot}\oarg{ltx options}\{\meta{graphics
+% obj}, \meta{format=EXT}, \meta{keyword args}\}}
+%
+% \noindent plots the given Sage graphics object and runs an
+% |\includegraphics| command to put it into your document. The options
+% work as follows:
+%
+% \begin{table}[h]
+%   \centering
+%   \begin{tabular}{l p{8cm}}
+%   Option & Description \\
+%   \hline
+%   \meta{ltx options} & Any text here is passed directly into the
+%   optional arguments (between the square brackets) of an
+%   |\includegraphics| command. If not specified,
+%   ``|width=.75\textwidth|'' will be used.\\
+%   \meta{graphics obj} & A Sage object on which you can call
+%   |.save()| with a graphics filename.\\
+%   \meta{format=EXT} & You can optionally specify a file
+%   extension here; Sage will then try to save the graphics object to a
+%   file with extension EXT. By default, \textsf{sagetex} will save to
+%   EPS and PDF files; it's best to avoid using this. \\
+%   \meta{keyword args} & Any keyword arguments you put here will
+%   all get put into the call to |.save()|.
+%   \end{tabular}
+%   \end{table}
+% This setup allows you to control both the Sage side of things, and the
+% \LaTeX{} side. For instance, the command
+% \begin{quote}
+% |\sageplot[angle=30, width=5cm]{plot(sin(x), 0, pi), axes=False,|\\
+% |chocolate=True}|
+% \end{quote}
+% will run the following command in Sage:
+% \begin{quote}
+% \texttt{plot(sin(x), 0, pi).save(filename=autogen, axes=False,\\
+% chocolate=True)}
+% \end{quote}
+% The filename is automatically generated, and unless you specify a
+% format, both EPS and PDF files will be generated. This allows you to
+% freely switch between using, say, a DVI viewer (many of which have
+% support for source specials and make the writing process easier) and
+% creating PDFs for posting on the web or emailing to colleagues. Then,
+% in your \LaTeX{} file, the following command will be issued
+% automatically:
+% \begin{quote}
+% |\includegraphics[angle=30, width=5cm]{autogen}|
+% \end{quote}
+% You needn't worry about the filenames; they are automatically
+% generated and will be put into the directory
+% \texttt{sage-plots-for-filename.tex}. You can safely delete that
+% directory anytime; if \textsf{sagetex} can't find the files, it will
+% warn you to run Sage to regenerate them.\\
+%
+% \noindent\fbox{\parbox{\textwidth}{\textbf{WARNING!} When you run Sage
+% on your |.sage| file, all files in the
+% \texttt{sage-plots-for-filename.tex} directory \emph{will be deleted!}
+% Do not put any files into that directory that you do not want to get
+% automatically deleted.}}
+% 
+% \subsection{Verbatim-like environments}
+%
+% The \textsf{sagetex} package provides several environments for
+% typesetting and executing Sage code.\\
+%
+% \DescribeEnv{sageblock} Any text between |\begin{sageblock}| and
+% |\end{sageblock}| will be typset into your file, and also written into
+% the |.sage| file for execution. This means you can do something like
+% this:
+% \begin{quote}
+% |\begin{sageblock}|\\
+% |   var('x')|\\
+% |   f = sin(x) - 1|\\
+% |   g = log(x)|\\
+% |   h = diff(f(x) * g(x), x)|\\
+% |\end{sageblock}|
+% \end{quote}
+% and then sometime later write in your source file
+% \begin{quote}
+%   \texttt{We have \$h(2) = }|\sage{h(2)}|\texttt{\$, where \$h\$ is
+%   the derivative of the product of \$f\$ and \$g\$.}
+% \end{quote}
+% You can use any Sage or Python commands inside a |sageblock|; all
+% the commands get sent directly to Sage.
+%
+% \iffalse meta-comment
+%   Sadly, we can't use sageblock or similar environments in this file!
+%   If you prefix the lines inside the environment with percent signs,
+%   then those percent signs get written to your .sage file. If you
+%   *don't* prefix the lines with percent signs, those lines get written
+%   into the .sty or .py file. It's just too tricky to get docstrip and
+%   the verbatim stuff to play nicely together. I'd have to redefine how
+%   those environments work, and get them to strip off initial percents. 
+% \fi
+% 
+% \DescribeEnv{sagesilent} This environment is like |sageblock|, but it
+% does not typeset any of the code; it just writes it to the |.sage|
+% file. This is useful if you have to do some setup in Sage that is not
+% interesting or relevant to the document you are writing.
+%
+% \DescribeEnv{sageverbatim} This environment is the opposite of the one
+% above: whatever you type will be typeset, but not written into the
+% |.sage| file. This allows you to typeset psuedocode, code that will
+% fail, or take too much time to execute, or whatever.
+%
+% \DescribeEnv{comment} Logically, we now need an environment that
+% neither typesets nor executes your Sage code\ldots but the |verbatim|
+% package, which is always loaded when using \textsf{sagetex}, provides
+% such an environment: |comment|.\\
+%
+% \DescribeMacro{\sagetexindent} There is one final bit to our
+% verbatim-like environments: the indentation. The \textsf{sagetex}
+% package defines a length |\sagetexindent|, which controls how much the
+% Sage code is indented when typeset. You can change this length however
+% you like with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or
+% whatever.
+% 
+% \StopEventually{}
+%
+% \section{Implementation}
+%
+% There are two pieces to this package: a \LaTeX{} style file, and a
+% Python module. They are mutually interdependent, so it makes sense to
+% document them both here.
+%
+% \subsection{The style file}
+%
+% \iffalse
+% tell docstrip to put code into the .sty file
+%<*latex>
+% \fi
+%
+% Let's begin by loading some packages. The key bits of |sageblock| and
+% friends are stol---um, adapted from the |verbatim| package manual.
+%    \begin{macrocode}
+\RequirePackage{verbatim}
+%    \end{macrocode}
+% Unsurprisingly, the |sageplot| command works poorly without graphics
+% support.
+%    \begin{macrocode}
+\RequirePackage{graphicx}
+%    \end{macrocode}
+% The |makecmds| package gives us a |provideenvironment| which we need,
+% and we use |ifpdf| in |sageplot| so we know whether to look for EPS or
+% PDF files.
+%    \begin{macrocode}
+\RequirePackage{makecmds}
+\RequirePackage{ifpdf}
+%    \end{macrocode}
+% 
+% Next set up the counters and the default indent.
+%    \begin{macrocode}
+\newcounter{@sage}
+\newcounter{@sageplot}
+\setcounter{@sage}{0}
+\setcounter{@sageplot}{0}
+\newlength{\sagetexindent}
+\setlength{\sagetexindent}{5ex}
+%    \end{macrocode}
+%
+% It's time to deal with files. Open the |.sage| file:
+%    \begin{macrocode}
+\newwrite\@sagefile
+\immediate\openout\@sagefile=\jobname.sage
+%    \end{macrocode}
+% We will write a lot of stuff to that file, so make a convenient
+% abbreviation, then use it to put the initial commands into the |.sage|
+% file.
+%    \begin{macrocode}
+\newcommand{\@wsf}[1]{\immediate\write\@sagefile{#1}}
+\@wsf{import sagetex}
+\@wsf{sagetex.openout('\jobname')}
+%    \end{macrocode}
+% Pull in the |.sout| file if it exists, or do nothing if it doesn't. I
+% suppose we could do this inside an |AtBeginDocument| but I don't see
+% any particular reason to do that. It will work whenever we load it.
+%    \begin{macrocode}
+\InputIfFileExists{\jobname.sout}{}{}
+%    \end{macrocode}
+%
+% Now let's define the cool stuff.
+%
+% \begin{macro}{\sage}
+% This macro combines |\ref|, |\label|, and Sage all at once. First, we
+% use Sage to get a \LaTeX{} representation of whatever you give this
+% function. The Sage script writes a |\newlabel| line into the |.sout|
+% file, and we read the output using the |\ref| command. Usually, |\ref|
+% pulls in a section or theorem number, but it will pull in arbitrary
+% text just as well.
+%
+% The first thing it does it write its argument into the |.sage| file,
+% along with a counter so we can produce a unique label, and the line
+% number in the input file so we can give helpful error messages to the
+% user.
+%    \begin{macrocode}
+\newcommand{\sage}[1]{%
+\@wsf{sagetex.inline(\the@sage, \the\inputlineno, #1)}%
+%    \end{macrocode}
+% Our use of |\newlabel| and |\ref| seems awfully clever until you load
+% the |hyperref| package, which gleefully tries to hyperlink the hell
+% out of everything. This is great until it hits one of our special
+% |\newlabel|s and gets deeply confused. Fortunately the |hyperref|
+% folks are willing to accomodate people like us, and give us a
+% |NoHyper| environment.
+%    \begin{macrocode}
+\begin{NoHyper}\ref{@sagelabel\the@sage}\end{NoHyper}%
+%    \end{macrocode}
+% Now check to see if the label has already been defined. (The
+% deep internal implementation of labels in \LaTeX{} involves defining a
+% function ``|r@labelname|''.) If it hasn't, we set a flag so that we
+% can tell the user to run Sage on the |.sage| file at the end of the
+% run. Finally, step the counter.
+%    \begin{macrocode}
+\@ifundefined{r@@sagelabel\the@sage}{\gdef\@rerunsage{x}}{}%
+\stepcounter{@sage}}
+%    \end{macrocode}
+% \end{macro}
+% The user might load the |hyperref| package after this one (indeed, the
+% |hyperref| documentation insists that it be loaded last) or not at
+% all---so when we hit the beginning of the document, provide a dummy
+% |NoHyper| environment if one hasn't been defined by the |hyperref|
+% package.
+%    \begin{macrocode}
+\AtBeginDocument{\provideenvironment{NoHyper}{}{}}
+%    \end{macrocode}
+%
+% \begin{macro}{\@plotdir}
+% A little abbreviation for the plot directory.
+%    \begin{macrocode}
+\newcommand{\@plotdir}{sage-plots-for-\jobname.tex}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\sageplot}
+% This function is similar to |\sage|. We write a couple lines to the
+% |.sage| file, including a counter, input line number, and all of the
+% mandatory argument. The neat thing is, commas aren't special for
+% arguments to \LaTeX{} commands, so it's easy to capture a bunch of
+% keyword arguments that get passed right into a Python function.
+%
+% The optional argument gets shoved right into the optional argument for
+% |\includegraphics|, so the user has easy control over both the Sage
+% and \LaTeX{} aspects of the plotting. We define a default size of
+% $3/4$ the textwidth, which seems reasonable.
+%    \begin{macrocode}
+\newcommand{\sageplot}[2][width=.75\textwidth]{%
+\@wsf{sagetex.initplot('\jobname')}%
+\@wsf{sagetex.sageplot(\the@sageplot, \the\inputlineno, #2)}%
+\includegraphics[#1]{\@plotdir/plot-\the@sageplot}%
+%    \end{macrocode}
+% Finally we check to see if the graphics have been produced. We check
+% for PDF output and look for the appropriate kind of file. This will
+% work unless the user passes a strange format string; if you ask for a
+% PNG file, this won't detect if it hasn't been generated. Given that
+% EPS and PDF files are the best choice almost all the time, as well as
+% the difficulty of parsing |#1| to figure out a requested format, I
+% think this is a good choice. Plus, at some point you have to trust
+% your users to be smart enough to run Sage when using commands like
+% |\sageplot|.
+%    \begin{macrocode}
+\ifpdf
+  \IfFileExists{\@plotdir/plot-\the@sageplot.pdf}%
+    {}{\gdef\@rerunsage{x}}
+\else
+  \IfFileExists{\@plotdir/plot-\the@sageplot.eps}%
+    {}{\gdef\@rerunsage{x}}
+\fi
+\stepcounter{@sageplot}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@beginsagefileblock}
+% This is an internal-use abbreviation that sets things up when we start
+% writing a chunk of Sage code to the |.sage| file. It begins with some
+% \TeX{} magic that fixes spacing, then writes ``|if True:|'' to the
+% |.sage| file---this allows the user to indent code without Sage/Python
+% complaining about indentation. The last bit is some magic from the
+% |verbatim| package manual that makes \LaTeX{} respect line breaks.
+%    \begin{macrocode}
+\newcommand{\@beginsagefileblock}{%
+  \@bsphack\@wsf{sagetex.blockbegin(\the\inputlineno)}\@wsf{if True:}%
+  \let\do\@makeother\dospecials\catcode`\^^M\active}
+%    \end{macrocode}
+% \end{macro}
+%
+% Now let's define the ``verbatim-like'' environments. There are four
+% possibilities, corresponding to two independent choices of
+% typesetting the code or not, and writing to the |.sage| file or not.
+%
+% \begin{environment}{sageblock}
+% This environment does both: it typesets your code and puts it into the
+% |.sage| file for execution by Sage.
+%    \begin{macrocode}
+\newenvironment{sageblock}{\@beginsagefileblock%
+%    \end{macrocode}
+% The space between |\@wsf{| and |\the| is crucial! It, along with the
+% ``|if True:|'', is what allows the user to indent code if they like.
+% This line sends stuff to the |.sage| file.
+%    \begin{macrocode}
+\def\verbatim@processline{\@wsf{ \the\verbatim@line}%
+%    \end{macrocode}
+% Next, we typeset your code and start the verbatim environment.
+%    \begin{macrocode}
+\hspace{\sagetexindent}\the\verbatim@line\par}%
+\verbatim}%
+%    \end{macrocode}
+% At the end of the environment, we put a chunk into the |.sage| file
+% and stop the verbatim environment.
+%    \begin{macrocode}
+{\@wsf{sagetex.blockend()}\endverbatim}
+%    \end{macrocode}
+% \end{environment}
+%
+% \begin{environment}{sagesilent}
+% This is from the |verbatim| package manual. It's just like the above,
+% except we don't typeset anything.
+%    \begin{macrocode}
+\newenvironment{sagesilent}{\@beginsagefileblock%
+\def\verbatim@processline{\@wsf{ \the\verbatim@line}}%
+\verbatim@start}%
+{\@wsf{sagetex.blockend()}\@esphack}
+%    \end{macrocode}
+% \end{environment}
+%
+% \begin{environment}{sageverbatim}
+% The opposite of |sagesilent|. This is exactly the same as the verbatim
+% environment, except that we include some indentation to be consistent
+% with other typeset Sage code.
+%    \begin{macrocode}
+\newenvironment{sageverbatim}{%
+\def\verbatim@processline{\hspace{\sagetexindent}\the\verbatim@line\par}%
+\verbatim}%
+{\endverbatim}
+%    \end{macrocode}
+% \end{environment}
+%
+% Logically, we now need an environment which neither typesets
+% \emph{nor} writes code to the |.sage| file. The verbatim package's
+% |comment| environment does that.\\
+%
+% Now we deal with some end-of-file cleanup.
+%
+% We tell the Sage script to write some information to the |.sout| file,
+% then check to see if |@rerunsage| ever got defined. If not, all the
+% inline formulas and plots worked, so do nothing. Otherwise, we issue a
+% warning to tell the user to run Sage on the |.sage| file. Part of the
+% reason we do this is that, by using |\ref| to pull in the inlines,
+% \LaTeX{} will complain about undefined references if you haven't run
+% the Sage script---and for many \LaTeX{} users, myself included, the
+% warning ``there were undefined references'' is a signal to run
+% \LaTeX{} again. But to fix these particular undefined references, you
+% need to run \emph{Sage}.
+%
+% At any rate, we warn the user to run Sage if it's necessary.
+%    \begin{macrocode}
+\AtEndDocument{\@wsf{sagetex.endofdocument()}%
+\@ifundefined{@rerunsage}{}%
+{\PackageWarningNoLine{sagetex}{There were undefined Sage formulas
+and/or plots}%
+\PackageWarningNoLine{sagetex}{Run Sage on \jobname.sage, and then run
+LaTeX on \jobname.tex again}}}
+%    \end{macrocode}
+%
+%
+% \subsection{The Python module}
+%
+% \iffalse
+% Hey, docstrip! Stop putting code into the .sty file, and start
+% putting it into the .py file.
+%</latex>
+%<*python>
+% Thanks.
+% \fi
+%
+% The style file writes things to the |.sage| file and reads them from
+% the |.sout| file. The Python module provides functions that help
+% produce the |.sout| file from the |.sage| file.
+%
+% We start with some imports and definitions of our global variables.
+% This is a relatively specialized uses of Sage, so using global variables
+% isn't a bad idea.
+%    \begin{macrocode}
+from sage.misc.latex import latex
+import sys
+import os
+import os.path
+import hashlib
+initplot_done  = False
+dirname        = None
+filename       = ""
+%    \end{macrocode}
+%
+% \begin{macro}{progress}
+% This is just a cute little function for printing stuff. It allows us
+% to not print a linebreak, so you can get ``|start...|'' (little time
+% spent processing) ``|end|'' on one line.
+%    \begin{macrocode}
+def progress(t,linebreak=True):
+  if linebreak:
+    print(t)
+  else:
+    sys.stdout.write(t)
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{openout}
+% This function opens a |.sout.tmp| file and writes all our output to
+% that. Then, when we're done, we move that to |.sout|. The
+% ``autogenerated'' line is basically the same as the lines that get put
+% at the top of preparsed Sage files; we are automatically generating a
+% file with Sage, so it seems reasonable to add it.
+%    \begin{macrocode}
+def openout(f):
+  global filename
+  filename = f
+  global _file_
+  _file_ = open(f + '.sout.tmp', 'w')
+  s = '% This file was *autogenerated* from the file ' + \
+        os.path.splitext(filename)[0] + '.sage.\n'
+  _file_.write(s)
+  progress('Processing Sage code for %s.tex...' % filename)
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{deltree}
+% When we start plotting, we delete the entire plots directory if it
+% exists. This function does that for us.
+%    \begin{macrocode}
+def deltree(root):
+  for name in os.listdir(root):
+    path = os.path.join(root, name)
+    if os.path.isdir(path):
+      deltree(path)
+    else:
+      os.remove(path)
+  os.rmdir(root) 
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{initplot}
+% We only want to create the plots directory if the user actually plots
+% something. This function creates the directory and sets the
+% |initplot_done| flag after doing so. We make a directory based on the
+% \LaTeX{} file being processed so that if there are multiple |.tex|
+% files in a directory, we don't overwrite plots from another file.
+%    \begin{macrocode}
+def initplot(f):
+  global initplot_done
+  if not initplot_done:
+    progress('Initializing plots directory')
+    global dirname
+    dirname = 'sage-plots-for-' + f + ".tex"
+    if os.path.isdir(dirname):
+      deltree(dirname)
+    os.mkdir(dirname)
+    initplot_done = True
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{inline}
+% This function works with |\sage| from the style file to put Sage
+% output into your \LaTeX{} file. Usually, when you use |\label|, it
+% writes a line such as
+% \begin{quote}
+%   |\newlabel{labelname}{{section number}{page number}}|
+% \end{quote}
+% to the |.aux| file. When you use the |hyperref| package, there are
+% more fields in the second argument, but the first two are the same.
+% The |\ref| command just pulls in what's in the first field, so we can
+% hijack this mechanism for our own nefarious purposes. The function
+% writes a |\newlabel| line with a label made from a counter and the
+% text from running Sage on |s|. 
+%
+% We print out the line number so if something goes wrong, the user can
+% more easily track down the offending |\sage| command in the source
+% file.
+%
+% That's a lot of explanation for a very short function:
+%    \begin{macrocode}
+def inline(counter, line, s):
+  progress('Inline formula %s, line %s' % (counter, line))
+  _file_.write('\\newlabel{@sagelabel' + str(counter) + '}{{' + \
+               latex(s) + '}{}{}{}{}}\n')
+%    \end{macrocode}
+% We are using five fields, just like |hyperref| does, because that
+% works whether or not |hyperref| is loaded. Using two fields, as in plain
+% \LaTeX, doesn't work if |hyperref| is loaded.
+% \end{macro}
+%
+% \begin{macro}{blockbegin}
+% \begin{macro}{blockend}
+% This function and its companion used to write stuff to the |.sout|
+% file, but now they just update the user on our progress evaluating a
+% code block.
+%    \begin{macrocode}
+def blockbegin(line):
+  progress('Code block on line %s begin...' % line, False)
+def blockend():
+  progress('end')
+%    \end{macrocode}
+% \end{macro} 
+% \end{macro} 
+%
+% \begin{macro}{sageplot}
+% Here we do plotting. As mentioned in the |\sageplot| code (note the
+% backslash), we're taking advantage of two things: first, that
+% \LaTeX{} doesn't treat commas and spaces in macro arguments specially,
+% and second, that Python (and Sage plotting functions) has nice support
+% for keyword arguments. The |#2| argument to |\sageplot| becomes
+% |format| and |**kwargs| below.
+%    \begin{macrocode}
+def sageplot(counter, line, p, format=None, **kwargs):
+  global dirname
+  progress('Plot %s, line %s' % (counter, line))
+%    \end{macrocode}
+% If the user says nothing about file formats, we default to producing
+% PDF and EPS. This, along with not using file extensions in the
+% |\includegraphics| line, allows the user to transparently switch
+% between using a DVI previewer (which usually has support for source
+% specials, which makes the writing process easier) and making PDFs. 
+%    \begin{macrocode}
+  if format is None:
+    formats = ['eps', 'pdf']
+  else:
+    formats = [format]
+  for format in formats:
+    plotfilename = os.path.join(dirname, 'plot-%s.%s' % (counter, format))
+    p.save(filename=plotfilename, **kwargs)
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{endofdocument}
+% When we're done processing, we have a couple little cleanup tasks. We
+% find the MD5 sum of the |.sage| file that produced the |.sout| file
+% we're about to write, and put that sum into the |.sout| file. This
+% allows external programs that build \LaTeX{} documents to tell if they
+% need to call Sage to update the |.sout| file. We do issue warnings to
+% run Sage on the |.sage| file, but those warnings do not quite capture
+% all situations, and anyway I think it's easier to grab the md5sum out
+% of the end of the file than parse the output from running |latex| on
+% your file. (The regular expression \verb|^%[0-9a-f]{32}%| will find
+% the MD5 sum.)
+%    \begin{macrocode}
+def endofdocument():
+  global filename
+  dotsagesum = hashlib.md5(open(filename + '.sage', 'rb').read()).hexdigest()
+  s = '%' + dotsagesum + '% md5sum of .sage file that produced this\n'
+  _file_.write(s)
+%    \end{macrocode}
+% Now we are done with the |.sout| file. Close it, rename it, and tell
+% the user we're done.
+%    \begin{macrocode}
+  _file_.close()
+  os.rename(filename + '.sout.tmp', filename + '.sout')
+  progress('Sage processing complete. Run LaTeX on %s.tex again.' % filename)
+%    \end{macrocode}
+% \end{macro}
+%
+% \section{Credits}
+%
+% According to the original README file, this system was originally
+% done by Gonzalo Tornaria and Joe Wetherell. Later Harald Schilly made
+% some improvements and modifications. Almost all the examples in the
+% |example.tex| file are from Harald.
+%
+% Dan Drake rewrote the style file (there is almost zero original code
+% there), made significant changes to the Python module, put both
+% files into \textsf{Docstrip} format, and wrote all the documentation.

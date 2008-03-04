@@ -1,0 +1,97 @@
+%%
+%% Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
+%%
+%% This program is free software: you can redistribute it and/or modify
+%% it under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 2 of the License, or (at
+%% your option) any later version.
+%% 
+%% This program is distributed in the hope that it will be useful, but
+%% WITHOUT ANY WARRANTY; without even the implied warranty of
+%% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+%% General Public License for more details.
+%%         
+%% You should have received a copy of the GNU General Public License
+%% along with this program.  If not, see <http://www.gnu.org/licenses/>
+
+\input docstrip.tex
+\keepsilent
+
+\usedir{tex/latex/skeleton}
+
+\preamble
+
+This is a generated file.
+
+Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+        
+You should have received a copy of the GNU General Public License along
+with this program.  If not, see <http://www.gnu.org/licenses/>
+
+\endpreamble
+
+% We use a name other than `sagetex' because building the documentation
+% from foo.dtx will involve producing a file called foo.py -- and below,
+% we generate a file called sagetex.py. Thus we use a name other than
+% `sagetex.dtx' so that building the documentation doesn't clobber the
+% very Python file we need to build the documentation!
+
+\generate{\file{sagetex.sty}{\from{sagetexpackage.dtx}{latex}}}
+
+
+% A trick from the Docstrip manual that allows us to put triple quotes
+% around the {pre,post}amble. It prints some bits twice, but it works.
+
+\declarepreamble\foo
+\defaultpreamble
+\endpreamble
+
+\edef\foo{"""^^J%
+          \foo^^J%
+          """}
+
+\declarepostamble\bar
+\defaultpostamble
+\endpostamble
+
+\edef\bar{"""^^J%
+          \bar^^J%
+          """}
+
+\generate{\usepreamble\foo
+          \usepostamble\bar
+          \file{sagetex.py}{\from{sagetexpackage.dtx}{python}}}
+
+\obeyspaces
+\Msg{******************************************************************}
+\Msg{*                                                                *}
+\Msg{* To finish the installation you have to move the following      *}
+\Msg{* files into directories searched by TeX and Sage, respectively. *}
+\Msg{*                                                                *}
+\Msg{*     sagetex.sty                                                *}
+\Msg{*     sagetex.py                                                 *}
+\Msg{*                                                                *}
+\Msg{* To produce the documentation run the file sagetex.dtx through  *}
+\Msg{* LaTeX. To produce the change history, run                      *}
+\Msg{*                                                                *}
+\Msg{* makeindex -s gglo.ist -o sagetexpackage.gls sagetexpackage.glo *}
+\Msg{*                                                                *}
+\Msg{* and to get the regular index, do                               *}
+\Msg{*                                                                *}
+\Msg{* makeindex -s gind.ist -o sagetexpackage.ind sagetexpackage.idx *}
+\Msg{*                                                                *}
+\Msg{* Happy TeXing...and, uh, Saging?                                *}
+\Msg{*                                                                *}
+\Msg{******************************************************************}
+
+\endbatchfile

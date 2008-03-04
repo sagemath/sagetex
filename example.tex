@@ -1,0 +1,171 @@
+% General example LaTeX file for including Sage calculations and plots
+% Build with: (pdf)latex example.tex; sage example.sage; pdflatex example.tex 
+% Please read README.txt and the documentation of the SageTeX package
+% for more information!
+
+\documentclass{article}
+
+\title{Examples of embedding Sage in \LaTeX}
+\usepackage{sagetex}
+
+\begin{document}
+\maketitle
+
+\section{Inline Sage, code blocks}
+
+This is an example $2+2=\sage{2+2}$. If you raise the current year
+($\the\year$) to the power of the current day ($\the\day$), you get
+$\sage{\the\year^\the\day}$.
+
+Code block which uses a variable \texttt{s} to store the solutions:
+\begin{sageblock}
+ var('a,b,c')
+ eqn = [a+b*c==1, b-a*c==0, a+b==5]
+ s = solve(eqn, a,b,c)
+\end{sageblock}
+
+Solutions of $\mbox{eqn}=\sage{eqn}$:
+$$
+\sage{s[0]}
+$$
+$$
+\sage{s[1]}
+$$
+
+Now we evaluate the following block:
+\begin{sageblock}
+E = EllipticCurve("37a")
+\end{sageblock}
+You can't do assignment inside \verb|\sage| macros, since Sage doesn't
+know how to typeset the output of such a thing. So you have to use a
+code block. The elliptic curve $E$ given by $\sage{E}$ 
+has discriminant $\sage{E.discriminant()}$. 
+
+You can do anything in a code block that you can do in Sage and/or
+Python. Here we save an elliptic curve into a file.
+\begin{sageblock}
+try:
+    E = load('E2')
+except IOError:
+    E = EllipticCurve([1,2,3,4,5])
+    E.anlist(100000)
+    E.save('E2')
+\end{sageblock}
+\label{ellipticcurve}
+
+The 9999th Fourier coefficient of $\sage{E}$ is 
+$\sage{E.anlist(100000)[9999]}$. 
+
+
+The following code block doesn't appear in the typeset file\dots
+\begin{sagesilent}
+  e = 2
+  e = 3*e + 1
+\end{sagesilent}
+but we can refer to whatever we did in that code block: $e=\sage{e}$.
+
+
+\begin{sageblock}
+  var('x')
+  f = log(sin(x)/x)
+\end{sageblock}
+The Taylor Series of $f$ is: $\sage{ f.taylor(x, 0, 10) }$.
+
+
+\section{Plotting}
+
+Here's a plot of the elliptic curve $E$.
+
+\sageplot{E.plot(-3,3)}
+
+\begin{sagesilent}
+  var('x')
+  f=-x^3+3*x^2+7*x-4
+\end{sagesilent}
+
+You can use variables to hold plot objects and do stuff with them.
+\begin{sageblock}
+  p = plot(f, x, -5, 5)
+\end{sageblock}
+
+Here's a small plot of $f$ from $-5$ to $5$, which I've centered:
+
+\centerline{\sageplot[scale=.2]{p}}
+
+On second thought, use the default size of $3/4$ the \verb|\textwidth|
+and don't use axes:
+
+\sageplot{p, axes=False}
+
+Remember, you're using Sage, and can therefore call upon any of the
+software packages Sage is built out of.
+\begin{sageblock}
+f = maxima('sin(x)^2*exp(x)')
+g = f.integrate('x')
+\end{sageblock}
+Plot $g(x)$, but don't typeset it.
+\begin{sagesilent}
+  # g is a Maxima thingy, it needs to get converted into a Sage object
+  plot1 = plot(g.sage(),x,-1,2*pi)
+\end{sagesilent}
+
+You can specify a file format and options for \verb|includegraphics|.
+Observe that if you are producing a DVI file from this, it will
+\emph{always} complain about a missing file, since regular \verb|latex|
+doesn't do PNGs. The default is for EPS and PDF files, which are the
+best choice in almost all situations.
+
+\sageplot[angle=45]{plot1, format='png'}
+
+When using \verb|\sageplot|, you can pass in just about anything that
+Sage can call \verb|.save()| on to produce a graphics file:
+
+\begin{center}
+\sageplot{plot1 + plot(f.sage(),x,-1,2*pi,rgbcolor=hue(0.4)), figsize=[1,2]}
+\end{center}
+
+\sageplot{graphs.FlowerSnark().plot()}
+
+\begin{sageblock}
+G4 = DiGraph({1:[2,2,3,5], 2:[3,4], 3:[4], 4:[5,7], 5:[6]}, multiedges=True)
+G4plot = G4.plot(layout='circular')
+\end{sageblock}
+
+\sageplot{G4plot, axes=False}
+
+Indentation and so on works fine.
+\begin{sageblock}
+ s     = 7
+ s2    = 2^s
+ P.<x> = GF(2)[]
+ M     = matrix(parent(x),s2)
+ for i in range(s2):
+    p  = (1+x)^i
+    pc = p.coeffs()
+    a  = pc.count(1)
+    for j in range(a):
+        idx        = pc.index(1)
+        M[i,idx+j] = pc.pop(idx)
+
+ matrixprogram = matrix_plot(M,cmap='Greys')
+\end{sageblock}
+And here the picture:
+
+\sageplot{matrixprogram}
+
+
+\subsection{3D plotting}
+
+3D plotting right now is problematic because there's no way to produce
+vector graphics. We can make PNGs, though. If you don't specify
+anything, right now you get Targa files, which are huge.
+
+Here's the famous Sage cube graph:
+
+\begin{sageblock}
+  G = graphs.CubeGraph(5)
+\end{sageblock}
+
+\sageplot{G.plot3d(), format='png'}
+
+\end{document}

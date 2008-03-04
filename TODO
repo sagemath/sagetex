@@ -1,0 +1,12 @@
+
+* put Sage calls into a try/except so that we can print line numbers if
+  things blow up
+
+* hyperlinks in documentation between LaTeX and Python functions that
+  are interdependent
+
+* magic bits written to .sage so we can keep the Python module in the
+  same place as the .sty file?
+
+* deal with graphics issues; use PGF? No warnings about missing graphics
+  files
