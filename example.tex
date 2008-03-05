@@ -4,7 +4,6 @@
 % for more information!
 
 \documentclass{article}
-
 \title{Examples of embedding Sage in \LaTeX}
 \usepackage{sagetex}
 
@@ -56,7 +55,6 @@ except IOError:
 The 9999th Fourier coefficient of $\sage{E}$ is 
 $\sage{E.anlist(100000)[9999]}$. 
 
-
 The following code block doesn't appear in the typeset file\dots
 \begin{sagesilent}
   e = 2
@@ -64,13 +62,11 @@ The following code block doesn't appear in the typeset file\dots
 \end{sagesilent}
 but we can refer to whatever we did in that code block: $e=\sage{e}$.
 
-
 \begin{sageblock}
   var('x')
   f = log(sin(x)/x)
 \end{sageblock}
 The Taylor Series of $f$ is: $\sage{ f.taylor(x, 0, 10) }$.
-
 
 \section{Plotting}
 
@@ -110,12 +106,10 @@ Plot $g(x)$, but don't typeset it.
 \end{sagesilent}
 
 You can specify a file format and options for \verb|includegraphics|.
-Observe that if you are producing a DVI file from this, it will
-\emph{always} complain about a missing file, since regular \verb|latex|
-doesn't do PNGs. The default is for EPS and PDF files, which are the
-best choice in almost all situations.
+The default is for EPS and PDF files, which are the best choice in
+almost all situations. (Although see the section on 3D plotting.)
 
-\sageplot[angle=45]{plot1, format='png'}
+\sageplot[angle=45, width=.5\textwidth][png]{plot1}
 
 When using \verb|\sageplot|, you can pass in just about anything that
 Sage can call \verb|.save()| on to produce a graphics file:
@@ -153,12 +147,14 @@ And here the picture:
 
 \sageplot{matrixprogram}
 
-
 \subsection{3D plotting}
 
-3D plotting right now is problematic because there's no way to produce
-vector graphics. We can make PNGs, though. If you don't specify
-anything, right now you get Targa files, which are huge.
+3D plotting right now is problematic because there's no convenient way
+to produce vector graphics. We can make PNGs, though, and since the
+\verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
+a valid format for 3D plotting}. Sage right now can't produce EPS or PDF
+files from plot3d objects, so if you don't specify a valid format,
+things will go badly.
 
 Here's the famous Sage cube graph:
 
@@ -166,6 +162,8 @@ Here's the famous Sage cube graph:
   G = graphs.CubeGraph(5)
 \end{sageblock}
 
-\sageplot{G.plot3d(), format='png'}
+% need empty [] so sageplot knows you want png format, and aren't
+% passing an option to includegraphics
+\sageplot[][png]{G.plot3d()}
 
 \end{document}

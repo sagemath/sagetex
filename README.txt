@@ -6,7 +6,8 @@ module from the .dtx file. To do that:
 
   0. Run `latex sagetexpackage.ins'
 
-Then, to get the documentation for this package:
+Then, to get the documentation for this package, which includes usage
+information:
 
   1. Run `latex sagetexpackage.dtx'
   2. Run `sage sagetexpackage.sage'
@@ -16,7 +17,10 @@ Then, to get the documentation for this package:
 You can skip step 3 if you don't care about the index.
 
 The file example.tex has, as you likely guessed, a bunch of examples
-showing you how this package works.
+showing you how this package works. You can compile it using a another
+latex-sage-latex cycle as in steps 1-2-4 above. Note that example.tex
+includes some PNG graphics which latex cannot use; to see those, use
+pdflatex instead of regular latex.
 
 This works builds on a lot of work by others; see the last section of
 the documentation for credits.
