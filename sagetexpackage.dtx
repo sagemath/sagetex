@@ -536,7 +536,6 @@
 \stepcounter{@sageplot}}
 %    \end{macrocode}
 % \end{macro}
-
 %
 % \begin{macro}{\@sagetexincludegrphics}
 % This command includes the requested graphics file with the requested
@@ -834,7 +833,7 @@ def sageplot(counter, line, p, format='notprovided', **kwargs):
     formats = [format]
   for fmt in formats:
     plotfilename = os.path.join(dirname, 'plot-%s.%s' % (counter, fmt))
-    print('  plotting %s with args %s' % (plotfilename, kwargs))
+    #print('  plotting %s with args %s' % (plotfilename, kwargs))
     p.save(filename=plotfilename, **kwargs)
 %    \end{macrocode}
 % \end{macro}
