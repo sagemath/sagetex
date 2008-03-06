@@ -5,7 +5,15 @@
 
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX}
+\author{\relax}
+
 \usepackage{sagetex}
+% 
+% If you want sagetex to use Imagemagick's convert utility to make eps
+% files from png files when generating a dvi file, add the
+% "imagemagick" option above:
+%
+%    \usepackage[imagemagick]{sagetex}
 
 \begin{document}
 \maketitle
@@ -121,7 +129,8 @@ Sage can call \verb|.save()| on to produce a graphics file:
 \sageplot{graphs.FlowerSnark().plot()}
 
 \begin{sageblock}
-G4 = DiGraph({1:[2,2,3,5], 2:[3,4], 3:[4], 4:[5,7], 5:[6]}, multiedges=True)
+G4 = DiGraph({1:[2,2,3,5], 2:[3,4], 3:[4], 4:[5,7], 5:[6]},\
+             multiedges=True)
 G4plot = G4.plot(layout='circular')
 \end{sageblock}
 
@@ -143,7 +152,7 @@ Indentation and so on works fine.
 
  matrixprogram = matrix_plot(M,cmap='Greys')
 \end{sageblock}
-And here the picture:
+And here's the picture:
 
 \sageplot{matrixprogram}
 
@@ -154,7 +163,9 @@ to produce vector graphics. We can make PNGs, though, and since the
 \verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
 a valid format for 3D plotting}. Sage right now can't produce EPS or PDF
 files from plot3d objects, so if you don't specify a valid format,
-things will go badly.
+things will go badly. You can specify the ``\texttt{imagemagick}''
+option, which will use the Imagemagick \texttt{convert} utility to make
+EPS files. See the documentation for details.
 
 Here's the famous Sage cube graph:
 

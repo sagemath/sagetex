@@ -263,7 +263,7 @@
 % \centerline{\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}}
 % 
 % \noindent That's supposed to resemble the traditional ``\textbf{??}''
-% that \LaTeX{} uses to indicate missing reference, and also the
+% that \LaTeX{} uses to indicate missing references, and also the
 % image-not-found graphics used by web browsers.
 %
 % You needn't worry about the filenames; they are automatically
@@ -358,13 +358,13 @@
 %    \begin{macrocode}
 \RequirePackage{verbatim}
 %    \end{macrocode}
-% Unsurprisingly, the |sageplot| command works poorly without graphics
+% Unsurprisingly, the |\sageplot| command works poorly without graphics
 % support.
 %    \begin{macrocode}
 \RequirePackage{graphicx}
 %    \end{macrocode}
-% The |makecmds| package gives us a |provideenvironment| which we need,
-% and we use |ifpdf| and |ifthen| in |sageplot| so we know what kind of
+% The |makecmds| package gives us a |\provideenvironment| which we need,
+% and we use |ifpdf| and |ifthen| in |\sageplot| so we know what kind of
 % files to look for.
 %    \begin{macrocode}
 \RequirePackage{makecmds}
@@ -381,6 +381,23 @@
 \newlength{\sagetexindent}
 \setlength{\sagetexindent}{5ex}
 %    \end{macrocode}
+%
+% \begin{macro}{\@epsmagick}
+% By default, we don't use ImageMagick to create EPS files:
+%    \begin{macrocode}
+\newcommand{\@epsmagick}{False}
+%    \end{macrocode}
+% That macro gets put into a Python function call, so it works to have
+% it be one of the strings ``|True|'' or ``|False|''.
+% \end{macro}
+% 
+% Declare the |imagemagick| option and process it:
+%    \begin{macrocode}
+\DeclareOption{imagemagick}{\renewcommand{\@epsmagick}{True}}
+\ProcessOptions\relax
+%    \end{macrocode}
+% The |\relax| is a little incantation suggested by the ``\LaTeX2e for
+% class and package writers'' manual, section 4.7.
 %
 % It's time to deal with files. Open the |.sage| file:
 %    \begin{macrocode}
@@ -509,7 +526,8 @@
 \def\sageplot@ii[#1][#2]#3{%
 \@wsf{try:}%
 \@wsf{  sagetex.initplot('\jobname')}%
-\@wsf{  sagetex.sageplot(\the@sageplot, \the\inputlineno, #3, format='#2')}%
+\@wsf{  sagetex.sageplot(\the@sageplot, \the\inputlineno, #3,
+    format='#2', epsmagick=\@epsmagick)}%
 \@wsf{except:}%
 \@wsf{  sagetex.goboom(\the\inputlineno)}%
 %    \end{macrocode}
@@ -537,7 +555,7 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\@sagetexincludegrphics}
+% \begin{macro}{\@sagetexincludegraphics}
 % This command includes the requested graphics file with the requested
 % options if the file exists (note that it just needs to know the
 % extension, since we use a counter in the filename).
@@ -554,8 +572,8 @@
     {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
      \PackageWarning{sagetex}{Graphics file
      \@plotdir/plot-\the@sageplot\space on page \thepage\space does not
-     exist}}%
-     \gdef\@rerunsage{x}}
+     exist}%
+     \gdef\@rerunsage{x}}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -693,6 +711,7 @@ import os
 import os.path
 import hashlib
 import traceback
+import subprocess
 initplot_done  = False
 dirname        = None
 filename       = ""
@@ -817,7 +836,7 @@ def blockend():
 % for keyword arguments. The |#3| argument to |\sageplot| becomes
 % |p| and |**kwargs| below.
 %    \begin{macrocode}
-def sageplot(counter, line, p, format='notprovided', **kwargs):
+def sageplot(counter, line, p, format='notprovided', epsmagick=False, **kwargs):
   global dirname
   progress('Plot %s, line %s' % (counter, line))
 %    \end{macrocode}
@@ -836,6 +855,32 @@ def sageplot(counter, line, p, format='notprovided', **kwargs):
     #print('  plotting %s with args %s' % (plotfilename, kwargs))
     p.save(filename=plotfilename, **kwargs)
 %    \end{macrocode}
+% If the user provides a format \emph{and} specifies the |imagemagick|
+% option, we try to convert the newly-created file into EPS format.
+%    \begin{macrocode}
+    if format != 'notprovided' and epsmagick is True:
+      print('calling toeps(%s, %s)...' % (counter, format))
+      toeps(counter, format)
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{toeps}
+% This function calls the Imagmagick utility |convert| to, well, convert
+% something into EPS format. This gets called when the user has
+% requested the ``|imagemagick|'' option to the \ST\ style file and is
+% making a graphic file with a nondefault extension.
+%    \begin{macrocode}
+def toeps(counter, ext):
+  global dirname
+  subprocess.check_call(['convert',\
+    '%s/plot-%s.%s' % (dirname, counter, ext), \
+    '%s/plot-%s.eps' % (dirname, counter)])
+%    \end{macrocode}
+% We are blindly assuming that the |convert| command exists and will do
+% the conversion for us; the |check_call| function raises an exception
+% which, since all these calls get wrapped in try/excepts in the |.sage|
+% file, should result in a reasonable error message if something strange
+% happens.
 % \end{macro}
 %
 % \begin{macro}{goboom}

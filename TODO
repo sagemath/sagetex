@@ -4,6 +4,7 @@
 * magic bits written to .sage so we can keep the Python module in the
   same place as the .sty file?
 
-* add option to use Imagemagick to convert bimaps to eps?
+* document imagemagick option
 
+* improve manual
 
