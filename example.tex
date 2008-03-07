@@ -7,7 +7,7 @@
 \title{Examples of embedding Sage in \LaTeX}
 \author{\relax}
 
-\usepackage{sagetex}
+\usepackage[imagemagick]{sagetex}
 % 
 % If you want sagetex to use Imagemagick's convert utility to make eps
 % files from png files when generating a dvi file, add the
@@ -118,6 +118,10 @@ The default is for EPS and PDF files, which are the best choice in
 almost all situations. (Although see the section on 3D plotting.)
 
 \sageplot[angle=45, width=.5\textwidth][png]{plot1}
+
+If you use regular \verb|latex| to make a DVI file, you'll see a box,
+beause DVI files can't include PNG files. If you use \verb|pdflatex|
+that will work. See the documentation for details.
 
 When using \verb|\sageplot|, you can pass in just about anything that
 Sage can call \verb|.save()| on to produce a graphics file:
