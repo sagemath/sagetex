@@ -1,4 +1,5 @@
-%%
+%% This is `sagetexpackage.ins', part of the sagetex package.
+%
 %% Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
 %%
 %% This program is free software: you can redistribute it and/or modify
@@ -19,7 +20,7 @@
 
 \usedir{tex/latex/sagetex}
 
-\preamble
+\declarepreamble\defaultpreamble
 
 This is a generated file.
 
@@ -40,37 +41,30 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 
 \endpreamble
 
-% We use a name other than `sagetex' because building the documentation
-% from foo.dtx will involve producing a file called foo.py -- and below,
-% we generate a file called sagetex.py. Thus we use a name other than
-% `sagetex.dtx' so that building the documentation doesn't clobber the
-% very Python file we need to build the documentation!
+% We use a name other than `sagetex' because when using the sagetex
+% package in a file called `foo.dtx', a file `foo.py' will be produced
+% -- and below, we generate a file called sagetex.py. Thus we use a name
+% other than `sagetex.dtx' so that building the documentation doesn't
+% clobber the very Python file we need to build the documentation!
 
 \generate{\file{sagetex.sty}{\from{sagetexpackage.dtx}{latex}}}
 
 
-% A trick from the Docstrip manual that allows us to put triple quotes
-% around the {pre,post}amble. It prints some bits twice, but it works.
+% Some trickery to get triple quotes around the {pre,post}amble. This is
+% a modification of what the Docstrip manual suggests; their method
+% resulted in some bits being printed twice because, I think, of a
+% problem in \declare{pre,post}amble. At any rate, this gives us a
+% properly commented Python file with the same preamble as the .sty
+% file.
 
-\declarepreamble\foo
-\defaultpreamble
-\endpreamble
-
-\edef\foo{"""^^J%
-          \foo^^J%
+\edef\defaultpreamble{"""^^J%
+          \defaultpreamble^^J%
+          """}
+\edef\defaultpostamble{"""^^J%
+          \defaultpostamble^^J%
           """}
 
-\declarepostamble\bar
-\defaultpostamble
-\endpostamble
-
-\edef\bar{"""^^J%
-          \bar^^J%
-          """}
-
-\generate{\usepreamble\foo
-          \usepostamble\bar
-          \file{sagetex.py}{\from{sagetexpackage.dtx}{python}}}
+\generate{\file{sagetex.py}{\from{sagetexpackage.dtx}{python}}}
 
 \obeyspaces
 \Msg{******************************************************************}

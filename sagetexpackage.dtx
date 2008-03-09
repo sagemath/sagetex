@@ -2,19 +2,9 @@
 %
 % Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
 % -------------------------------------------------------
-% 
-% This program is free software: you can redistribute it and/or modify
-% it under the terms of the GNU General Public License as published by
-% the Free Software Foundation, either version 2 of the License, or (at
-% your option) any later version.
-% 
-% This program is distributed in the hope that it will be useful, but
-% WITHOUT ANY WARRANTY; without even the implied warranty of
-% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-% General Public License for more details.
-%         
-% You should have received a copy of the GNU General Public License
-% along with this program.  If not, see <http://www.gnu.org/licenses/>
+%
+% See the "Copying and licenses" section for the terms under which this
+% source code and documentation may be modified and distributed.
 % 
 % \fi
 %
@@ -104,13 +94,13 @@
 % we're concerned only with \LTX.) You can even embed Haskell code in
 % your document that writes part of your document for you. 
 %
-% The \ST package allows you to do (roughly) the same with Sage and
-% \LTX. (If you know how to write literate Haskell: the |\eval|
-% command corresponds to |\sage|, and the |code| environment
-% to the |sageblock| environment.) As a simple example, imagine in
-% your document you are writing about how to count license plates with
-% three letters and three digits. With this package, you can write
-% something like this:
+% The \ST package allows you to do (roughly) the same thing with the
+% Sage mathematics software suite (see \url{http://sagemath.org}) and
+% \LTX. (If you know how to write literate Haskell: the |\eval| command
+% corresponds to |\sage|, and the |code| environment to the |sageblock|
+% environment.) As a simple example, imagine in your document you are
+% writing about how to count license plates with three letters and three
+% digits. With this package, you can write something like this:
 % \begin{quote}
 %  \texttt{There are \$26\$ choices for each letter, and \$10\$ choices
 %  for each digit, for a total of } \verb+$26^3*10^3 = \sage{26^3*10^3}$+
@@ -132,7 +122,7 @@
 %
 % A less trivial, and perhaps more useful example is plotting. You can
 % include a plot of the sine curve without manually producing a plot,
-% saving an eps or pdf file, and doing the \verb+\includegraphics+
+% saving an eps or pdf file, and doing the \verb|\includegraphics|
 % business with the correct filename yourself. If you write this:
 % \begin{quote}
 % \texttt{Here is a lovely graph of the sine curve:}
@@ -163,7 +153,7 @@
 %
 % Till Tantau has some good commentary on the use of graphics in
 % \href{http://www.ctan.org/tex-archive/graphics/pgf/}{section 6 of the
-% \textsf{pgf} manual}. You should always give careful thought and
+% \textsc{pgf} manual}. You should always give careful thought and
 % attention to creating graphics for your document; I have in mind that
 % a good workflow for using \ST for plotting is something like this:
 %
@@ -179,18 +169,41 @@
 % The \ST{} package's plotting capabilities don't help you find those
 % Sage commands to make your lovely plot, but they do eliminate the need
 % to muck around with saving the result to a file, remembering the
-% filename, including it into your document, and so on. In the next
-% section, we will see what what we can do with \ST.
+% filename, including it into your document, and so on. In
+% \autoref{s:usage}, we will see what what we can do with \ST.
 %
-% \section{Usage}
 % 
-% Let's begin with a rough description of how \ST works.
-% When you use macros from this package and run \LTX on your file,
-% along with the usual zoo of auxiliary files, a |.sage| file is
-% written. This is a Sage source file that uses the Python module from
-% this package and when you run Sage on that file, it will produce a
-% |.sout| file. That file contains \LTX code which, when you run
-% \LTX on your source file again, will pull in all the results of
+% \section{Installation}
+%
+% The simplest way to ``install'' \ST is to copy the files
+% \texttt{sagetex.sty} and \texttt{sagetex.py} into the same directory
+% as your document. This will always work, as \LTX and Python search the
+% current directory for files. It is also convenient for zipping up a
+% directory to send to a colleague who is not yet enlightened enough to
+% be using \ST.
+%
+% Rather than make lots of copies of those files, you can keep them in
+% one place and update the TEXINPUTS and PYTHONPATH environment
+% variables appropriately.
+%
+% Perhaps the best solution is to put the files into a directory
+% searched by \TeX{} and friends, and then edit the \texttt{sagetex.sty}
+% file so that the \texttt{.sage} files we generate update Python's path
+% appropriately---look for ``Python path'' in \texttt{sagetex.sty}. This
+% is suitable for a system-wide installation, or if you are the kind of
+% person who keeps a \texttt{texmf} tree in your home directory.
+%
+%
+% \section{Usage} \label{s:usage}
+% 
+% Let's begin with a rough description of how \ST works. Naturally the
+% very first step is to put \verb|\usepackage{sagetex}| in the preamble
+% of your document. When you use macros from this package and run \LTX
+% on your file, along with the usual zoo of auxiliary files, a |.sage|
+% file is written. This is a Sage source file that uses the Python
+% module from this package and when you run Sage on that file, it will
+% produce a |.sout| file. That file contains \LTX code which, when you
+% run \LTX on your source file again, will pull in all the results of
 % Sage's computation.
 %
 % All you really need to know is that to typeset your document, you need
@@ -226,9 +239,9 @@
 % \end{quote}
 % in your document---that \LTX code is exactly exactly what you get
 % from doing
-% \begin{quote}
+% \begin{center}
 % |latex(matrix([[1, 2], [3,4]])^2)|
-% \end{quote}
+% \end{center}
 % in Sage.
 %
 % Note that since \LTX will do macro expansion on whatever you give
@@ -240,7 +253,11 @@
 % |$\sage{factor(foo + \thepage)}$|.
 % \end{quote}
 % Here, I'll do just that right now: the prime factorization of the
-% current page plus $12$ is $\sage{factor(\thepage + 12)}$.\\
+% current page plus $12$ is $\sage{factor(\thepage + 12)}$.
+%
+% The |\sage| command doesn't automatically use math mode for its
+% output, so be sure to use dollar signs or a displayed math environment
+% as appropriate.
 %
 % \subsection{Graphics and plotting}
 %
@@ -284,15 +301,15 @@
 % \end{quote}
 % Then, in your \LTX file, the following command will be issued
 % automatically:
-% \begin{quote}
+% \begin{center}
 % |\includegraphics[angle=30, width=5cm]{autogen}|
-% \end{quote}
+% \end{center}
 % You can specify a file format if you like. This must be the
 % \emph{second} optional argument, so you must use empty brackets if
 % you're not passing anything to \verb|\includegraphics|:
-% \begin{quote}
+% \begin{center}
 % |\sageplot[][png]{plot(sin(x), x, 0, pi)}|
-% \end{quote}
+% \end{center}
 % The filename is automatically generated, and unless you specify a
 % format, both EPS and PDF files will be generated. This allows you to
 % freely switch between using, say, a DVI viewer (many of which have
@@ -483,8 +500,12 @@
 %<*latex>
 % \fi
 %
+% All macros and counters intended for use internal to this package
+% begin with ``|ST@|''.
+%
 % Let's begin by loading some packages. The key bits of |sageblock| and
-% friends are stol---um, adapted from the |verbatim| package manual.
+% friends are stol---um, adapted from the |verbatim| package manual. So
+% grab the |verbatim| package.
 %    \begin{macrocode}
 \RequirePackage{verbatim}
 %    \end{macrocode}
@@ -501,21 +522,22 @@
 \RequirePackage{ifpdf}
 \RequirePackage{ifthen}
 %    \end{macrocode}
-% 
+%
 % Next set up the counters and the default indent.
 %    \begin{macrocode}
-\newcounter{@sage}
-\newcounter{@sageplot}
-\setcounter{@sage}{0}
-\setcounter{@sageplot}{0}
+\newcounter{ST@inline}
+\newcounter{ST@plot}
+\setcounter{ST@inline}{0}
+\setcounter{ST@plot}{0}
 \newlength{\sagetexindent}
 \setlength{\sagetexindent}{5ex}
 %    \end{macrocode}
 %
-% \begin{macro}{\@epsmagick}
-% By default, we don't use ImageMagick to create EPS files:
+% \begin{macro}{\ST@epsim}
+% By default, we don't use ImageMagick to create EPS files when a
+% non-default format is specified.
 %    \begin{macrocode}
-\newcommand{\@epsmagick}{False}
+\newcommand{\ST@epsim}{False}
 %    \end{macrocode}
 % That macro gets put into a Python function call, so it works to have
 % it be one of the strings ``|True|'' or ``|False|''.
@@ -523,7 +545,7 @@
 % 
 % Declare the |imagemagick| option and process it:
 %    \begin{macrocode}
-\DeclareOption{imagemagick}{\renewcommand{\@epsmagick}{True}}
+\DeclareOption{imagemagick}{\renewcommand{\ST@epsim}{True}}
 \ProcessOptions\relax
 %    \end{macrocode}
 % The |\relax| is a little incantation suggested by the ``\LaTeXe{} for
@@ -534,6 +556,8 @@
 \newwrite\@sagefile
 \immediate\openout\@sagefile=\jobname.sage
 %    \end{macrocode}
+%
+% \begin{macro}{\ST@wsf}
 % We will write a lot of stuff to that file, so make a convenient
 % abbreviation, then use it to put the initial commands into the |.sage|
 % file. If you know what directory |sagetex.py| will be kept in,
@@ -541,16 +565,20 @@
 % (\emph{don't} do it in the |.dtx| file) and change the directory
 % appropriately. This is useful if you have a |texmf| tree in your home
 % directory or are installing \ST system-wide; then you don't need to
-% copy \texttt{sagetex.py} into the same directory as you document.
+% copy \texttt{sagetex.py} into the same directory as your document.
 %    \begin{macrocode}
-\newcommand{\@wsf}[1]{\immediate\write\@sagefile{#1}}
+\newcommand{\ST@wsf}[1]{\immediate\write\@sagefile{#1}}
 \iffalse
-\@wsf{import sys}
-\@wsf{sys.path.insert(0, '/home/drake/texmf/tex/latex/sagetex')}
+%% To get .sage files to automatically change the Python path to find
+%% sagetex.py, delete the \iffalse and \fi lines surrounding this and
+%% change the directory below to where sagetex.py can be found.
+\ST@wsf{import sys}
+\ST@wsf{sys.path.insert(0, 'directory with sagetex.py')}
 \fi
-\@wsf{import sagetex}
-\@wsf{sagetex.openout('\jobname')}
+\ST@wsf{import sagetex}
+\ST@wsf{sagetex.openout('\jobname')}
 %    \end{macrocode}
+% \end{macro}
 % Pull in the |.sout| file if it exists, or do nothing if it doesn't. I
 % suppose we could do this inside an |AtBeginDocument| but I don't see
 % any particular reason to do that. It will work whenever we load it.
@@ -577,10 +605,10 @@
 % contains the offending code.)
 %    \begin{macrocode}
 \newcommand{\sage}[1]{%
-\@wsf{try:}%
-\@wsf{  sagetex.inline(\the@sage, \the\inputlineno, #1)}%
-\@wsf{except:}%
-\@wsf{  sagetex.goboom(\the\inputlineno)}%
+\ST@wsf{try:}%
+\ST@wsf{  sagetex.inline(\theST@inline, \the\inputlineno, #1)}%
+\ST@wsf{except:}%
+\ST@wsf{  sagetex.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % Our use of |\newlabel| and |\ref| seems awfully clever until you load
 % the |hyperref| package, which gleefully tries to hyperlink the hell
@@ -589,16 +617,16 @@
 % folks are willing to accomodate people like us, and give us a
 % |NoHyper| environment.
 %    \begin{macrocode}
-\begin{NoHyper}\ref{@sagelabel\the@sage}\end{NoHyper}%
+\begin{NoHyper}\ref{@sagelabel\theST@inline}\end{NoHyper}%
 %    \end{macrocode}
-% Now check to see if the label has already been defined. (The
-% deep internal implementation of labels in \LTX involves defining a
-% function ``|r@labelname|''.) If it hasn't, we set a flag so that we
-% can tell the user to run Sage on the |.sage| file at the end of the
-% run. Finally, step the counter.
+% Now check to see if the label has already been defined. (The internal
+% implementation of labels in \LTX involves defining a function
+% ``|r@@labelname|''.) If it hasn't, we set a flag so that we can tell
+% the user to run Sage on the |.sage| file at the end of the run.
+% Finally, step the counter.
 %    \begin{macrocode}
-\@ifundefined{r@@sagelabel\the@sage}{\gdef\@rerunsage{x}}{}%
-\stepcounter{@sage}}
+\@ifundefined{r@@sagelabel\theST@inline}{\gdef\@rerunsage{x}}{}%
+\stepcounter{ST@inline}}
 %    \end{macrocode}
 % \end{macro}
 % The user might load the |hyperref| package after this one (indeed, the
@@ -610,17 +638,17 @@
 \AtBeginDocument{\provideenvironment{NoHyper}{}{}}
 %    \end{macrocode}
 %
-% \begin{macro}{\@plotdir}
+% \begin{macro}{\ST@plotdir}
 % A little abbreviation for the plot directory. We don't use
 % |\graphicspath| because it's
 % \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=graphicspath}{
 % apparently slow}---also, since we know right where our plots are
 % going, no need to have \LTX looking for them.
 %    \begin{macrocode}
-\newcommand{\@plotdir}{sage-plots-for-\jobname.tex}
+\newcommand{\ST@plotdir}{sage-plots-for-\jobname.tex}
 %    \end{macrocode}
 % \end{macro}
-
+%
 % \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
 % \begin{macro}{\sageplot}
@@ -635,17 +663,17 @@
 % \href{http://tug.ctan.org/tex-archive/support/newcommand/}{\texttt{newcommand}}
 % package to create this macro; the options I fed to his script were
 % similar to this:
-%\begin{quote}
+%\begin{center}
 % |MACRO sageplot OPT[#1={width}] OPT[#2={notprovided}] #3|
-%\end{quote}
+%\end{center}
 % Observe that we are using a Python script to write \LTX code which
 % writes Python code which writes \LTX code. Crazy!
 % 
-% Here's the ``shell'' command which does whatever magic we need to get
+% Here's the wrapper command which does whatever magic we need to get
 % two optional arguments.
 %    \begin{macrocode}
 \newcommand{\sageplot}[1][width=.75\textwidth]{%
-  \@ifnextchar[{\sageplot@ii[#1]}{\sageplot@ii[#1][notprovided]}%]
+  \@ifnextchar[{\ST@sageplot[#1]}{\ST@sageplot[#1][notprovided]}%]
 }
 %    \end{macrocode}
 % That percent sign followed by a square bracket seems necessary; I have
@@ -661,23 +689,24 @@
 % put into the Python function call, so the user can put in keyword
 % arguments there which get interpreted correctly by Python.
 %
-% Let's see the real code here. We write a couple lines to the
-% |.sage| file, including a counter, input line number, and all of the
-% mandatory argument; all this is wrapped in another try/except. 
+% \begin{macro}{\ST@sageplot} Let's see the real code here. We write a
+% couple lines to the |.sage| file, including a counter, input line
+% number, and all of the mandatory argument; all this is wrapped in
+% another try/except. 
 %    \begin{macrocode}
-\def\sageplot@ii[#1][#2]#3{%
-\@wsf{try:}%
-\@wsf{  sagetex.initplot('\jobname')}%
-\@wsf{  sagetex.sageplot(\the@sageplot, \the\inputlineno, #3,
-    format='#2', epsmagick=\@epsmagick)}%
-\@wsf{except:}%
-\@wsf{  sagetex.goboom(\the\inputlineno)}%
+\def\ST@sageplot[#1][#2]#3{%
+\ST@wsf{try:}%
+\ST@wsf{  sagetex.initplot('\jobname')}%
+\ST@wsf{  sagetex.sageplot(\theST@plot, \the\inputlineno, #3,
+    format='#2', epsmagick=\ST@epsim)}%
+\ST@wsf{except:}%
+\ST@wsf{  sagetex.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % Now we include the appropriate graphics file. Because the user might
 % be producing DVI or PDF files, and have supplied a file format or not,
 % and so on, the logic we follow is a bit complicated.
 % \autoref{f:sageplottree} shows what we do; for completeness, we show
-% what |\@sagetexincludegraphics| does in \autoref{f:stig}. This entire
+% what |\ST@inclgrfx| does in \autoref{f:stig}. This entire
 % complicated business is intended to avoid doing an |\includegraphics|
 % command on a file that doesn't exist, and to issue warnings
 % appropriate to the situation.
@@ -709,10 +738,10 @@
 %   \end{tikzpicture}
 %   \caption{The logic tree that \texttt{\bslash sageplot} uses to
 %   decide whether to run \texttt{\bslash includegraphics} or to yell at
-%   the user. ``Format'' is the \texttt{\#2} argument, ``STig'' is
-%   ``\texttt{\bslash sagetexincludegraphics}'' and ``STig ext'' means a
-%   call to \texttt{\bslash sagetexincludegraphics} with ``ext'' as the
-%   second argument, and ``IM'' is Imagemagick. }
+%   the user. ``Format'' is the \texttt{\#2} argument to \texttt{\bslash
+%   sageplot}, ``STig ext''
+%   means a call to \texttt{\bslash ST@inclgrfx} with ``ext'' as the
+%   second argument, and ``IM'' is Imagemagick.}
 %   \label{f:sageplottree}
 % \end{figure}
 %
@@ -721,55 +750,56 @@
 %    \begin{macrocode}
 \ifpdf
   \ifthenelse{\equal{#2}{notprovided}}%
-    {\@sagetexincludegraphics{#1}{pdf}}%
-    {\@sagetexincludegraphics{#1}{#2}}%
+    {\ST@inclgrfx{#1}{pdf}}%
+    {\ST@inclgrfx{#1}{#2}}%
 %    \end{macrocode}
 % Otherwise, we are creating a DVI file, which only supports EPS. If the
 % user provided a format anyway, don't include the file (since it won't
 % work) and warn the user about this. (Unless the file doesn't exist, in
-% which case we do the same thing that |\@sagetexincludegraphics| does.)
+% which case we do the same thing that |\ST@inclgrfx| does.)
 %    \begin{macrocode}
 \else
   \ifthenelse{\equal{#2}{notprovided}}%
-    {\@sagetexincludegraphics{#1}{eps}}%
+    {\ST@inclgrfx{#1}{eps}}%
 %    \end{macrocode}
 % If a format is provided, we check to see if we're using the
 % imagemagick option. If so, try to include an EPS file anyway.
 %    \begin{macrocode}
-    {\ifthenelse{\equal{\@epsmagick}{True}}
-      {\@sagetexincludegraphics{#1}{eps}}%
+    {\ifthenelse{\equal{\ST@epsim}{True}}
+      {\ST@inclgrfx{#1}{eps}}%
 %    \end{macrocode}
 % If we're not using the imagemagick option, we're going to issue some
 % sort of warning, depending on whether the file exists yet or not.
 %    \begin{macrocode}
-      {\IfFileExists{\@plotdir/plot-\the@sageplot.#2}%
+      {\IfFileExists{\ST@plotdir/plot-\theST@plot.#2}%
         {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
          \PackageWarning{sagetex}{Graphics file
-         \@plotdir/plot-\the@sageplot.#2\space on page \thepage\space cannot
-         be used with DVI output. Use pdflatex or create an EPS file. Plot
-         command is}}%
+         \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space
+         cannot be used with DVI output. Use pdflatex or create an EPS
+         file. Plot command is}}%
         {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
          \PackageWarning{sagetex}{Graphics file
-         \@plotdir/plot-\the@sageplot.#2\space on page \thepage\space does
-         not exist}%
+         \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space
+         does not exist}%
          \gdef\@rerunsage{x}}}}%
 \fi
 %    \end{macrocode}
 % Finally, step the counter and we're done.
 %    \begin{macrocode}
-\stepcounter{@sageplot}}
+\stepcounter{ST@plot}}
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
 %
-% \begin{macro}{\@sagetexincludegraphics}
+% \begin{macro}{\ST@inclgrfx}
 % This command includes the requested graphics file (|#2| is the
 % extension) with the requested options (|#1|) if the file exists. Note
 % that it just needs to know the extension, since we use a counter for
 % the filename.
 %    \begin{macrocode}
-\newcommand{\@sagetexincludegraphics}[2]{%
-  \IfFileExists{\@plotdir/plot-\the@sageplot.#2}%
-    {\includegraphics[#1]{\@plotdir/plot-\the@sageplot.#2}}%
+\newcommand{\ST@inclgrfx}[2]{%
+  \IfFileExists{\ST@plotdir/plot-\theST@plot.#2}%
+    {\includegraphics[#1]{\ST@plotdir/plot-\theST@plot.#2}}%
 %    \end{macrocode}
 % If the file doesn't exist, we insert a little box to indicate it
 % wasn't found, issue a warning that we didn't find a graphics file,
@@ -778,13 +808,12 @@
 %    \begin{macrocode}
     {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
      \PackageWarning{sagetex}{Graphics file
-     \@plotdir/plot-\the@sageplot.#2\space on page \thepage\space does not
+     \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
      exist}%
      \gdef\@rerunsage{x}}}
 %    \end{macrocode}
 % \autoref{f:stig} makes this a bit clearer. 
 % \begin{figure}
-%   \label{f:stig}
 %   \centering
 %   \begin{tikzpicture}
 %     \tikzstyle{level 1}=[sibling distance=4cm]
@@ -794,35 +823,37 @@
 %       child {node [box] {Use \texttt{includegraphics}}
 %         edge from parent node[right] {yes}};
 %   \end{tikzpicture}
-%   \caption{The sagetexincludegraphics command.}
+%   \caption{The logic used by the \texttt{\bslash ST@inclgrfx}
+%   command.}
+%   \label{f:stig}
 % \end{figure}
 % \end{macro}
-% 
 %
-% \begin{macro}{\@beginsagefileblock}
-% This is an internal-use abbreviation that sets things up when we start
-% writing a chunk of Sage code to the |.sage| file. It begins with some
-% \TeX{} magic that fixes spacing, then puts the start of a try/except
-% block in the |.sage| file---this not only allows the user to indent
-% code without Sage/Python complaining about indentation, but lets us
-% tell the user where things went wrong. The last bit is some magic from
-% the |verbatim| package manual that makes \LTX respect line breaks.
+% \begin{macro}{\ST@beginsfbl}
+% This is ``begin |.sage| file block'', an internal-use abbreviation
+% that sets things up when we start writing a chunk of Sage code to the
+% |.sage| file. It begins with some \TeX{} magic that fixes spacing,
+% then puts the start of a try/except block in the |.sage| file---this
+% not only allows the user to indent code without Sage/Python
+% complaining about indentation, but lets us tell the user where things
+% went wrong. The last bit is some magic from the |verbatim| package
+% manual that makes \LTX respect line breaks.
 %    \begin{macrocode}
-\newcommand{\@beginsagefileblock}{%
+\newcommand{\ST@beginsfbl}{%
   \@bsphack%
-  \@wsf{sagetex.blockbegin(\the\inputlineno)}%
-  \@wsf{try:}%
+  \ST@wsf{sagetex.blockbegin(\the\inputlineno)}%
+  \ST@wsf{try:}%
   \let\do\@makeother\dospecials\catcode`\^^M\active}
 %    \end{macrocode}
 % \end{macro}
-% 
-% \begin{macro}{\@endsagefileblock}
-% The companion to |\@beginsagefileblock|. 
+%
+% \begin{macro}{\ST@endsfbl}
+% The companion to |\ST@beginsfbl|. 
 %    \begin{macrocode}
-\newcommand{\@endsagefileblock}{%
-\@wsf{except:}%
-\@wsf{  sagetex.goboom(\the\inputlineno)}%
-\@wsf{sagetex.blockend()}}
+\newcommand{\ST@endsfbl}{%
+\ST@wsf{except:}%
+\ST@wsf{  sagetex.goboom(\the\inputlineno)}%
+\ST@wsf{sagetex.blockend()}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -834,13 +865,13 @@
 % This environment does both: it typesets your code and puts it into the
 % |.sage| file for execution by Sage.
 %    \begin{macrocode}
-\newenvironment{sageblock}{\@beginsagefileblock%
+\newenvironment{sageblock}{\ST@beginsfbl%
 %    \end{macrocode}
-% The space between |\@wsf{| and |\the| is crucial! It, along with the
+% The space between |\ST@wsf{| and |\the| is crucial! It, along with the
 % ``|try:|'', is what allows the user to indent code if they like.
 % This line sends stuff to the |.sage| file.
 %    \begin{macrocode}
-\def\verbatim@processline{\@wsf{ \the\verbatim@line}%
+\def\verbatim@processline{\ST@wsf{ \the\verbatim@line}%
 %    \end{macrocode}
 % Next, we typeset your code and start the verbatim environment.
 %    \begin{macrocode}
@@ -850,7 +881,7 @@
 % At the end of the environment, we put a chunk into the |.sage| file
 % and stop the verbatim environment.
 %    \begin{macrocode}
-{\@endsagefileblock\endverbatim}
+{\ST@endsfbl\endverbatim}
 %    \end{macrocode}
 % \end{environment}
 %
@@ -858,10 +889,10 @@
 % This is from the |verbatim| package manual. It's just like the above,
 % except we don't typeset anything.
 %    \begin{macrocode}
-\newenvironment{sagesilent}{\@beginsagefileblock%
-\def\verbatim@processline{\@wsf{ \the\verbatim@line}}%
+\newenvironment{sagesilent}{\ST@beginsfbl%
+\def\verbatim@processline{\ST@wsf{ \the\verbatim@line}}%
 \verbatim@start}%
-{\@endsagefileblock\@esphack}
+{\ST@endsfbl\@esphack}
 %    \end{macrocode}
 % \end{environment}
 %
@@ -887,7 +918,7 @@
 % then check to see if |@rerunsage| ever got defined. If not, all the
 % inline formulas and plots worked, so do nothing.
 %    \begin{macrocode}
-\AtEndDocument{\@wsf{sagetex.endofdocument()}%
+\AtEndDocument{\ST@wsf{sagetex.endofdoc()}%
 \@ifundefined{@rerunsage}{}%
 %    \end{macrocode}
 % Otherwise, we issue a warning to tell the user to run Sage on the
@@ -949,15 +980,16 @@ import os.path
 import hashlib
 import traceback
 import subprocess
+import shutil
 initplot_done  = False
 dirname        = None
 filename       = ""
 %    \end{macrocode}
 %
 % \begin{macro}{progress}
-% This is just a cute little function for printing stuff. It allows us
-% to not print a linebreak, so you can get ``|start...|'' (little time
-% spent processing) ``|end|'' on one line.
+% This function justs prints stuff. It allows us to not print a
+% linebreak, so you can get ``|start...|'' (little time spent
+% processing) ``|end|'' on one line.
 %    \begin{macrocode}
 def progress(t,linebreak=True):
   if linebreak:
@@ -986,21 +1018,6 @@ def openout(f):
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{deltree}
-% When we start plotting, we delete the entire plots directory if it
-% exists. This function does that for us.
-%    \begin{macrocode}
-def deltree(root):
-  for name in os.listdir(root):
-    path = os.path.join(root, name)
-    if os.path.isdir(path):
-      deltree(path)
-    else:
-      os.remove(path)
-  os.rmdir(root) 
-%    \end{macrocode}
-% \end{macro}
-%
 % \begin{macro}{initplot}
 % We only want to create the plots directory if the user actually plots
 % something. This function creates the directory and sets the
@@ -1013,9 +1030,17 @@ def initplot(f):
   if not initplot_done:
     progress('Initializing plots directory')
     global dirname
+%    \end{macrocode}
+% We hard-code the |.tex| extension, which is fine in the overwhelming
+% majority of cases, although it does cause minor confusion when
+% building the documentation. If it turns out lots of people use, say, a
+% \texttt{ltx} extension or whatever, I think we could find out the
+% correct extension, but it would involve a lot of irritating mucking
+% around.
+%    \begin{macrocode}
     dirname = 'sage-plots-for-' + f + '.tex'
     if os.path.isdir(dirname):
-      deltree(dirname)
+      shutil.rmtree(dirname)
     os.mkdir(dirname)
     initplot_done = True
 %    \end{macrocode}
@@ -1025,9 +1050,9 @@ def initplot(f):
 % This function works with |\sage| from the style file to put Sage
 % output into your \LTX file. Usually, when you use |\label|, it
 % writes a line such as
-% \begin{quote}
+% \begin{center}
 %   |\newlabel{labelname}{{section number}{page number}}|
-% \end{quote}
+% \end{center}
 % to the |.aux| file. When you use the |hyperref| package, there are
 % more fields in the second argument, but the first two are the same.
 % The |\ref| command just pulls in what's in the first field, so we can
@@ -1096,7 +1121,8 @@ def sageplot(counter, line, p, format='notprovided', epsmagick=False, **kwargs):
 % option, we try to convert the newly-created file into EPS format.
 %    \begin{macrocode}
     if format != 'notprovided' and epsmagick is True:
-      print('calling toeps(%s, %s)...' % (counter, format))
+      print('Calling Imagemagick to convert plot-%s.%s to EPS' % \
+        (counter, format))
       toeps(counter, format)
 %    \end{macrocode}
 % \end{macro}
@@ -1132,15 +1158,17 @@ def toeps(counter, ext):
 %    \begin{macrocode}
 def goboom(line):
   global filename
-  print('\n**** Error in Sage code on line %s of %s.tex! Traceback follows.' % (line, filename))
+  print('\n**** Error in Sage code on line %s of %s.tex! Traceback\
+ follows.' % (line, filename))
   traceback.print_exc()
-  print('\n**** Running Sage on %s.sage failed! Fix %s.tex and try again.' % (filename, filename))
+  print('\n**** Running Sage on %s.sage failed! Fix %s.tex and try\
+ again.' % (filename, filename))
   os.remove(filename + '.sout.tmp')
   sys.exit(1)
 %    \end{macrocode}
 % \end{macro}
 % 
-% \begin{macro}{endofdocument}
+% \begin{macro}{endofdoc}
 % When we're done processing, we have a couple little cleanup tasks. We
 % find the MD5 sum of the |.sage| file that produced the |.sout| file
 % we're about to write, and put that sum into the |.sout| file. This
@@ -1152,10 +1180,10 @@ def goboom(line):
 % your file. (The regular expression \verb|^%[0-9a-f]{32}%| will find
 % the MD5 sum.)
 %    \begin{macrocode}
-def endofdocument():
+def endofdoc():
   global filename
-  dotsagesum = hashlib.md5(open(filename + '.sage', 'rb').read()).hexdigest()
-  s = '%' + dotsagesum + '% md5sum of .sage file that produced this\n'
+  sagesum = hashlib.md5(open(filename + '.sage', 'rb').read()).hexdigest()
+  s = '%' + sagesum + '% md5sum of .sage file that produced this\n'
   _file_.write(s)
 %    \end{macrocode}
 % Now we are done with the |.sout| file. Close it, rename it, and tell
@@ -1163,7 +1191,8 @@ def endofdocument():
 %    \begin{macrocode}
   _file_.close()
   os.rename(filename + '.sout.tmp', filename + '.sout')
-  progress('Sage processing complete. Run LaTeX on %s.tex again.' % filename)
+  progress('Sage processing complete. Run LaTeX on %s.tex again.' %\
+           filename)
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1181,3 +1210,20 @@ def endofdocument():
 %
 % Many thanks to Jason Grout for his numerous comments, suggestions, and
 % feedback.
+%
+% \section{Copying and licenses}
+%
+% The \emph{source code} of the \ST package may be redistributed and/or
+% modified under the terms of the GNU General Public License as
+% published by the Free Software Foundation, either version 2 of the
+% License, or (at your option) any later version. To view a copy of this
+% license, see \url{http://www.gnu.org/licenses/} or send a letter to
+% the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+% Boston, MA 02110-1301, USA.
+%
+% The \emph{documentation} of the \ST package is licensed under the
+% Creative Commons Attribution-Noncommercial-Share Alike 3.0 License. To
+% view a copy of this license, visit
+% \url{http://creativecommons.org/licenses/by-nc-sa/3.0/} or send a
+% letter to Creative Commons, 171 Second Street, Suite 300, San
+% Francisco, California, 94105, USA.
