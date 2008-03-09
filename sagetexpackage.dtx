@@ -25,14 +25,15 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-    [2008/03/07 v1.2 embedding Sage into LaTeX documents]
+    [2008/03/08 v1.3 embedding Sage into LaTeX documents]
 %</latex>
 %
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{sagetex}
-\usepackage{hyperref}
 \usepackage{xspace}
+\usepackage{tikz}
+\usepackage{hyperref}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
@@ -103,7 +104,7 @@
 % we're concerned only with \LTX.) You can even embed Haskell code in
 % your document that writes part of your document for you. 
 %
-% The \ST{} package allows you to do (roughly) the same with Sage and
+% The \ST package allows you to do (roughly) the same with Sage and
 % \LTX. (If you know how to write literate Haskell: the |\eval|
 % command corresponds to |\sage|, and the |code| environment
 % to the |sageblock| environment.) As a simple example, imagine in
@@ -150,10 +151,10 @@
 % producing the file and sourcing it into your document.
 %
 % \paragraph{But \texttt{\bslash sageplot} isn't magic} I just tried to
-% convince you that \ST{} makes putting nice graphics into your document
+% convince you that \ST makes putting nice graphics into your document
 % very easy; let me turn around and warn you that using graphics
 % \emph{well} is not easy, and no \LTX package or Python script will
-% ever make it easy. What \ST{} does is make it easy to \emph{use Sage}
+% ever make it easy. What \ST does is make it easy to \emph{use Sage}
 % to create graphics; it doesn't magically make your graphics good,
 % appropriate, or useful. (For instance, look at the sine plot above---I
 % would say that a truly lovely plot of the sine curve would not mark
@@ -164,14 +165,14 @@
 % \href{http://www.ctan.org/tex-archive/graphics/pgf/}{section 6 of the
 % \textsf{pgf} manual}. You should always give careful thought and
 % attention to creating graphics for your document; I have in mind that
-% a good workflow for using \ST{} for plotting is something like this:
+% a good workflow for using \ST for plotting is something like this:
 %
 % \begin{enumerate}
 %   \item Figure out what sort of graphic you need to communicate your
 %   ideas or information.
 %   \item Fiddle around in Sage until you get a graphics object and set
 %   of options that produce the graphic you need.
-%   \item Copy those commands and options into \ST{} commands in your
+%   \item Copy those commands and options into \ST commands in your
 %   \LTX document.
 % \end{enumerate}
 %
@@ -183,7 +184,7 @@
 %
 % \section{Usage}
 % 
-% Let's begin with a rough description of how \ST{} works.
+% Let's begin with a rough description of how \ST works.
 % When you use macros from this package and run \LTX on your file,
 % along with the usual zoo of auxiliary files, a |.sage| file is
 % written. This is a Sage source file that uses the Python module from
@@ -202,7 +203,7 @@
 % Sage will remember that it's $12$---just like in a regular Sage
 % session.
 %
-% Now that you know that, let's describe what macros \ST{} provides and
+% Now that you know that, let's describe what macros \ST provides and
 % how to use them. If you are the sort of person who can't be bothered
 % to read documentation until something goes wrong, you can also just
 % look through the \texttt{example.tex} file included with this package.
@@ -300,12 +301,12 @@
 % to colleagues.
 %
 % If you ask for, say, a PNG file, keep in mind that ordinary
-% |latex| and DVI files have no support for DVI files; \ST{} detects
+% |latex| and DVI files have no support for DVI files; \ST detects
 % this and will warn you that it cannot find a suitable file if using
 % |latex|; if you use |pdflatex|, there will be no problems because PDF
 % files can include PNG graphics.
 %
-% When \ST{} cannot find a graphics file, it inserts this into your
+% When \ST cannot find a graphics file, it inserts this into your
 % file:
 %
 % \begin{center}
@@ -319,7 +320,7 @@
 % You needn't worry about the filenames; they are automatically
 % generated and will be put into the directory
 % \texttt{sage-plots-for-filename.tex}. You can safely delete that
-% directory anytime; if \ST\ can't find the files, it will warn you to
+% directory anytime; if \ST can't find the files, it will warn you to
 % run Sage to regenerate them.\\
 %
 % \noindent\fbox{\parbox{\textwidth}{\textbf{WARNING!} When you run Sage
@@ -343,16 +344,18 @@
 % Because of this, when producing 3D plots with \verb|\sageplot|,
 % \emph{you must specify a file format}. The PNG format is compressed
 % and lossless and is by far the best choice, so use that whenever
-% possible. If you do not specify a file format, or specify one that
-% Tachyon does not understand, it will produce files in the Targa format
-% with an incorrect extension and \LTX (both \texttt{latex} and
-% \texttt{pdflatex}) will be profoundly confused. Don't do that.
+% possible. (Right now, it is always possible.) If you do not specify a
+% file format, or specify one that Tachyon does not understand, it will
+% produce files in the Targa format with an incorrect extension and \LTX
+% (both \texttt{latex} and \texttt{pdflatex}) will be profoundly
+% confused. Don't do that.
 % 
-% Since \texttt{latex} does not support PNGs, when using 3D plotting,
-% \ST will \emph{always} issue a warning about missing graphics if you
-% use \texttt{latex}, even though the plotting worked fine and the PNG
-% file exists. (Running \texttt{pdflatex} on the same file will work,
-% since PDF files can include PNG files.) 
+% Since \texttt{latex} does not support PNGs, when using 3D plotting (ad
+% therefore a bitmap format like PNG), \ST will \emph{always} issue a
+% warning about incompatible graphics if you use \texttt{latex},
+% provided you've processed the \texttt{.sage} file  and the PNG file
+% exists. (Running \texttt{pdflatex} on the same file will work, since
+% PDF files can include PNG files.) 
 %
 % \paragraph{The imagemagick option} As a response to the above issue,
 % the \ST package has one option: \texttt{imagemagick}. If you specify
@@ -368,7 +371,8 @@
 %
 % The resulting EPS files are not very high quality, but they will work.
 % This option is not intended to produce good graphics, but to allow you
-% to use \texttt{latex} and DVI files while writing your document.
+% to see you graphics when you use \texttt{latex} and DVI files while
+% writing your document.
 %
 % \paragraph{But that's not good enough!} The \verb|\sageplot| command
 % tries to be both flexible and easy to use, but if you are just not
@@ -386,7 +390,7 @@
 %
 % \subsection{Verbatim-like environments}
 %
-% The \ST\ package provides several environments for typesetting and
+% The \ST package provides several environments for typesetting and
 % executing Sage code.\\
 %
 % \DescribeEnv{sageblock} Any text between |\begin{sageblock}| and
@@ -438,7 +442,7 @@
 % |\iffalse| and |\fi|.\\
 %
 % \DescribeMacro{\sagetexindent} There is one final bit to our
-% verbatim-like environments: the indentation. The \ST\ package defines a
+% verbatim-like environments: the indentation. The \ST package defines a
 % length |\sagetexindent|, which controls how much the Sage code is
 % indented when typeset. You can change this length however you like
 % with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or whatever.
@@ -532,9 +536,18 @@
 %    \end{macrocode}
 % We will write a lot of stuff to that file, so make a convenient
 % abbreviation, then use it to put the initial commands into the |.sage|
-% file.
+% file. If you know what directory |sagetex.py| will be kept in,
+% delete the |\iffalse| and |\fi| lines in the generated style file
+% (\emph{don't} do it in the |.dtx| file) and change the directory
+% appropriately. This is useful if you have a |texmf| tree in your home
+% directory or are installing \ST system-wide; then you don't need to
+% copy \texttt{sagetex.py} into the same directory as you document.
 %    \begin{macrocode}
 \newcommand{\@wsf}[1]{\immediate\write\@sagefile{#1}}
+\iffalse
+\@wsf{import sys}
+\@wsf{sys.path.insert(0, '/home/drake/texmf/tex/latex/sagetex')}
+\fi
 \@wsf{import sagetex}
 \@wsf{sagetex.openout('\jobname')}
 %    \end{macrocode}
@@ -607,8 +620,11 @@
 \newcommand{\@plotdir}{sage-plots-for-\jobname.tex}
 %    \end{macrocode}
 % \end{macro}
+
+% \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
 % \begin{macro}{\sageplot}
+% \changes{v1.3}{2008/03/08}{Iron out warnings, cool TikZ flowchart}
 % This function is similar to |\sage|. The neat thing that we take
 % advantage of is that commas aren't special for arguments to \LTX
 % commands, so it's easy to capture a bunch of keyword arguments that
@@ -657,11 +673,51 @@
 \@wsf{except:}%
 \@wsf{  sagetex.goboom(\the\inputlineno)}%
 %    \end{macrocode}
-% Now we include the appropriate graphics file. We use our own function
-% for this; it checks to see if the file exists before running the
-% appropriate |\includegraphics| command, and issues some warnings it
-% the file doesn't exist. If we are creating a PDF, we check to see if
-% the user asked for a different format, and use that if necessary.
+% Now we include the appropriate graphics file. Because the user might
+% be producing DVI or PDF files, and have supplied a file format or not,
+% and so on, the logic we follow is a bit complicated.
+% \autoref{f:sageplottree} shows what we do; for completeness, we show
+% what |\@sagetexincludegraphics| does in \autoref{f:stig}. This entire
+% complicated business is intended to avoid doing an |\includegraphics|
+% command on a file that doesn't exist, and to issue warnings
+% appropriate to the situation.
+%
+% \tikzstyle{box}=[draw, shape=rectangle, thick]
+%
+% \begin{figure}
+%   \centering
+%   \begin{tikzpicture}
+%     \tikzstyle{level 1}=[sibling distance=6cm]
+%     \tikzstyle{level 2}=[sibling distance=3cm]
+%     \node [box] {DVI or PDF?}
+%       child {node [box] {Format provided?}
+%         child {node [box] {STig EPS}
+%           edge from parent node[left] {no}}
+%         child {node [box] {IM option set?}
+%           child {node [box, text width=3cm] {Warn that DVI + PNG = bad}
+%             edge from parent node[left] {no}}
+%           child {node [box] {STig EPS}
+%             edge from parent node[right] {yes}}
+%           edge from parent node[right] {yes}}
+%         edge from parent node[left] {DVI}}
+%       child {node [box] {Format provided?}
+%         child {node [box] {STig PDF}
+%           edge from parent node[left] {no}}
+%         child {node [box] {STig \texttt{\#2}}
+%           edge from parent node[right] {yes}}
+%         edge from parent node[right] {PDF}};
+%   \end{tikzpicture}
+%   \caption{The logic tree that \texttt{\bslash sageplot} uses to
+%   decide whether to run \texttt{\bslash includegraphics} or to yell at
+%   the user. ``Format'' is the \texttt{\#2} argument, ``STig'' is
+%   ``\texttt{\bslash sagetexincludegraphics}'' and ``STig ext'' means a
+%   call to \texttt{\bslash sagetexincludegraphics} with ``ext'' as the
+%   second argument, and ``IM'' is Imagemagick. }
+%   \label{f:sageplottree}
+% \end{figure}
+%
+% If we are creating a PDF, we check to see if the user asked for a
+% different format, and use that if necessary:
 %    \begin{macrocode}
 \ifpdf
   \ifthenelse{\equal{#2}{notprovided}}%
@@ -726,7 +782,22 @@
      exist}%
      \gdef\@rerunsage{x}}}
 %    \end{macrocode}
+% \autoref{f:stig} makes this a bit clearer. 
+% \begin{figure}
+%   \label{f:stig}
+%   \centering
+%   \begin{tikzpicture}
+%     \tikzstyle{level 1}=[sibling distance=4cm]
+%     \node [box] {Does EXT file exist?}
+%       child {node [box, text width = 2.125cm] {Warn user to rerun Sage}
+%         edge from parent node[left] {no}}
+%       child {node [box] {Use \texttt{includegraphics}}
+%         edge from parent node[right] {yes}};
+%   \end{tikzpicture}
+%   \caption{The sagetexincludegraphics command.}
+% \end{figure}
 % \end{macro}
+% 
 %
 % \begin{macro}{\@beginsagefileblock}
 % This is an internal-use abbreviation that sets things up when we start
@@ -852,12 +923,27 @@ LaTeX on \jobname.tex again}}}
 % the |.sout| file. The Python module provides functions that help
 % produce the |.sout| file from the |.sage| file.
 %
+% The \texttt{sagetex.py} file is intended to be used a module and
+% doesn't do anything useful when called directly, so if someone does
+% that, warn them. We do this right away so that we print this and exit
+% before trying to import any Sage modules; that way, this error message
+% gets printed whether you run the script with Sage or with Python.
+%    \begin{macrocode}
+import sys
+if __name__ == "__main__":
+  print("""This file is part of the SageTeX package.
+It is not meant to be called directly.
+
+This file will be used by Sage scripts generated from a LaTeX document
+using the sagetex package. Keep it somewhere where Sage and Python can
+find it and it will automatically be imported.""")
+  sys.exit()
+%    \end{macrocode}
 % We start with some imports and definitions of our global variables.
 % This is a relatively specialized use of Sage, so using global variables
 % isn't a bad idea.
 %    \begin{macrocode}
 from sage.misc.latex import latex
-import sys
 import os
 import os.path
 import hashlib
@@ -1088,8 +1174,10 @@ def endofdocument():
 % some improvements and modifications. Almost all the examples in the
 % |example.tex| file are from Harald.
 %
-% Dan Drake rewrote the style file (there is almost zero original code
-% there), made significant changes to the Python module, put both
-% files into \textsf{Docstrip} format, and wrote all the documentation.
+% Dan Drake rewrote and extended the style file (there is almost zero
+% original code there), made significant changes to the Python module,
+% put both files into \textsf{Docstrip} format, and wrote all the
+% documentation.
 %
-% Many thanks to Jason Grout for comments, suggestions, and feedback.
+% Many thanks to Jason Grout for his numerous comments, suggestions, and
+% feedback.
