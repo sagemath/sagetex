@@ -1,7 +1,17 @@
 * hyperlinks in documentation between LaTeX and Python functions that
   are interdependent
 
-* magic bits written to .sage so we can keep the Python module in the
-  same place as the .sty file?
+* What about graphs and TikZ?
 
-* TikZ flow chart for sageplot logic tree
+* add LPPL maintainer stuff; files 
+
+example.pdf
+example.tex
+README
+sagetexpackage.dtx
+sagetexpackage.ins
+sagetexpackage.pdf
+sagetex.py
+sagetex.sty
+
+* kpsewhich stuff from CTAN upload page?

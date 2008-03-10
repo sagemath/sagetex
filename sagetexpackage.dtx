@@ -5,6 +5,17 @@
 %
 % See the "Copying and licenses" section for the terms under which this
 % source code and documentation may be modified and distributed.
+%
+% This package is not licensed under the LPPL, but it seems reasonable
+% to say:
+%
+%   This work has the LPPL maintenance status `maintained'.
+%   
+%   The Current Maintainer of this work is Dan Drake.
+%
+%   This work consists of the files sagetexpackage.dtx,
+%   sagetexpackage.ins, example.tex, and the derived files sagetex.sty
+%   and sagetex.py.
 % 
 % \fi
 %
@@ -14,10 +25,7 @@
 %</driver>
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
-%<*latex>
-    [2008/03/08 v1.3 embedding Sage into LaTeX documents]
-%</latex>
-%
+%<latex>  [2008/03/10 v1.4 embedding Sage into LaTeX documents]
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{sagetex}
@@ -58,6 +66,7 @@
 % \changes{v1.1}{2008/03/05}{Wrapped user-provided Sage code in
 % try/except clauses; plotting now has optional format argument.}
 % \changes{v1.2}{2008/03/07}{Imagemagick option; better documentation}
+% \changes{v1.4}{2008/03/10}{Internal variables renamed; fixed typos}
 %
 % \GetFileInfo{sagetexpackage.dtx}
 %
@@ -122,7 +131,7 @@
 %
 % A less trivial, and perhaps more useful example is plotting. You can
 % include a plot of the sine curve without manually producing a plot,
-% saving an eps or pdf file, and doing the \verb|\includegraphics|
+% saving an EPS or PDF file, and doing the \verb|\includegraphics|
 % business with the correct filename yourself. If you write this:
 % \begin{quote}
 % \texttt{Here is a lovely graph of the sine curve:}
@@ -268,7 +277,7 @@
 % \noindent plots the given Sage graphics object and runs an
 % |\includegraphics| command to put it into your document. It does not
 % have to actually be a plot of a function; it can be any Sage graphics
-% object. The options work as follows:
+% object. The options are described in \autoref{t:sageplotopts}.
 %
 % \begin{table}[h]
 %   \centering
@@ -287,7 +296,11 @@
 %   \meta{keyword args} & Any keyword arguments you put here will
 %   all be put into the call to |.save()|.
 %   \end{tabular}
-%   \end{table}
+%   \caption{Explanation of options for the \texttt{\bslash sageplot}
+%   command.}
+%   \label{t:sageplotopts}
+% \end{table}
+
 % This setup allows you to control both the Sage side of things, and the
 % \LTX side. For instance, the command
 % \begin{quote}
@@ -318,21 +331,21 @@
 % to colleagues.
 %
 % If you ask for, say, a PNG file, keep in mind that ordinary
-% |latex| and DVI files have no support for DVI files; \ST detects
-% this and will warn you that it cannot find a suitable file if using
-% |latex|; if you use |pdflatex|, there will be no problems because PDF
-% files can include PNG graphics.
+% \texttt{latex} and DVI files have no support for DVI files; \ST
+% detects this and will warn you that it cannot find a suitable file if
+% using |latex|. If you use |pdflatex|, there will be no problems
+% because PDF files can include PNG graphics.
 %
 % When \ST cannot find a graphics file, it inserts this into your
-% file:
+% document:
 %
 % \begin{center}
 %   \framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}
 % \end{center}
 % 
-% \noindent That's supposed to resemble the traditional ``\textbf{??}''
-% that \LTX uses to indicate missing references, and also the
-% image-not-found graphics used by web browsers.
+% \noindent That's supposed to resemble the image-not-found graphics
+% used by web browsers and use the traditional ``\textbf{??}'' that \LTX
+% uses to indicate missing references.
 %
 % You needn't worry about the filenames; they are automatically
 % generated and will be put into the directory
@@ -349,11 +362,11 @@
 % \subsubsection{3D plotting}
 %
 % Right now there is, to put it nicely, a bit of tension between the
-% sort of graphics formats supported by |latex| and
-% |pdflatex|\footnote{We use a typewriter font here to indicate the
-% binaries which produce DVI and PDF files, respectively, as opposed to
-% ``\LTX'' which refers to the entire typesetting system.}, and the
-% graphics formats supported by Sage's 3D plotting systems. \LTX is
+% sort of graphics formats supported by \texttt{latex} and
+% \texttt{pdflatex}, and the graphics formats supported by Sage's 3D
+% plotting systems.\footnote{We use a typewriter font here to indicate
+% the binaries which produce DVI and PDF files, respectively, as opposed
+% to ``\LTX'' which refers to the entire typesetting system.} \LTX is
 % happiest, and produces the best output, with EPS and PDF files, which
 % are vector formats. Tachyon, Sage's 3D plotting system, produces
 % bitmap formats like BMP and PNG.
@@ -367,10 +380,10 @@
 % (both \texttt{latex} and \texttt{pdflatex}) will be profoundly
 % confused. Don't do that.
 % 
-% Since \texttt{latex} does not support PNGs, when using 3D plotting (ad
-% therefore a bitmap format like PNG), \ST will \emph{always} issue a
-% warning about incompatible graphics if you use \texttt{latex},
-% provided you've processed the \texttt{.sage} file  and the PNG file
+% Since \texttt{latex} does not support PNGs, when using 3D plotting
+% (and therefore a bitmap format like PNG), \ST will \emph{always} issue
+% a warning about incompatible graphics if you use \texttt{latex},
+% provided you've processed the \texttt{.sage} file and the PNG file
 % exists. (Running \texttt{pdflatex} on the same file will work, since
 % PDF files can include PNG files.) 
 %
@@ -388,7 +401,7 @@
 %
 % The resulting EPS files are not very high quality, but they will work.
 % This option is not intended to produce good graphics, but to allow you
-% to see you graphics when you use \texttt{latex} and DVI files while
+% to see your graphics when you use \texttt{latex} and DVI files while
 % writing your document.
 %
 % \paragraph{But that's not good enough!} The \verb|\sageplot| command
@@ -430,7 +443,7 @@
 % and the |\sage| call will get correctly replaced by $\sage{
 % diff((sin(x) - 1)*log(x), x)(1)}$. You can use any Sage or Python
 % commands inside a |sageblock|; all the commands get sent directly to
-% Sage.
+% Sage.\\
 %
 % \iffalse meta-comment
 %   Sadly, we can't use sageblock or similar environments in this file!
@@ -445,12 +458,12 @@
 % \DescribeEnv{sagesilent} This environment is like |sageblock|, but it
 % does not typeset any of the code; it just writes it to the |.sage|
 % file. This is useful if you have to do some setup in Sage that is not
-% interesting or relevant to the document you are writing.
+% interesting or relevant to the document you are writing.\\
 %
 % \DescribeEnv{sageverbatim} This environment is the opposite of the one
 % above: whatever you type will be typeset, but not written into the
 % |.sage| file. This allows you to typeset psuedocode, code that will
-% fail, or take too much time to execute, or whatever.
+% fail, or take too much time to execute, or whatever.\\
 %
 % \DescribeEnv{comment} Logically, we now need an environment that
 % neither typesets nor executes your Sage code\ldots but the |verbatim|
@@ -464,6 +477,7 @@
 % indented when typeset. You can change this length however you like
 % with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or whatever.
 % 
+%
 % \section{Other notes}
 %
 % Here are some other notes on using \ST.
@@ -539,8 +553,8 @@
 %    \begin{macrocode}
 \newcommand{\ST@epsim}{False}
 %    \end{macrocode}
-% That macro gets put into a Python function call, so it works to have
-% it be one of the strings ``|True|'' or ``|False|''.
+% The expansion of that macro gets put into a Python function call, so
+% it works to have it be one of the strings ``|True|'' or ``|False|''.
 % \end{macro}
 % 
 % Declare the |imagemagick| option and process it:
@@ -553,8 +567,8 @@
 %
 % It's time to deal with files. Open the |.sage| file:
 %    \begin{macrocode}
-\newwrite\@sagefile
-\immediate\openout\@sagefile=\jobname.sage
+\newwrite\ST@sf
+\immediate\openout\ST@sf=\jobname.sage
 %    \end{macrocode}
 %
 % \begin{macro}{\ST@wsf}
@@ -567,7 +581,7 @@
 % directory or are installing \ST system-wide; then you don't need to
 % copy \texttt{sagetex.py} into the same directory as your document.
 %    \begin{macrocode}
-\newcommand{\ST@wsf}[1]{\immediate\write\@sagefile{#1}}
+\newcommand{\ST@wsf}[1]{\immediate\write\ST@sf{#1}}
 \iffalse
 %% To get .sage files to automatically change the Python path to find
 %% sagetex.py, delete the \iffalse and \fi lines surrounding this and
@@ -625,7 +639,7 @@
 % the user to run Sage on the |.sage| file at the end of the run.
 % Finally, step the counter.
 %    \begin{macrocode}
-\@ifundefined{r@@sagelabel\theST@inline}{\gdef\@rerunsage{x}}{}%
+\@ifundefined{r@@sagelabel\theST@inline}{\gdef\ST@rerun{x}}{}%
 \stepcounter{ST@inline}}
 %    \end{macrocode}
 % \end{macro}
@@ -681,8 +695,10 @@
 %
 % The first optional argument |#1| will get shoved right into the
 % optional argument for |\includegraphics|, so the user has easy control
-% over both the Sage and \LTX aspects of the plotting. We define a
-% default size of $3/4$ the textwidth, which seems reasonable. The
+% over the \LTX aspects of the plotting. We define a
+% default size of $3/4$ the textwidth, which seems reasonable. (Perhaps
+% a future version of \ST will allow the user to specify in the package
+% options a set of default options to be used throughout.) The
 % second optional argument |#2| is the file format and allows us to tell
 % what files to look for. It defaults to ``notprovided'', which tells
 % the Python module to create EPS and PDF files. Everything in |#3| gets
@@ -781,7 +797,7 @@
          \PackageWarning{sagetex}{Graphics file
          \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space
          does not exist}%
-         \gdef\@rerunsage{x}}}}%
+         \gdef\ST@rerun{x}}}}%
 \fi
 %    \end{macrocode}
 % Finally, step the counter and we're done.
@@ -810,7 +826,7 @@
      \PackageWarning{sagetex}{Graphics file
      \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
      exist}%
-     \gdef\@rerunsage{x}}}
+     \gdef\ST@rerun{x}}}
 %    \end{macrocode}
 % \autoref{f:stig} makes this a bit clearer. 
 % \begin{figure}
@@ -915,11 +931,11 @@
 % Now we deal with some end-of-file cleanup.
 %
 % We tell the Sage script to write some information to the |.sout| file,
-% then check to see if |@rerunsage| ever got defined. If not, all the
+% then check to see if |ST@rerun| ever got defined. If not, all the
 % inline formulas and plots worked, so do nothing.
 %    \begin{macrocode}
 \AtEndDocument{\ST@wsf{sagetex.endofdoc()}%
-\@ifundefined{@rerunsage}{}%
+\@ifundefined{ST@rerun}{}%
 %    \end{macrocode}
 % Otherwise, we issue a warning to tell the user to run Sage on the
 % |.sage| file. Part of the reason we do this is that, by using |\ref|
@@ -954,7 +970,18 @@ LaTeX on \jobname.tex again}}}
 % the |.sout| file. The Python module provides functions that help
 % produce the |.sout| file from the |.sage| file.
 %
-% The \texttt{sagetex.py} file is intended to be used a module and
+% \paragraph{A note on Python and \textsf{Docstrip}} There is one tiny
+% potential source of confusion when documenting Python code with
+% \textsf{Docstrip}: the percent sign. If you have a long line of Python
+% code which includes a percent sign for string formatting and you break
+% the line with a backslash and begin the next line with a percent sign,
+% that line \emph{will not} be written to the output file. This is only
+% a problem if you \emph{begin} the line with a percent sign; there are
+% no troubles otherwise.
+%
+% On to the code:
+%
+% The \texttt{sagetex.py} file is intended to be used as a module and
 % doesn't do anything useful when called directly, so if someone does
 % that, warn them. We do this right away so that we print this and exit
 % before trying to import any Sage modules; that way, this error message
@@ -972,7 +999,8 @@ find it and it will automatically be imported.""")
 %    \end{macrocode}
 % We start with some imports and definitions of our global variables.
 % This is a relatively specialized use of Sage, so using global variables
-% isn't a bad idea.
+% isn't a bad idea. Plus I think when we import this module, they will
+% all stay inside the \texttt{sagetex} namespace anyway.
 %    \begin{macrocode}
 from sage.misc.latex import latex
 import os
@@ -981,9 +1009,9 @@ import hashlib
 import traceback
 import subprocess
 import shutil
-initplot_done  = False
-dirname        = None
-filename       = ""
+initplot_done = False
+dirname       = None
+filename      = ""
 %    \end{macrocode}
 %
 % \begin{macro}{progress}
@@ -1098,7 +1126,8 @@ def blockend():
 % for keyword arguments. The |#3| argument to |\sageplot| becomes
 % |p| and |**kwargs| below.
 %    \begin{macrocode}
-def sageplot(counter, line, p, format='notprovided', epsmagick=False, **kwargs):
+def sageplot(counter, line, p, format='notprovided', epsmagick=False, \
+             **kwargs):
   global dirname
   progress('Plot %s, line %s' % (counter, line))
 %    \end{macrocode}
@@ -1175,7 +1204,7 @@ def goboom(line):
 % allows external programs that build \LTX documents to tell if they
 % need to call Sage to update the |.sout| file. We do issue warnings to
 % run Sage on the |.sage| file, but those warnings do not quite capture
-% all situations, and anyway I think it's easier to grab the md5sum out
+% all situations, and anyway I think it's easier to grab the MD5 sum out
 % of the end of the file than parse the output from running |latex| on
 % your file. (The regular expression \verb|^%[0-9a-f]{32}%| will find
 % the MD5 sum.)

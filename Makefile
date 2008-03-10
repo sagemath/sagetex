@@ -14,8 +14,11 @@ all:
 	pdflatex example.tex
 
 clean: 
-	@latexcleanup clean .
-	@rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz
+	latexcleanup clean .
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty
 
 dist: all
-	tar zcf sagetex.tar.gz ../sagetex/example.pdf ../sagetex/example.tex ../sagetex/README.txt ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins ../sagetex/sagetexpackage.pdf ../sagetex/sagetex.py ../sagetex/sagetex.sty
+	@echo
+	@echo Did you turn off Imagemagick in example.tex?
+	@echo
+	@tar zcf sagetex.tar.gz ../sagetex/example.pdf ../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins ../sagetex/sagetexpackage.pdf ../sagetex/sagetex.py ../sagetex/sagetex.sty
