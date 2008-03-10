@@ -1,13 +1,13 @@
 % General example LaTeX file for including Sage calculations and plots
-% Build with: (pdf)latex example.tex; sage example.sage; pdflatex example.tex 
-% Please read README.txt and the documentation of the SageTeX package
-% for more information!
+% Build with: (pdf)latex example.tex; sage example.sage; pdflatex
+% example.tex Please read README and the documentation of the SageTeX
+% package for more information!
 
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX}
-\author{\relax}
+\author{}
 
-\usepackage[imagemagick]{sagetex}
+\usepackage{sagetex}
 % 
 % If you want sagetex to use Imagemagick's convert utility to make eps
 % files from png files when generating a dvi file, add the
@@ -20,9 +20,9 @@
 
 \section{Inline Sage, code blocks}
 
-This is an example $2+2=\sage{2+2}$. If you raise the current year
-($\the\year$) to the power of the current day ($\the\day$), you get
-$\sage{\the\year^\the\day}$.
+This is an example $2+2=\sage{2+2}$. If you raise the current year mod
+$100$ ($\sage{mod(\the\year, 100)}$) to the power of the current day
+($\the\day$), you get $\sage{Integer(mod(\the\year, 100))^\the\day}$.
 
 Code block which uses a variable \texttt{s} to store the solutions:
 \begin{sageblock}
