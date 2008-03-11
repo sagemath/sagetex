@@ -23,6 +23,7 @@
 This is an example $2+2=\sage{2+2}$. If you raise the current year mod
 $100$ ($\sage{mod(\the\year, 100)}$) to the power of the current day
 ($\the\day$), you get $\sage{Integer(mod(\the\year, 100))^\the\day}$.
+Also, $\the\year$ modulo $42$ is $\sage{\the\year \percent 42}$.
 
 Code block which uses a variable \texttt{s} to store the solutions:
 \begin{sageblock}
@@ -32,12 +33,12 @@ Code block which uses a variable \texttt{s} to store the solutions:
 \end{sageblock}
 
 Solutions of $\mbox{eqn}=\sage{eqn}$:
-$$
+\[
 \sage{s[0]}
-$$
-$$
+\]
+\[
 \sage{s[1]}
-$$
+\]
 
 Now we evaluate the following block:
 \begin{sageblock}
@@ -58,7 +59,6 @@ except IOError:
     E.anlist(100000)
     E.save('E2')
 \end{sageblock}
-\label{ellipticcurve}
 
 The 9999th Fourier coefficient of $\sage{E}$ is 
 $\sage{E.anlist(100000)[9999]}$. 
