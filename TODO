@@ -3,15 +3,4 @@
 
 * What about graphs and TikZ?
 
-* add LPPL maintainer stuff; files 
-
-example.pdf
-example.tex
-README
-sagetexpackage.dtx
-sagetexpackage.ins
-sagetexpackage.pdf
-sagetex.py
-sagetex.sty
-
 * kpsewhich stuff from CTAN upload page?

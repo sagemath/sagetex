@@ -1,4 +1,5 @@
 pkg=sagetexpackage
+dest=/home/drake/texmf/tex/latex/sagetex/
 
 all:
 	latex $(pkg).ins
@@ -16,6 +17,10 @@ all:
 clean: 
 	latexcleanup clean .
 	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty
+
+install:
+	cp sagetex.py $(dest)
+	sed -e 's/ hrm iffalse and fi
 
 dist: all
 	@echo

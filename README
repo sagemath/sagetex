@@ -1,9 +1,10 @@
 This is the SageTeX package. It allows you to embed code, results of
 computations, and plots from the Sage mathematics software suite
 (http://sagemath.org) into LaTeX documents.
+====================================================================
 
-To use SageTeX, you must first extract the LaTeX style file and Python
-module from the .dtx file. To do that:
+To use SageTeX, you need the files sagetex.sty and sagetex.py. If those
+haven't been extracted from the .dtx file, you'll need to do:
 
   0. Run `latex sagetexpackage.ins'
 
@@ -30,7 +31,11 @@ To use the SageTeX package with your own documents, see the
 "Installation" section of the documentation.
 
 This works builds on a lot of work by others; see the "Credits" section
-of the documentation for credits.
+of the documentation for credits. The source code may be modified and
+distributed under the terms of the GPL, v2 or later; the documentation
+may be modified and distributed under a Creative Commons Attribution -
+Noncommercial - Share Alike 3.0 License. See the "Copying and licenses"
+section of the documentation.
 
 Please let me know if you find any bugs or have any ideas for
 improvement!
