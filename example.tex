@@ -165,11 +165,12 @@ And here's the picture:
 3D plotting right now is problematic because there's no convenient way
 to produce vector graphics. We can make PNGs, though, and since the
 \verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
-a valid format for 3D plotting}. Sage right now can't produce EPS or PDF
-files from plot3d objects, so if you don't specify a valid format,
-things will go badly. You can specify the ``\texttt{imagemagick}''
-option, which will use the Imagemagick \texttt{convert} utility to make
-EPS files. See the documentation for details.
+a valid format for 3D plotting}. Sage right now (version 2.10.3) can't
+produce EPS or PDF files from plot3d objects, so if you don't specify a
+valid format, things will go badly. You can specify the
+``\texttt{imagemagick}'' option, which will use the Imagemagick
+\texttt{convert} utility to make EPS files. See the documentation for
+details.
 
 Here's the famous Sage cube graph:
 
@@ -179,6 +180,6 @@ Here's the famous Sage cube graph:
 
 % need empty [] so sageplot knows you want png format, and aren't
 % passing an option to includegraphics
-\sageplot[][png]{G.plot3d()}
+\sageplot[][png]{G.plot3d(engine='tachyon')}
 
 \end{document}
