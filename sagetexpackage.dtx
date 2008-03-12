@@ -26,7 +26,7 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-  [2008/03/10 v1.4 embedding Sage into LaTeX documents]
+  [2008/03/12 v1.5 embedding Sage into LaTeX documents]
 %</latex>
 %<*driver>
 \documentclass{ltxdoc}
@@ -86,6 +86,8 @@
 % inside an fbox is really hard. Verbatim stuff doesn't work because
 % it's fragile. This code works; it's copied out of Scott Pakin's
 % dtxtut.tex. 
+% 
+% There is \textbackslash but I don't like how that looks. 
 % \fi
 % {\catcode`\|=0 \catcode`\\=12
 % |gdef|bslash{\}}
@@ -134,7 +136,7 @@
 %
 % A less trivial, and perhaps more useful example is plotting. You can
 % include a plot of the sine curve without manually producing a plot,
-% saving an EPS or PDF file, and doing the \verb|\includegraphics|
+% saving an EPS or PDF file, and doing the |\includegraphics|
 % business with the correct filename yourself. If you write this:
 % \begin{quote}
 % |Here is a lovely graph of the sine curve:|
@@ -209,14 +211,14 @@
 % \section{Usage} \label{s:usage}
 % 
 % Let's begin with a rough description of how \ST works. Naturally the
-% very first step is to put \verb|\usepackage{sagetex}| in the preamble
-% of your document. When you use macros from this package and run \LTX
-% on your file, along with the usual zoo of auxiliary files, a |.sage|
-% file is written. This is a Sage source file that uses the Python
-% module from this package and when you run Sage on that file, it will
-% produce a |.sout| file. That file contains \LTX code which, when you
-% run \LTX on your source file again, will pull in all the results of
-% Sage's computation.
+% very first step is to put |\usepackage{sagetex}| in the preamble of
+% your document. When you use macros from this package and run \LTX on
+% your file, along with the usual zoo of auxiliary files, a |.sage| file
+% is written. This is a Sage source file that uses the Python module
+% from this package and when you run Sage on that file, it will produce
+% a |.sout| file. That file contains \LTX code which, when you run \LTX
+% on your source file again, will pull in all the results of Sage's
+% computation.
 %
 % All you really need to know is that to typeset your document, you need
 % to run \LTX, then run Sage, then run \LTX again. 
@@ -260,7 +262,7 @@
 % in Sage.
 %
 % Note that since \LTX will do macro expansion on whatever you give
-% to \verb|\sage|, you can mix \LTX variables and Sage variables! If
+% to |\sage|, you can mix \LTX variables and Sage variables! If
 % you have defined the Sage variable |foo| to be $12$ (using, say, the
 % |sageblock| environment), then you can do something like this:
 % \begin{quote}
@@ -338,7 +340,7 @@
 % \end{center}
 % You can specify a file format if you like. This must be the
 % \emph{second} optional argument, so you must use empty brackets if
-% you're not passing anything to \verb|\includegraphics|:
+% you're not passing anything to |\includegraphics|:
 % \begin{center}
 % |\sageplot[][png]{plot(sin(x), x, 0, pi)}|
 % \end{center}
@@ -390,7 +392,7 @@
 % Tachyon, Sage's 3D plotting system, produces bitmap formats like BMP
 % and PNG.
 %
-% Because of this, when producing 3D plots with \verb|\sageplot|,
+% Because of this, when producing 3D plots with |\sageplot|,
 % \emph{you must specify a file format}. The PNG format is compressed
 % and lossless and is by far the best choice, so use that whenever
 % possible. (Right now, it is always possible.) If you do not specify a
@@ -422,10 +424,10 @@
 % to see your graphics when you use |latex| and DVI files while writing
 % your document.
 %
-% \paragraph{But that's not good enough!} The \verb|\sageplot| command
-% tries to be both flexible and easy to use, but if you are just not
-% happy with it, you can always do things manually: inside a
-% |sagesilent| environment (see the next section) you could do
+% \paragraph{But that's not good enough!} \label{s:notgoodenough}
+% The |\sageplot| command tries to be both flexible and easy to use, but
+% if you are just not happy with it, you can always do things manually:
+% inside a |sagesilent| environment (see the next section) you could do
 % \begin{quote}
 %   |your special commands|\\
 %   |x = your graphics object|\\
@@ -442,7 +444,7 @@
 % executing Sage code.\\
 %
 % \DescribeEnv{sageblock} Any text between |\begin{sageblock}| and
-% |\end{sageblock}| will be typset into your file, and also written into
+% |\end{sageblock}| will be typeset into your file, and also written into
 % the |.sage| file for execution. This means you can do something like
 % this:
 % \begin{quote}
@@ -515,6 +517,35 @@
 % line as the last line of your code, it works properly.
 %
 % Thanks to Franco Saliola for reporting this.
+%
+% \paragraph{Plotting from Mathematica, Maple, etc.} Sage can use
+% Mathematica, Maple, and friends and can tell them to do plotting, but
+% since it cannot get those plots into a Sage graphics object, you
+% cannot use |\sageplot| to use such graphics. You'll need to use the
+% method described in ``But that's not good enough!''
+% (\hyperref[s:notgoodenough]{page~\pageref*{s:notgoodenough}}) with
+% some additional bits to get the directory right---otherwise your file
+% will get saved to someplace in a hidden directory.
+%
+% For Mathematica, you can do something like this inside a |sagesilent|
+% or |sageblock| environment:
+% \begin{quote}
+%   |mathematica('plot = commands to make your plot')|\\
+%   |mathematica('Export["%s/graphicsfile.eps", plot]' % os.getcwd())|
+% \end{quote}
+% then put |\includegraphics[opts]{graphicsfile}| in your file.
+%
+% For Maple, you'll need something like
+% \begin{quote}
+%   |maple('plotsetup(ps, plotoutput=`%s/graphicsfile.eps`, \|\\
+%   |  plotoptions=`whatever`);' % os.getcwd())|\\
+%   |maple('plot(function, x=1..whatever);')|
+% \end{quote}
+% and then |\includegraphics| as necessary.
+%
+% These interfaces, especially when plotting, can be finicky. The above
+% commands are just meant to be a starting point.
+%
 %
 % \StopEventually{}
 %
@@ -694,7 +725,7 @@
 % \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
 % \begin{macro}{\sageplot}
-% \changes{v1.3}{2008/03/08}{Iron out warnings, cool TikZ flowchart}
+% \changes{v1.3}{2008/03/08}{Iron out warnings, cool Ti\emph{k}Z flowchart}
 % This function is similar to |\sage|. The neat thing that we take
 % advantage of is that commas aren't special for arguments to \LTX
 % commands, so it's easy to capture a bunch of keyword arguments that
@@ -1264,7 +1295,7 @@ lines) that produced this\n'
 % warning will be issued since all the |\ref|s find a |\newlabel|.)
 % Anyway, I think it's easier to grab an MD5 sum out of the end of the
 % file than parse the output from running |latex| on your file. (The
-% regular expression \verb|^%[0-9a-f]{32}%| will find the MD5 sum.)
+% regular expression |^%[0-9a-f]{32}%| will find the MD5 sum.)
 %
 % Now we are done with the |.sout| file. Close it, rename it, and tell
 % the user we're done.
