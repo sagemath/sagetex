@@ -26,7 +26,7 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-  [2008/03/12 v1.5 embedding Sage into LaTeX documents]
+  [2008/03/12 v1.4 embedding Sage into LaTeX documents]
 %</latex>
 %<*driver>
 \documentclass{ltxdoc}
@@ -63,13 +63,12 @@
 %   Grave accent  \`     Left brace    \{     Vertical bar  \|
 %   Right brace   \}     Tilde         \~}
 %
-%
 % \changes{v1.0}{2008/03/03}{Initial version}
 % \changes{v1.1}{2008/03/05}{Wrapped user-provided Sage code in
 % try/except clauses; plotting now has optional format argument.}
 % \changes{v1.2}{2008/03/07}{Imagemagick option; better documentation}
-% \changes{v1.4}{2008/03/10}{Internal variables renamed; fixed typos}
-% \changes{v1.5}{2008/03/11}{MD5 fix, percent sign macro}
+% \changes{v1.3.1}{2008/03/10}{Internal variables renamed; fixed typos}
+% \changes{v1.4}{2008/03/11}{MD5 fix, percent sign macro, CTAN upload}
 %
 % \GetFileInfo{sagetexpackage.dtx}
 %
@@ -667,9 +666,9 @@
 %    \begin{macrocode}
 \newcommand{\sage}[1]{%
 \ST@wsf{try:}%
-\ST@wsf{  sagetex.inline(\theST@inline, #1)}%
+\ST@wsf{ sagetex.inline(\theST@inline, #1)}%
 \ST@wsf{except:}%
-\ST@wsf{  sagetex.goboom(\the\inputlineno)}%
+\ST@wsf{ sagetex.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % Our use of |\newlabel| and |\ref| seems awfully clever until you load
 % the |hyperref| package, which gleefully tries to hyperlink the hell
@@ -927,7 +926,7 @@
 %    \begin{macrocode}
 \newcommand{\ST@endsfbl}{%
 \ST@wsf{except:}%
-\ST@wsf{  sagetex.goboom(\the\inputlineno)}%
+\ST@wsf{ sagetex.goboom(\the\inputlineno)}%
 \ST@wsf{sagetex.blockend()}}
 %    \end{macrocode}
 % \end{macro}
