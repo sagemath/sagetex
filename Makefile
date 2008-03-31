@@ -16,14 +16,17 @@ all:
 
 clean: 
 	latexcleanup clean .
-	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py desagetexparser.py
 
 install:
 	cp sagetex.py $(dest)
-	sed -e 's/ hrm iffalse and fi
+	sed -e '/\\iffalse/ d' \
+	    -e '/^%%/ d' \
+	    -e 's|directory with sagetex.py|$(dest)|'\
+		-e '50,55 s/\\fi//' sagetex.sty > $(dest)/sagetex.sty
 
 dist: all
 	@echo
 	@echo Did you turn off Imagemagick in example.tex?
 	@echo
-	@tar zcf sagetex.tar.gz ../sagetex/example.pdf ../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins ../sagetex/sagetexpackage.pdf ../sagetex/sagetex.py ../sagetex/sagetex.sty
+	@tar zcf sagetex.tar.gz ../sagetex/example.pdf ../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins ../sagetex/sagetexpackage.pdf

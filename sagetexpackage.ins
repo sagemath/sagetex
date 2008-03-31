@@ -22,7 +22,7 @@
 
 \declarepreamble\defaultpreamble
 
-This is a generated file.
+This is a generated file. It is part of the SageTeX package.
 
 Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
 
@@ -42,10 +42,11 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 \endpreamble
 
 % We use a name other than `sagetex' because when using the sagetex
-% package in a file called `foo.dtx', a file `foo.py' will be produced
-% -- and below, we generate a file called sagetex.py. Thus we use a name
-% other than `sagetex.dtx' so that building the documentation doesn't
-% clobber the very Python file we need to build the documentation!
+% package in a file called `foo.dtx', a file `foo.py' will be
+% produced---and below, we generate a file called sagetex.py. Thus we
+% use a name other than `sagetex.dtx' so that building the documentation
+% doesn't clobber the very Python file we need to build the
+% documentation!
 
 \generate{\file{sagetex.sty}{\from{sagetexpackage.dtx}{latex}}}
 
@@ -58,13 +59,23 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 % file.
 
 \edef\defaultpreamble{"""^^J%
-          \defaultpreamble^^J%
-          """}
+  \defaultpreamble^^J%
+  """}
 \edef\defaultpostamble{"""^^J%
-          \defaultpostamble^^J%
-          """}
+  \defaultpostamble^^J%
+  """}
 
 \generate{\file{sagetex.py}{\from{sagetexpackage.dtx}{python}}}
+\generate{\file{desagetexparser.py}{\from{sagetexpackage.dtx}{staticmod}}}
+
+% Now we modify the preamble again to get the shebang line at the top.
+
+\catcode`\#=12
+\newcommand{\shebang}{#!}
+\catcode`\#=6
+\edef\defaultpreamble{\shebang/usr/bin/env python^^J\defaultpreamble}
+
+\generate{\file{makestatic.py}{\from{sagetexpackage.dtx}{staticscript}}}
 
 \obeyspaces
 \Msg{******************************************************************}
