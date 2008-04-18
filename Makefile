@@ -1,8 +1,7 @@
 pkg=sagetexpackage
 dest=/home/drake/texmf/tex/latex/sagetex/
 
-all:
-	latex $(pkg).ins
+all: ins
 	latex $(pkg).dtx
 	sage $(pkg).sage
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
@@ -14,9 +13,12 @@ all:
 	latex example.tex
 	pdflatex example.tex
 
+ins:
+	yes | latex $(pkg).ins
+
 clean: 
 	latexcleanup clean .
-	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py desagetexparser.py
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py
 
 install:
 	cp sagetex.py $(dest)

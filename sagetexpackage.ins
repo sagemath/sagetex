@@ -66,7 +66,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
   """}
 
 \generate{\file{sagetex.py}{\from{sagetexpackage.dtx}{python}}}
-\generate{\file{desagetexparser.py}{\from{sagetexpackage.dtx}{staticmod}}}
+\generate{\file{sagetexparse.py}{\from{sagetexpackage.dtx}{parsermod}}}
 
 % Now we modify the preamble again to get the shebang line at the top.
 
@@ -76,6 +76,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 \edef\defaultpreamble{\shebang/usr/bin/env python^^J\defaultpreamble}
 
 \generate{\file{makestatic.py}{\from{sagetexpackage.dtx}{staticscript}}}
+\generate{\file{extractsagecode.py}{\from{sagetexpackage.dtx}{extractscript}}}
 
 \obeyspaces
 \Msg{******************************************************************}
