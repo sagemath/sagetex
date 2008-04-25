@@ -3,8 +3,9 @@
 % Copyright (C) 2008 by Dan Drake <ddrake@member.ams.org>
 % -------------------------------------------------------
 %
-% See the "Copying and licenses" section for the terms under which this
-% source code and documentation may be modified and distributed.
+% See the "Copying and licenses" section at the end of this file for the
+% terms under which this source code and documentation may be modified
+% and distributed.
 %
 % This package is not licensed under the LPPL, but it seems reasonable
 % to say:
@@ -74,13 +75,13 @@
 %
 % \DoNotIndex{\newcommand,\newenvironment,\the}
 % 
-% \newcommand{\ST}{\textsf{Sagetex}\xspace}
+% \newcommand{\ST}{\textsf{SageTex}\xspace}
 % \iffalse
 % so I don't have to put \ or {} after \LaTeX:
 % \fi
 % \newcommand{\LTX}{\LaTeX\xspace}
 %
-% \newcommand{\TikZ}{Ti\emph{k}Z}
+% \newcommand{\TikZ}{Ti\emph{k}Z\xspace}
 %
 % \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
@@ -103,13 +104,16 @@
 %
 % \section{Introduction}
 %
-% Why should the Haskell folks have all the fun? 
+% Why should the Haskell and R folks have all the fun? 
 %
 % \href{http://www.haskell.org/haskellwiki/Literate_programming}{Literate
 % Haskell} is a popular way to mix Haskell source code and \LTX
 % documents. (Well, actually any kind of text or document, but here
 % we're concerned only with \LTX.) You can even embed Haskell code in
-% your document that writes part of your document for you. 
+% your document that writes part of your document for you. Similarly,
+% the R statistical computing environment includes
+% \href{http://tug.org/pracjourn/2008-1/zahn/}{Sweave}, which lets you
+% do the same thing with R code and \LTX.
 %
 % The \ST package allows you to do (roughly) the same thing with the
 % Sage mathematics software suite (see \url{http://sagemath.org}) and
@@ -129,18 +133,18 @@
 %   digit, for a total of $\sage{26^3 * 10^3}$ license plates.
 % \end{quote}
 % The great thing is, you don't have to do the multiplication. Sage does
-% it for you. This process mirrors one of the great aspects of
-% \LTX: when writing a \LTX document, you can concentrate on the
-% logical structure of the document and trust \LTX and its army of
-% packages to deal with the presentation and typesetting. Similarly,
-% with \ST, you can concentrate on the mathematical
-% structure (``I need the product of $26^3$ and $10^3$'') and let Sage
-% deal with the base-$10$ presentation of the number.
+% it for you. This process mirrors one of the great aspects of \LTX:
+% when writing a \LTX document, you can concentrate on the logical
+% structure of the document and trust \LTX and its army of packages to
+% deal with the presentation and typesetting. Similarly, with \ST, you
+% can concentrate on the mathematical structure (``I need the product of
+% $26^3$ and $10^3$'') and let Sage deal with the base-$10$ presentation
+% of the number.
 %
 % A less trivial, and perhaps more useful example is plotting. You can
 % include a plot of the sine curve without manually producing a plot,
-% saving an EPS or PDF file, and doing the |\includegraphics|
-% business with the correct filename yourself. If you write this:
+% saving an EPS or PDF file, and doing the |\includegraphics| business
+% with the correct filename yourself. If you write this:
 % \begin{quote}
 % |Here is a lovely graph of the sine curve:|
 %
@@ -161,8 +165,8 @@
 % convince you that \ST makes putting nice graphics into your document
 % very easy; let me turn around and warn you that using graphics
 % \emph{well} is not easy, and no \LTX package or Python script will
-% ever make it easy. What \ST does is make it easy to \emph{use Sage}
-% to create graphics; it doesn't magically make your graphics good,
+% ever make it easy. What \ST does is make it easy to \emph{use Sage} to
+% create graphics; it doesn't magically make your graphics good,
 % appropriate, or useful. (For instance, look at the sine plot above---I
 % would say that a truly lovely plot of the sine curve would not mark
 % integer points on the $x$-axis, but rather $\pi/2$, $\pi$, $3\pi/2$,
@@ -192,12 +196,11 @@
 %
 % \section{Installation}
 %
-% The simplest way to ``install'' \ST is to copy the files
-% |sagetex.sty| and |sagetex.py| into the same directory
-% as your document. This will always work, as \LTX and Python search the
-% current directory for files. It is also convenient for zipping up a
-% directory to send to a colleague who is not yet enlightened enough to
-% be using \ST.
+% The simplest way to ``install'' \ST is to copy the files |sagetex.sty|
+% and |sagetex.py| into the same directory as your document. This will
+% always work, as \LTX and Python search the current directory for
+% files. It is also convenient for zipping up a directory to send to a
+% colleague who is not yet enlightened enough to be using \ST.
 %
 % Rather than make lots of copies of those files, you can keep them in
 % one place and update the TEXINPUTS and PYTHONPATH environment
@@ -395,14 +398,13 @@
 % Tachyon, Sage's 3D plotting system, produces bitmap formats like BMP
 % and PNG.
 %
-% Because of this, when producing 3D plots with |\sageplot|,
-% \emph{you must specify a file format}. The PNG format is compressed
-% and lossless and is by far the best choice, so use that whenever
-% possible. (Right now, it is always possible.) If you do not specify a
-% file format, or specify one that Tachyon does not understand, it will
-% produce files in the Targa format with an incorrect extension and \LTX
-% (both |latex| and |pdflatex|) will be profoundly confused. Don't do
-% that.
+% Because of this, when producing 3D plots with |\sageplot|, \emph{you
+% must specify a file format}. The PNG format is compressed and lossless
+% and is by far the best choice, so use that whenever possible. (Right
+% now, it is always possible.) If you do not specify a file format, or
+% specify one that Tachyon does not understand, it will produce files in
+% the Targa format with an incorrect extension and \LTX (both |latex|
+% and |pdflatex|) will be profoundly confused. Don't do that.
 % 
 % Since |latex| does not support PNGs, when using 3D plotting (and
 % therefore a bitmap format like PNG), \ST will \emph{always} issue a
@@ -829,24 +831,19 @@
 % two optional arguments.
 %    \begin{macrocode}
 \newcommand{\sageplot}[1][width=.75\textwidth]{%
-  \@ifnextchar[{\ST@sageplot[#1]}{\ST@sageplot[#1][notprovided]}%]
-}
+  \@ifnextchar[{\ST@sageplot[#1]}{\ST@sageplot[#1][notprovided]}}
 %    \end{macrocode}
-% That percent sign followed by a square bracket seems necessary; I have
-% no idea why.
-%
 % The first optional argument |#1| will get shoved right into the
 % optional argument for |\includegraphics|, so the user has easy control
-% over the \LTX aspects of the plotting. We define a
-% default size of $3/4$ the textwidth, which seems reasonable. (Perhaps
-% a future version of \ST will allow the user to specify in the package
-% options a set of default options to be used throughout.) The
-% second optional argument |#2| is the file format and allows us to tell
-% what files to look for. It defaults to ``notprovided'', which tells
-% the Python module to create EPS and PDF files. Everything in |#3| gets
-% put into the Python function call, so the user can put in keyword
-% arguments there which get interpreted correctly by Python.
-%
+% over the \LTX aspects of the plotting. We define a default size of
+% $3/4$ the textwidth, which seems reasonable. (Perhaps a future version
+% of \ST will allow the user to specify in the package options a set of
+% default options to be used throughout.) The second optional argument
+% |#2| is the file format and allows us to tell what files to look for.
+% It defaults to ``notprovided'', which tells the Python module to
+% create EPS and PDF files. Everything in |#3| gets put into the Python
+% function call, so the user can put in keyword arguments there which
+% get interpreted correctly by Python.
 %
 % \begin{macro}{\ST@sageplot} Let's see the real code here. We write a
 % couple lines to the |.sage| file, including a counter, input line
@@ -1018,8 +1015,8 @@
 % \end{macro}
 %
 % Now let's define the ``verbatim-like'' environments. There are four
-% possibilities, corresponding to two independent choices of
-% typesetting the code or not, and writing to the |.sage| file or not.
+% possibilities, corresponding to two independent choices of typesetting
+% the code or not, and writing to the |.sage| file or not.
 %
 % \begin{environment}{sageblock}
 % This environment does both: it typesets your code and puts it into the
@@ -1028,8 +1025,8 @@
 \newenvironment{sageblock}{\ST@beginsfbl%
 %    \end{macrocode}
 % The space between |\ST@wsf{| and |\the| is crucial! It, along with the
-% ``|try:|'', is what allows the user to indent code if they like.
-% This line sends stuff to the |.sage| file.
+% ``|try:|'', is what allows the user to indent code if they like. This
+% line sends stuff to the |.sage| file.
 %    \begin{macrocode}
 \def\verbatim@processline{\ST@wsf{ \the\verbatim@line}%
 %    \end{macrocode}
@@ -1083,13 +1080,12 @@
 %    \end{macrocode}
 % Otherwise, we issue a warning to tell the user to run Sage on the
 % |.sage| file. Part of the reason we do this is that, by using |\ref|
-% to pull in the inlines, \LTX will complain about undefined
-% references if you haven't run the Sage script---and for many \LTX
-% users, myself included, the warning ``there were undefined
-% references'' is a signal to run \LTX again. But to fix these
-% particular undefined references, you need to run \emph{Sage}. We also
-% suppressed file-not-found errors for graphics files, and need to tell
-% the user what to do about that.
+% to pull in the inlines, \LTX will complain about undefined references
+% if you haven't run the Sage script---and for many \LTX users, myself
+% included, the warning ``there were undefined references'' is a signal
+% to run \LTX again. But to fix these particular undefined references,
+% you need to run \emph{Sage}. We also suppressed file-not-found errors
+% for graphics files, and need to tell the user what to do about that.
 %
 % At any rate, we tell the user to run Sage if it's necessary.
 %    \begin{macrocode}
@@ -1240,8 +1236,8 @@ class SageTeXProcessor():
                  latex(s) + '}{}{}{}{}}\n')
 %    \end{macrocode}
 % We are using five fields, just like |hyperref| does, because that
-% works whether or not |hyperref| is loaded. Using two fields, as in plain
-% \LTX, doesn't work if |hyperref| is loaded.
+% works whether or not |hyperref| is loaded. Using two fields, as in
+% plain \LTX, doesn't work if |hyperref| is loaded.
 % \end{macro}
 %
 % \begin{macro}{blockbegin}
@@ -1388,8 +1384,8 @@ class SageTeXProcessor():
 % file than parse the output from running |latex| on your file. (The
 % regular expression |^%[0-9a-f]{32}%| will find the MD5 sum.)
 %
-% Now we are done with the |.sout.tmp| file. Close it, rename it, and tell
-% the user we're done.
+% Now we are done with the |.sout.tmp| file. Close it, rename it, and
+% tell the user we're done.
 %    \begin{macrocode}
     self.souttmp.close()
     os.rename(self.filename + '.sout.tmp', self.filename + '.sout')
@@ -1405,9 +1401,9 @@ class SageTeXProcessor():
 %
 % \section{Included Python scripts}
 %
-% Here we describe the Python code for |makestatic.py|, which removes \ST
-% commands to produce a ``static'' file, and |extractsagecode.py|, which
-% extracts all the Sage code from a |.tex| file.
+% Here we describe the Python code for |makestatic.py|, which removes
+% \ST commands to produce a ``static'' file, and |extractsagecode.py|,
+% which extracts all the Sage code from a |.tex| file.
 %
 % \subsection{makestatic.py}
 %
@@ -1795,15 +1791,15 @@ class SageCodeExtractor():
 %
 % \section{Credits and acknowledgements}
 %
-% According to the original README file, this system was originally
-% done by Gonzalo Tornaria and Joe Wetherell. Later Harald Schilly made
-% some improvements and modifications. Almost all the examples in the
+% According to the original README file, this system was originally done
+% by Gonzalo Tornaria and Joe Wetherell. Later Harald Schilly made some
+% improvements and modifications. Almost all the examples in the
 % |example.tex| file are from Harald.
 %
 % Dan Drake rewrote and extended the style file (there is almost zero
 % original code there), made significant changes to the Python module,
 % put both files into \textsf{Docstrip} format, and wrote all the
-% documentation.
+% documentation and extra Python scripts.
 %
 % Many thanks to Jason Grout for his numerous comments, suggestions, and
 % feedback.
