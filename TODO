@@ -1,3 +1,6 @@
+* should I switch over entirely to the Sweave strategy, where we parse a
+  file into LaTeX format?
+
 * hyperlinks in documentation between LaTeX and Python functions that
   are interdependent
 
