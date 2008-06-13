@@ -85,17 +85,6 @@
 %
 % \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
-% \iffalse
-% For some reason, getting a blackslash in a typewriter font to print
-% inside an fbox is really hard. Verbatim stuff doesn't work because
-% it's fragile. This code works; it's copied out of Scott Pakin's
-% dtxtut.tex. 
-% 
-% There is \textbackslash but I don't like how that looks. 
-% \fi
-% {\catcode`\|=0 \catcode`\\=12
-% |gdef|bslash{\}}
-%
 % \title{The \ST{} package\thanks{This document
 %   corresponds to \textsf{sagetex}~\fileversion, dated \filedate.}}
 % \author{Dan Drake (\texttt{ddrake@member.ams.org}) and others}
@@ -104,8 +93,7 @@
 %
 % \section{Introduction}
 %
-% Why should the Haskell and R folks have all the fun? 
-%
+% Why should the Haskell and R folks have all the fun?
 % \href{http://www.haskell.org/haskellwiki/Literate_programming}{Literate
 % Haskell} is a popular way to mix Haskell source code and \LTX
 % documents. (Well, actually any kind of text or document, but here
