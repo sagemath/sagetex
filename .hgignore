@@ -1,14 +1,4 @@
 syntax: glob
-*.aux
-*.dvi
-*.glo
-*.gls
-*.idx
-*.ilg
-*.ind
-*.log
-*.out
-*.pdf
 *.pyc
 *.sout
 *.sobj
