@@ -23,9 +23,10 @@
 \section{Inline Sage, code blocks}
 
 This is an example $2+2=\sage{2+2}$. If you raise the current year mod
-$100$ ($\sage{mod(\the\year, 100)}$) to the power of the current day
-($\the\day$), you get $\sage{Integer(mod(\the\year, 100))^\the\day}$.
-Also, $\the\year$ modulo $42$ is $\sage{\the\year \percent 42}$.
+$100$ (which equals $\sage{mod(\the\year, 100)}$) to the power of the
+current day ($\the\day$), you get $\sage{Integer(mod(\the\year,
+100))^\the\day}$. Also, $\the\year$ modulo $42$ is $\sage{\the\year
+\percent 42}$.
 
 Code block which uses a variable \texttt{s} to store the solutions:
 \begin{sageblock}
@@ -156,11 +157,14 @@ Indentation and so on works fine.
         idx        = pc.index(1)
         M[i,idx+j] = pc.pop(idx)
 
- matrixprogram = matrix_plot(M,cmap='Greys')
+# matrixprogram = matrix_plot(M,cmap='Greys')
 \end{sageblock}
 And here's the picture:
 
-\sageplot{matrixprogram}
+%\sageplot{matrixprogram}
+
+\ldots or not. Right now matrixplot for that matrix doesn't work! Get
+this fixed!
 
 \subsection{3D plotting}
 
