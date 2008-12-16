@@ -834,7 +834,10 @@
 % function call, so the user can put in keyword arguments there which
 % get interpreted correctly by Python.
 %
-% \begin{macro}{\ST@sageplot} Let's see the real code here. We write a
+% \begin{macro}{\ST@sageplot}
+% \changes{v2.0}{2008/12/16}{Change to use only keyword arguments: see issue
+% 2 on bitbucket tracker}
+% Let's see the real code here. We write a
 % couple lines to the |.sage| file, including a counter, input line
 % number, and all of the mandatory argument; all this is wrapped in
 % another try/except. Note that the |\write| gobbles up line endings, so
@@ -842,7 +845,7 @@
 %    \begin{macrocode}
 \def\ST@sageplot[#1][#2]#3{%
 \ST@wsf{try:}%
-\ST@wsf{ _st_.plot(\theST@plot, #3, format='#2')}%
+\ST@wsf{ _st_.plot(\theST@plot, format='#2', _p_=#3)}%
 \ST@wsf{except:}%
 \ST@wsf{ _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
@@ -1249,9 +1252,9 @@ class SageTeXProcessor():
 % that \LTX doesn't treat commas and spaces in macro arguments
 % specially, and second, that Python (and Sage plotting functions) has
 % nice support for keyword arguments. The |#3| argument to |\sageplot|
-% becomes |p| and |**kwargs| below.
+% becomes |_p_| and |**kwargs| below.
 %    \begin{macrocode}
-  def plot(self, counter, p, format='notprovided', **kwargs):
+  def plot(self, counter, _p_, format='notprovided', **kwargs):
     if not self.didinitplot:
       self.initplot()
     self.progress('Plot %s' % counter)
@@ -1279,7 +1282,7 @@ class SageTeXProcessor():
         continue
       plotfilename = os.path.join(self.plotdir, 'plot-%s.%s' % (counter, fmt))
       #print('  plotting %s with args %s' % (plotfilename, kwargs))
-      p.save(filename=plotfilename, **kwargs)
+      _p_.save(filename=plotfilename, **kwargs)
 %    \end{macrocode}
 % If the user provides a format \emph{and} specifies the |imagemagick|
 % option, we try to convert the newly-created file into EPS format.
@@ -1794,6 +1797,13 @@ class SageCodeExtractor():
 % feedback.
 %
 % \section{Copying and licenses}
+%
+% If you are unnaturally curious about the current state of the \ST
+% package, you can visit \url{http://www.bitbucket.org/ddrake/sagetex/}.
+% There is a Mercurial repository and other stuff there.
+%
+% As for the terms and conditions under which you can copy and modify
+% \ST:
 %
 % The \emph{source code} of the \ST package may be redistributed and/or
 % modified under the terms of the GNU General Public License as

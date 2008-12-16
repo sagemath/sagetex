@@ -4,8 +4,8 @@
 % package for more information!
 
 \documentclass{article}
-\title{Examples of embedding Sage in \LaTeX}
-\author{}
+\title{Examples of embedding Sage in \LaTeX{} with \textsf{SageTex}}
+\author{Dan Drake and others}
 
 \usepackage{sagetex}
 % 
@@ -167,7 +167,7 @@ And here's the picture:
 3D plotting right now is problematic because there's no convenient way
 to produce vector graphics. We can make PNGs, though, and since the
 \verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
-a valid format for 3D plotting}. Sage right now (version 2.10.3) can't
+a valid format for 3D plotting}. Sage right now (version 3.2.2) can't
 produce EPS or PDF files from plot3d objects, so if you don't specify a
 valid format, things will go badly. You can specify the
 ``\texttt{imagemagick}'' option, which will use the Imagemagick
