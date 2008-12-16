@@ -70,6 +70,9 @@
 % \changes{v1.2}{2008/03/07}{Imagemagick option; better documentation}
 % \changes{v1.3.1}{2008/03/10}{Internal variables renamed; fixed typos}
 % \changes{v1.4}{2008/03/11}{MD5 fix, percent sign macro, CTAN upload}
+% \changes{v2.0}{2008/12/16}{External Python scripts for parsing
+% SageTeX-ified documents}
+% 
 %
 % \GetFileInfo{sagetexpackage.dtx}
 %
@@ -379,7 +382,7 @@
 % Right now there is, to put it nicely, a bit of tension between the
 % sort of graphics formats supported by |latex| and |pdflatex|, and the
 % graphics formats supported by Sage's 3D plotting systems.\footnote{We
-% use a typewriter font here to indicate the binaries which produce DVI
+% use a typewriter font here to indicate the executables which produce DVI
 % and PDF files, respectively, as opposed to ``\LTX'' which refers to
 % the entire typesetting system.} \LTX is happiest, and produces the
 % best output, with EPS and PDF files, which are vector formats.
@@ -669,11 +672,13 @@
 \newlength{\sagetexindent}
 \setlength{\sagetexindent}{5ex}
 %    \end{macrocode}
-%
-% It's time to deal with files. Open the |.sage| file:
+% Set up the file stuff, which will get run at the beginning of the
+% document, after we know what's happening with the |final| option. 
+% First, we open the |.sage| file:
 %    \begin{macrocode}
-\newwrite\ST@sf
-\immediate\openout\ST@sf=\jobname.sage
+\AtBeginDocument{\@ifundefined{ST@final}{%
+\newwrite\ST@sf%
+\immediate\openout\ST@sf=\jobname.sage%
 %    \end{macrocode}
 %
 % \begin{macro}{\ST@wsf}
@@ -686,27 +691,64 @@
 % directory or are installing \ST system-wide; then you don't need to
 % copy |sagetex.py| into the same directory as your document.
 %    \begin{macrocode}
-\newcommand{\ST@wsf}[1]{\immediate\write\ST@sf{#1}}
+\newcommand{\ST@wsf}[1]{\immediate\write\ST@sf{#1}}%
 \iffalse
 %% To get .sage files to automatically change the Python path to find
 %% sagetex.py, delete the \iffalse and \fi lines surrounding this and
 %% change the directory below to where sagetex.py can be found.
-\ST@wsf{import sys}
-\ST@wsf{sys.path.insert(0, 'directory with sagetex.py')}
-\fi
-\ST@wsf{import sagetex}
-\ST@wsf{_st_ = sagetex.SageTeXProcessor('\jobname')}
+\ST@wsf{import sys}%
+\ST@wsf{sys.path.insert(0, 'directory with sagetex.py')}%
+\fi%
+\ST@wsf{import sagetex}%
+\ST@wsf{_st_ = sagetex.SageTeXProcessor('\jobname')}}%
+%    \end{macrocode}
+% On the other hand, if the |ST@final| flag is set, don't bother with
+% any of the file stuff, and make |\ST@wsf| a no-op.
+%    \begin{macrocode}
+{\newcommand{\ST@wsf}[1]{\relax}}}
 %    \end{macrocode}
 % \end{macro}
 % Now we declare our options, which mostly just do things to the |st|
 % object that just got defined in the |.sage| file.
-% \changes{v2.0}{2008/04/40}{Add \texttt{epstopdf} option}
+% \changes{v2.0}{2008/04/04}{Add \texttt{epstopdf} and \texttt{final}
+% options}
+%
+% The |final| option controls whether or not we write the |.sage| file;
+% the |imagemagick| and |epstopdf| options both want to write something
+% to that same file. So we put off all the actual file stuff until the
+% beginning of the document---by that time, we'll have processed the
+% |final| option (or not) and can check the |\ST@final| flag to see what
+% to do. (We have to do this because can't specify code to get run if an
+% option \emph{isn't} defined.)
+%
+% For |final|, we set a flag for other guys to check, and if there's no
+% |.sout| file, we warn the user that something fishy is going on.
+%    \begin{macrocode}
+\DeclareOption{final}{%
+  \newcommand{\ST@final}{x}%
+  \IfFileExists{\jobname.sout}{}{\AtEndDocument{\PackageWarningNoLine{sagetex}%
+  {`final' option provided, but \jobname.sout^^Jdoesn't exist! No Sage
+    input will appear in your document. Remove the `final'^^Joption and
+    rerun LaTeX on your document}}}}
+%    \end{macrocode}
+% For |imagemagick|, we set two flags: one for \LTX and one for Sage.
+% It's important that we set |ST@useimagmagick| \emph{before} the
+% beginning of the document, so that the graphics commands can check
+% that. We do wait until the beginning of the document to do file
+% writing stuff.
 %    \begin{macrocode}
 \DeclareOption{imagemagick}{%
   \newcommand{\ST@useimagemagick}{x}%
-  \ST@wsf{_st_.useimagemagick = True}}
+  \AtBeginDocument{%
+  \@ifundefined{ST@final}{%
+    \ST@wsf{_st_.useimagemagick = True}}{}}}
+%    \end{macrocode}
+% For |epstopdf|, we just set a flag for Sage. Then, process the options.
+%    \begin{macrocode}
 \DeclareOption{epstopdf}{%
-  \ST@wsf{_st_.useepstopdf = True}}
+\AtBeginDocument{%
+\@ifundefined{ST@final}{%
+  \ST@wsf{_st_.useepstopdf = True}}{}}}
 \ProcessOptions\relax
 %    \end{macrocode}
 % The |\relax| is a little incantation suggested by the ``\LaTeXe{} for

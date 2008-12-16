@@ -12,3 +12,4 @@ sagetex.py
 makestatic.py
 extractsagecode.py
 sagetexparse.py
+auto/*.el
