@@ -1829,8 +1829,8 @@ class SageCodeExtractor():
     self.result += t.code[1:-1] + '\n\n'
 
   def envout(self, s, l, t):
-    self.result += '# %s environment from line %s:' % (lineno(l, s),
-      t.env)
+    self.result += '# %s environment from line %s:' % (t.env,
+      lineno(l, s))
     self.result += t.code[0] + '\n'
 %    \end{macrocode}
 % \end{macro}
