@@ -27,7 +27,7 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-  [2008/03/12 v1.4 embedding Sage into LaTeX documents]
+  [2008/12/18 v2.0 embedding Sage into LaTeX documents]
 %</latex>
 %<*driver>
 \documentclass{ltxdoc}
@@ -35,6 +35,8 @@
 \usepackage{xspace}
 \usepackage{tikz}
 \usepackage{hyperref}
+\renewcommand{\subsubsectionautorefname}{section}
+\renewcommand{\subsectionautorefname}{section}
 \EnableCrossrefs         
 \CodelineIndex
 \RecordChanges
@@ -71,7 +73,8 @@
 % \changes{v1.3.1}{2008/03/10}{Internal variables renamed; fixed typos}
 % \changes{v1.4}{2008/03/11}{MD5 fix, percent sign macro, CTAN upload}
 % \changes{v2.0}{2008/12/16}{External Python scripts for parsing
-% SageTeX-ified documents}
+% SageTeX-ified documents, tons of documentation improvements,
+% sagetex.py refactored}
 %
 % \GetFileInfo{sagetexpackage.dtx}
 %
@@ -88,7 +91,7 @@
 % \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
 % \title{The \ST{} package\thanks{This document
-%   corresponds to \textsf{sagetex}~\fileversion, dated \filedate.}}
+%   corresponds to \ST~\fileversion, dated \filedate.}}
 % \author{Dan Drake (\texttt{ddrake@member.ams.org}) and others}
 %
 % \maketitle
@@ -98,7 +101,7 @@
 % Why should the Haskell and R folks have all the fun?
 % \href{http://www.haskell.org/haskellwiki/Literate_programming}{Literate
 % Haskell} is a popular way to mix Haskell source code and \LTX
-% documents. (Well, actually any kind of text or document, but here
+% documents. (Actually any kind of text or document, but here
 % we're concerned only with \LTX.) You can even embed Haskell code in
 % your document that writes part of your document for you. Similarly,
 % the R statistical computing environment includes
@@ -193,16 +196,38 @@
 % colleague who is not yet enlightened enough to be using \ST.
 %
 % Rather than make lots of copies of those files, you can keep them in
-% one place and update the TEXINPUTS and PYTHONPATH environment
-% variables appropriately.
+% one place and use the |SAGE_PYTHONPATH| environment variable so that
+% Sage can find |sagetex.py|. It is slightly more complicated to get
+% \LTX to find |sagetex.sty|; the easiest thing to do is to create a
+% |texmf| directory in your home directory and use the |texhash| utility
+% so that your \TeX{} system can find the new files. See
+% \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=privinst}
+% {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=privinst}} which
+% describes the basic ideas, and also
+% \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}
+% {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}} which has
+% some information specific to MiK\TeX. Linux/Unix users can use
+% |$HOME/texmf| and users of \TeX Live on OS X should use
+% |$HOME/Library/texmf|.
 %
-% Perhaps the best solution is to put the files into a directory
-% searched by \TeX{} and friends, and then edit the |sagetex.sty| file
-% so that the |.sage| files we generate update Python's path
-% appropriately---look for ``Python path'' in |sagetex.sty|. This is
-% suitable for a system-wide installation, or if you are the kind of
-% person who keeps a |texmf| tree in your home directory.
+% Since modern \TeX{} distributions all automatically look for things in
+% your personal |texmf| directory, it's very convenient to put both
+% |sagetex.sty| and |sagetex.py| in your home |texmf| directory and edit
+% the |sagetex.sty| file so that the |.sage| files we generate update
+% Python's path appropriately---look for ``Python path'' in
+% |sagetex.sty|. This is also suitable for a system-wide installation.
 %
+% A future version of Sage will include |sagetex.py|, so that you can
+% simply run Sage on the |.sage| files that \ST produces and it will
+% just work.
+%
+% When you extract everything using the |.ins| file, you also get
+% several Python files: |makestatic.py| and |extractsagecode.py| are
+% convenience scripts that you can use after you've written your
+% document. See \autoref{sec:makestatic} and
+% \autoref{sec:extractsagecode} for information on using those scripts.
+% The file |sagetexparse.py| is a module used by both those scripts.
+% These three file are independent of \ST.
 %
 % \section{Usage} \label{s:usage}
 % 
@@ -235,10 +260,11 @@
 % \texttt{example.tex}\dots}\\
 %
 % \noindent\fbox{\parbox{.97\textwidth}{\textbf{WARNING!} When you run
-% \LTX on a file |foo.tex|, the file |foo.sage| is created---and will be
+% \LTX on a file named \texttt{\meta{filename}.tex}, the file
+% \texttt{\meta{filename}.sage} is created---and will be
 % \emph{automatically overwritten} if it already exists. If you keep
-% Sage scripts in the same directory as your \ST-ified \LTX documents,
-% use a different file name!}}
+% Sage scripts in the same directory as your \ST-ified \LTX
+% documents, use a different file name!}}
 %
 % \paragraph{The final option} On a similar note, \ST, like many \LTX
 % packages, accepts the |final| option. When passed this option, either
@@ -253,9 +279,8 @@
 %
 % \DescribeMacro{\sage}
 % \fbox{\texttt{\bslash sage}\marg{Sage code}}
-%
-% \noindent takes whatever Sage code you give it, runs Sage's |latex|
-% function on it, and puts the result into your document. 
+% takes whatever Sage code you give it, runs Sage's |latex| function on
+% it, and puts the result into your document.
 %
 % For example, if you do |\sage{matrix([[1, 2], [3,4]])^2}|, then that
 % macro will get replaced by
@@ -305,8 +330,7 @@
 % \noindent \DescribeMacro{\sageplot}
 % \fbox{\texttt{\bslash sageplot}\oarg{ltx opts}\oarg{fmt}\{\meta{graphics
 % obj}, \meta{keyword args}\}}
-%
-% \noindent plots the given Sage graphics object and runs an
+% plots the given Sage graphics object and runs an
 % |\includegraphics| command to put it into your document. It does not
 % have to actually be a plot of a function; it can be any Sage graphics
 % object. The options are described in \autoref{t:sageplotopts}.
@@ -421,11 +445,11 @@
 % and |pdflatex|) will be profoundly confused. Don't do that.
 % 
 % Since |latex| does not support PNGs, when using 3D plotting (and
-% therefore a bitmap format like PNG), \ST will \emph{always} issue a
-% warning about incompatible graphics if you use |latex|, provided
-% you've processed the |.sage| file and the PNG file exists. (Running
-% |pdflatex| on the same file will work, since PDF files can include PNG
-% files.) 
+% therefore a bitmap format like PNG), \ST will always issue a warning
+% about incompatible graphics if you use |latex|, provided you've
+% processed the |.sage| file and the PNG file exists. The only exception
+% is if you're using the |imagemagick| option below. (Running |pdflatex|
+% on the same file will work, since PDF files can include PNG files.)
 %
 % \paragraph{The imagemagick option} As a response to the above issue,
 % the \ST package has an |imagemagick| option. If you specify this
@@ -568,6 +592,7 @@
 % commands are just meant to be a starting point.
 %
 % \subsection{Sending \ST files to others who don't use Sage}
+% \label{sec:makestatic}
 %
 % What can you do when sending a \LTX document that uses \ST to a
 % colleague who doesn't use Sage?\footnote{Or who cannot use Sage, since
@@ -624,6 +649,7 @@
 % me know.
 %
 % \subsection{Extracting the Sage code from a document}
+% \label{sec:extractsagecode}
 %
 % This next script is probably not so useful, but having done the above,
 % this was pretty easy. The |extractsagecode.py| script does the
@@ -778,6 +804,7 @@
 %    \end{macrocode}
 %
 % \subsubsection{The \texttt{\bslash sage} macro}
+% \label{sec:sagemacro}
 %
 % \begin{macro}{\sage}
 % This macro combines |\ref|, |\label|, and Sage all at once. First, we
@@ -801,6 +828,9 @@ try:^^J
  _st_.inline(\theST@inline, #1)^^Jexcept:^^J
  _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
+% The |inline| function of the Python module is documented on page
+% \pageref{inlinefn}.
+%
 % Our use of |\newlabel| and |\ref| seems awfully clever until you load
 % the |hyperref| package, which gleefully tries to hyperlink the hell
 % out of everything. This is great until it hits one of our special
@@ -842,6 +872,7 @@ try:^^J
 % \end{macro}
 %
 % \subsubsection{The \texttt{\bslash sageplot} macro and friends}
+% \label{sec:sageplotmacro}
 %
 % Plotting is rather more complicated, and requires several helper
 % macros that accompany |\sageplot|.
@@ -857,6 +888,13 @@ try:^^J
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\ST@missingfilebox}
+% The code that makes the ``file not found'' box. This shows up in a
+% couple places below, so let's just define it once.
+%    \begin{macrocode}
+\newcommand{\ST@missingfilebox}{\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}}
+%    \end{macrocode}
+% \end{macro}
 % \begin{macro}{\sageplot}
 % \changes{v1.3}{2008/03/08}{Iron out warnings, cool \TikZ flowchart}
 % This function is similar to |\sage|. The neat thing that we take
@@ -906,6 +944,8 @@ try:^^J
  _st_.plot(\theST@plot, format='#2', _p_=#3)^^Jexcept:^^J
  _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
+% The Python |plot| function is documented on page~\pageref{plotfn}.
+%
 % Now we include the appropriate graphics file. Because the user might
 % be producing DVI or PDF files, and have supplied a file format or not,
 % and so on, the logic we follow is a bit complicated.
@@ -971,12 +1011,12 @@ try:^^J
 %    \begin{macrocode}
     {\@ifundefined{ST@useimagemagick}%
       {\IfFileExists{\ST@plotdir/plot-\theST@plot.#2}%
-        {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
+        {\ST@missingfilebox%
          \PackageWarning{sagetex}{Graphics file
          \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space
          cannot be used with DVI output. Use pdflatex or create an EPS
          file. Plot command is}}%
-        {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
+        {\ST@missingfilebox%
          \PackageWarning{sagetex}{Graphics file
          \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space
          does not exist. Plot command is}%
@@ -1010,7 +1050,7 @@ try:^^J
 % then set a flag that, at the end of the run, tells the user to run
 % Sage again.
 %    \begin{macrocode}
-    {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
+    {\ST@missingfilebox%
      \PackageWarning{sagetex}{Graphics file
      \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
      exist. Plot command is}%
@@ -1034,16 +1074,19 @@ try:^^J
 % \end{macro}
 %
 % \subsubsection{Verbatim-like environments}
+% \label{sec:verbatim-envs}
 %
 % \begin{macro}{\ST@beginsfbl}
 % This is ``begin |.sage| file block'', an internal-use abbreviation
-% that sets things up when we start writing a chunk of Sage code to the
-% |.sage| file. It begins with some \TeX{} magic that fixes spacing,
-% then puts the start of a try/except block in the |.sage| file---this
-% not only allows the user to indent code without Sage/Python
-% complaining about indentation, but lets us tell the user where things
-% went wrong. The last bit is some magic from the |verbatim| package
-% manual that makes \LTX respect line breaks.
+% that sets things up when we start writing a chunk of Sage code to
+% the |.sage| file. It begins with some \TeX{} magic that fixes
+% spacing, then puts the start of a try/except block in the |.sage|
+% file---this not only allows the user to indent code without
+% Sage/Python complaining about indentation, but lets us tell the user
+% where things went wrong. The |blockbegin| and |blockend| functions
+% are documented on page~\pageref{blocksbeginend}. The last bit is some
+% magic from the |verbatim| package manual that makes \LTX respect
+% line breaks.
 %    \begin{macrocode}
 \newcommand{\ST@beginsfbl}{%
   \@bsphack\ST@wsf{%
@@ -1257,9 +1300,10 @@ class SageTeXProcessor():
 % \end{macro}
 %
 % \begin{macro}{inline}
-% This function works with |\sage| from the style file to put Sage
-% output into your \LTX file. Usually, when you use |\label|, it
-% writes a line such as
+% \phantomsection\label{inlinefn}
+% This function works with |\sage| from the style file (see
+% \autoref{sec:sagemacro}) to put Sage output into your \LTX file.
+% Usually, when you use |\label|, it writes a line such as
 % \begin{center}
 %   |\newlabel{labelname}{{section number}{page number}}|
 % \end{center}
@@ -1288,9 +1332,11 @@ class SageTeXProcessor():
 %
 % \begin{macro}{blockbegin}
 % \begin{macro}{blockend}
+% \phantomsection\label{blocksbeginend}
 % This function and its companion used to write stuff to the |.sout|
 % file, but now they just update the user on our progress evaluating a
-% code block.
+% code block. The verbatim-like environments of
+% \autoref{sec:verbatim-envs} use these functions.
 %    \begin{macrocode}
   def blockbegin(self):
     self.progress('Code block begin...', False)
@@ -1301,12 +1347,14 @@ class SageTeXProcessor():
 % \end{macro} 
 %
 % \begin{macro}{plot}
-% I hope it's obvious that this function does plotting. As mentioned in
-% the |\sageplot| code, we're taking advantage of two things: first,
-% that \LTX doesn't treat commas and spaces in macro arguments
-% specially, and second, that Python (and Sage plotting functions) has
-% nice support for keyword arguments. The |#3| argument to |\sageplot|
-% becomes |_p_| and |**kwargs| below.
+% \phantomsection\label{plotfn}
+% I hope it's obvious that this function does plotting. It's the Python
+% counterpart of |\ST@sageplot| described in \autoref{sec:sageplotmacro}. As
+% mentioned in the |\sageplot| code, we're taking advantage of two
+% things: first, that \LTX doesn't treat commas and spaces in macro
+% arguments specially, and second, that Python (and Sage plotting
+% functions) has nice support for keyword arguments. The |#3| argument
+% to |\sageplot| becomes |_p_| and |**kwargs| below.
 %    \begin{macrocode}
   def plot(self, counter, _p_, format='notprovided', **kwargs):
     if not self.didinitplot:
