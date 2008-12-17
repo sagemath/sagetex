@@ -1586,8 +1586,8 @@ if len(args) == 2 and (os.path.exists(args[1]) and not overwrite):
 src, ext = os.path.splitext(args[0])
 sagecode = SageCodeExtractor(src)
 header = """\
-%% This file contains Sage code extracted from %s.%s.
-%% Processed %s.
+# This file contains Sage code extracted from %s%s.
+# Processed %s.
 
 """ % (src, ext, time.strftime('%a %d %b %Y %H:%M:%S', time.localtime()))
 
@@ -1614,6 +1614,7 @@ dest.write(sagecode.result)
 % expressions, which sometimes look like someone sneezed punctuation all
 % over the screen.
 %    \begin{macrocode}
+import sys
 from pyparsing import *
 %    \end{macrocode}
 % First, we define this very helpful parser: it finds the matching
@@ -1676,7 +1677,11 @@ class SoutParser():
 % A |.sout| file consists of one or more such lines. Now go parse the
 % file we were given.
 %    \begin{macrocode}
-    OneOrMore(parselabel).parseFile(fn)
+    try:
+      OneOrMore(parselabel).parseFile(fn)
+    except IOError:
+      print 'Error accessing %s; exiting. Does your .sout file exist?' % fn
+      sys.exit(1)
 %    \end{macrocode}
 % Pyparser's parse actions get called with three arguments: the string
 % that matched, the location of the beginning, and the resulting parse
