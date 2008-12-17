@@ -72,13 +72,12 @@
 % \changes{v1.4}{2008/03/11}{MD5 fix, percent sign macro, CTAN upload}
 % \changes{v2.0}{2008/12/16}{External Python scripts for parsing
 % SageTeX-ified documents}
-% 
 %
 % \GetFileInfo{sagetexpackage.dtx}
 %
 % \DoNotIndex{\newcommand,\newenvironment,\the}
 % 
-% \newcommand{\ST}{\textsf{SageTex}\xspace}
+% \newcommand{\ST}{\textsf{Sage\TeX}\xspace}
 % \iffalse
 % so I don't have to put \ or {} after \LaTeX:
 % \fi
@@ -211,11 +210,11 @@
 % very first step is to put |\usepackage{sagetex}| in the preamble of
 % your document. When you use macros from this package and run \LTX on
 % your file, along with the usual zoo of auxiliary files, a |.sage| file
-% is written. This is a Sage source file that uses the Python module
-% from this package and when you run Sage on that file, it will produce
-% a |.sout| file. That file contains \LTX code which, when you run \LTX
-% on your source file again, will pull in all the results of Sage's
-% computation.
+% is written with the same basename as your document. This is a Sage
+% source file that uses the Python module from this package and when you
+% run Sage on that file, it will produce a |.sout| file. That file
+% contains \LTX code that, when you run \LTX on your source file again,
+% will pull in all the results of Sage's computation.
 %
 % All you really need to know is that to typeset your document, you need
 % to run \LTX, then run Sage, then run \LTX again. 
@@ -233,7 +232,22 @@
 % look through the |example.tex| file included with this
 % package.\footnote{Then again, if you're such a person, you're probably
 % not reading this, and are already fiddling with
-% \texttt{example.tex}\dots}
+% \texttt{example.tex}\dots}\\
+%
+% \noindent\fbox{\parbox{.97\textwidth}{\textbf{WARNING!} When you run
+% \LTX on a file |foo.tex|, the file |foo.sage| is created---and will be
+% \emph{automatically overwritten} if it already exists. If you keep
+% Sage scripts in the same directory as your \ST-ified \LTX documents,
+% use a different file name!}}
+%
+% \paragraph{The final option} On a similar note, \ST, like many \LTX
+% packages, accepts the |final| option. When passed this option, either
+% directly in the |\usepackage| line, or from the |\documentclass| line,
+% \ST will not write a |.sage| file. It will try to read in the |.sout|
+% file so that the \ST macros can pull in their results. However, this
+% will not allow you to have an independent Sage script with the same
+% basename as your document, since to get the |.sout| file, you need the
+% |.sage| file.
 %
 % \subsection{Inline Sage}
 %
@@ -349,9 +363,12 @@
 % to colleagues.
 %
 % If you ask for, say, a PNG file, keep in mind that ordinary |latex|
-% and DVI files have no support for DVI files; \ST detects this and will
-% warn you that it cannot find a suitable file if using |latex|. If you
-% use |pdflatex|, there will be no problems because PDF files can
+% and DVI files have no support for PNG files; \ST detects this and will
+% warn you that it cannot find a suitable file if using
+% |latex|.\footnote{We use a typewriter font here to indicate the
+% executables which produce DVI and PDF files, respectively, as
+% opposed to ``\LTX'' which refers to the entire typesetting system.}
+% If you use |pdflatex|, there will be no problems because PDF files can
 % include PNG graphics.
 %
 % When \ST cannot find a graphics file, it inserts this into your
@@ -371,23 +388,29 @@
 % anytime; if \ST can't find the files, it will warn you to run Sage to
 % regenerate them.\\
 %
-% \noindent\fbox{\parbox{\textwidth}{\textbf{WARNING!} When you run Sage
-% on your |.sage| file, all files in the
-% \texttt{sage-plots-for-filename.tex} directory \emph{will be deleted!}
-% Do not put any files into that directory that you do not want to get
-% automatically deleted.}}
+% \noindent\fbox{\parbox{.97\textwidth}{\textbf{WARNING!} When you run
+% Sage on your |.sage| file, all files in the
+% \texttt{sage-plots-for-\meta{filename}.tex} directory \emph{will be
+% deleted!} Do not put any files into that directory that you do not
+% want to get automatically deleted.}}
+%
+% \paragraph{The epstopdf option} One of the graphics-related options
+% supported by \ST is |epstopdf|. This option causes \ST to use the
+% |epstopdf| command to convert EPS files into PDF files. Like with the
+% |imagemagick| option, it doesn't check to see if the |epstopdf|
+% command exists or add options: it just runs the command. This option
+% was motivated by a bug in the matplotlib PDF backend which caused it
+% to create invalid PDFs. Ideally, this option should never be
+% necessary; if you do need to use it, file a bug!
 %
 % \subsubsection{3D plotting}
 %
 % Right now there is, to put it nicely, a bit of tension between the
 % sort of graphics formats supported by |latex| and |pdflatex|, and the
-% graphics formats supported by Sage's 3D plotting systems.\footnote{We
-% use a typewriter font here to indicate the executables which produce DVI
-% and PDF files, respectively, as opposed to ``\LTX'' which refers to
-% the entire typesetting system.} \LTX is happiest, and produces the
-% best output, with EPS and PDF files, which are vector formats.
-% Tachyon, Sage's 3D plotting system, produces bitmap formats like BMP
-% and PNG.
+% graphics formats supported by Sage's 3D plotting systems. \LTX is
+% happiest, and produces the best output, with EPS and PDF files, which
+% are vector formats. Tachyon, Sage's 3D plotting system, produces
+% bitmap formats like BMP and PNG.
 %
 % Because of this, when producing 3D plots with |\sageplot|, \emph{you
 % must specify a file format}. The PNG format is compressed and lossless
@@ -420,15 +443,6 @@
 % to see your graphics when you use |latex| and DVI files while writing
 % your document.
 %
-% \paragraph{The epstopdf option} The only other option supported by \ST
-% is |epstopdf|. This option causes \ST to use the |epstopdf| command to
-% convert EPS files into PDF files. Like with the |imagemagick| option,
-% it doesn't check to see if the |epstopdf| command exists or add
-% options: it just runs the command. This option was motivated by a bug
-% in the matplotlib PDF backend which caused it to create invalid PDFs.
-% Ideally, this option should never be necessary; if you do need to use
-% it, file a bug!
-%
 % \subsubsection{But that's not good enough!} \label{s:notgoodenough}
 %
 % The |\sageplot| command tries to be both flexible and easy to use, but
@@ -447,7 +461,7 @@
 % \label{s:codeblockenv}
 %
 % The \ST package provides several environments for typesetting and
-% executing Sage code.\\
+% executing blocks of Sage code.\\
 %
 % \DescribeEnv{sageblock} Any text between |\begin{sageblock}| and
 % |\end{sageblock}| will be typeset into your file, and also written into
@@ -557,13 +571,13 @@
 %
 % What can you do when sending a \LTX document that uses \ST to a
 % colleague who doesn't use Sage?\footnote{Or who cannot use Sage, since
-% currently \ST is not very useful on Windows.} Well, the best option is
-% to bring your colleague into the light and get him or her using Sage!
-% But this may not be feasible, because some (most?) mathematicians are
-% fiercely crotchety about their choice of computer algebra system, and
+% currently \ST is not very useful on Windows.} The best option is to
+% bring your colleague into the light and get him or her using Sage! But
+% this may not be feasible, because some (most?) mathematicians are
+% fiercely crotchety about their choice of computer algebra system, or
 % you may be sending a paper to a journal or the arXiv, and such places
-% are unlikely to get Sage just so they can typeset your paper---at
-% least not until Sage is much closer to its goal of world domination.
+% will not run Sage just so they can typeset your paper---at least not
+% until Sage is much closer to its goal of world domination.
 %
 % How can you send your \ST-enabled document to someone else who doesn't
 % use Sage? The easiest way is to simply include with your document the
@@ -585,22 +599,24 @@
 % Use of the script is quite simple. Copy it and |sagetexparse.py| to
 % the directory with your document, and run
 % \begin{quote}
-%   |./makestatic.py inputfile [outputfile]|
+%   |python makestatic.py inputfile [outputfile]|
 % \end{quote}
-% where |inputfile| is your document. You optionally specify
-% |outputfile|; if you do so, the results will be written to that file.
-% If the file exists, it won't be overwritten unless you also specify
-% the |-o| switch.
+% where |inputfile| is your document. (You can also set the executable
+% bit of |makestatic.py| and use |./makestatic.py|.) You optionally
+% specify |outputfile|; if you do so, the results will be written to
+% that file. If the file exists, it won't be overwritten unless you also
+% specify the |-o| switch.
 %
 % You will need to run this after you've compiled your document and run
 % Sage on the |.sage| file. The script reads in the |.sout| file and
-% replaces all the calls to |\sage| and |\sageplot| with their \LTX
-% equivalent, and turns the |sageblock| and |sageverbatim| environments
-% into |verbatim| environments. Any |sagesilent| environment is turned
-% into a |comment| environment. The resulting document should compile to
-% something identical to the original file.
+% replaces all the calls to |\sage| and |\sageplot| with their plain
+% \LTX equivalent, and turns the |sageblock| and |sageverbatim|
+% environments into |verbatim| environments. Any |sagesilent|
+% environment is turned into a |comment| environment. The resulting
+% document should compile to something identical, or very nearly so, to
+% the original file.
 %
-% The parsing that |makestatic.py| is pretty good, but not perfect.
+% The parsing that |makestatic.py| does is pretty good, but not perfect.
 % Right now it doesn't support having a comma-separated list of
 % packages, so you can't have |\usepackage{sagetex, foo}|. You need to
 % have just |\usepackage{sagetex}|. (Along with package options; those
@@ -708,17 +724,17 @@
 {\newcommand{\ST@wsf}[1]{\relax}}}
 %    \end{macrocode}
 % \end{macro}
-% Now we declare our options, which mostly just do things to the |st|
-% object that just got defined in the |.sage| file.
-% \changes{v2.0}{2008/04/04}{Add \texttt{epstopdf} and \texttt{final}
-% options}
+% Now we declare our options, which mostly just set flags that we check
+% at the beginning of the document, and when running the |.sage| file.
+% \changes{v2.0}{2008/04/04}{Add \texttt{epstopdf} option}
+% \changes{v2.0}{2008/12/16}{Add \texttt{final} option}
 %
 % The |final| option controls whether or not we write the |.sage| file;
 % the |imagemagick| and |epstopdf| options both want to write something
 % to that same file. So we put off all the actual file stuff until the
 % beginning of the document---by that time, we'll have processed the
 % |final| option (or not) and can check the |\ST@final| flag to see what
-% to do. (We have to do this because can't specify code to get run if an
+% to do. (We must do this because we can't specify code that runs if an
 % option \emph{isn't} defined.)
 %
 % For |final|, we set a flag for other guys to check, and if there's no
@@ -776,13 +792,14 @@
 % try/except around the function call so that we can provide a more
 % helpful error message in case something goes wrong. (In particular, we
 % can tell the user which line of the |.tex| file contains the offending
-% code.)
+% code.) We can use |^^J| to put linebreaks into the |.sage| file, but
+% \LTX wants to put a space after that, which is why we don't put the
+% ``except'' on its own line here in the source.
 %    \begin{macrocode}
-\newcommand{\sage}[1]{%
-\ST@wsf{try:}%
-\ST@wsf{ _st_.inline(\theST@inline, #1)}%
-\ST@wsf{except:}%
-\ST@wsf{ _st_.goboom(\the\inputlineno)}%
+\newcommand{\sage}[1]{\ST@wsf{%
+try:^^J
+ _st_.inline(\theST@inline, #1)^^Jexcept:^^J
+ _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % Our use of |\newlabel| and |\ref| seems awfully clever until you load
 % the |hyperref| package, which gleefully tries to hyperlink the hell
@@ -793,8 +810,8 @@
 %    \begin{macrocode}
 \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}%
 %    \end{macrocode}
-% Now check to see if the label has already been defined. (The internal
-% implementation of labels in \LTX involves defining a function
+% Now check if the label has already been defined. (The internal
+% implementation of labels in \LTX involves defining a macro called
 % ``|r@@labelname|''.) If it hasn't, we set a flag so that we can tell
 % the user to run Sage on the |.sage| file at the end of the run.
 % Finally, step the counter.
@@ -882,14 +899,12 @@
 % Let's see the real code here. We write a
 % couple lines to the |.sage| file, including a counter, input line
 % number, and all of the mandatory argument; all this is wrapped in
-% another try/except. Note that the |\write| gobbles up line endings, so
-% the |sageplot| bits below get written to the |.sage| file as one line.
+% another try/except. 
 %    \begin{macrocode}
-\def\ST@sageplot[#1][#2]#3{%
-\ST@wsf{try:}%
-\ST@wsf{ _st_.plot(\theST@plot, format='#2', _p_=#3)}%
-\ST@wsf{except:}%
-\ST@wsf{ _st_.goboom(\the\inputlineno)}%
+\def\ST@sageplot[#1][#2]#3{\ST@wsf{%
+try:^^J
+ _st_.plot(\theST@plot, format='#2', _p_=#3)^^Jexcept:^^J
+ _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % Now we include the appropriate graphics file. Because the user might
 % be producing DVI or PDF files, and have supplied a file format or not,
@@ -964,7 +979,7 @@
         {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
          \PackageWarning{sagetex}{Graphics file
          \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space
-         does not exist}%
+         does not exist. Plot command is}%
          \gdef\ST@rerun{x}}}%
 %    \end{macrocode}
 % Otherwise, we are using Imagemagick, so try to include an EPS file
@@ -998,7 +1013,7 @@
     {\framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}%
      \PackageWarning{sagetex}{Graphics file
      \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
-     exist}%
+     exist. Plot command is}%
      \gdef\ST@rerun{x}}}
 %    \end{macrocode}
 % \autoref{f:stig} makes this a bit clearer. 
@@ -1031,9 +1046,8 @@
 % manual that makes \LTX respect line breaks.
 %    \begin{macrocode}
 \newcommand{\ST@beginsfbl}{%
-  \@bsphack%
-  \ST@wsf{_st_.blockbegin()}%
-  \ST@wsf{try:}%
+  \@bsphack\ST@wsf{%
+_st_.blockbegin()^^Jtry:}%
   \let\do\@makeother\dospecials\catcode`\^^M\active}
 %    \end{macrocode}
 % \end{macro}
@@ -1042,9 +1056,8 @@
 % The companion to |\ST@beginsfbl|. 
 %    \begin{macrocode}
 \newcommand{\ST@endsfbl}{%
-\ST@wsf{except:}%
-\ST@wsf{ _st_.goboom(\the\inputlineno)}%
-\ST@wsf{_st_.blockend()}}
+\ST@wsf{except:^^J
+ _st_.goboom(\the\inputlineno)^^J_st_.blockend()}}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1124,8 +1137,7 @@
 % At any rate, we tell the user to run Sage if it's necessary.
 %    \begin{macrocode}
 {\PackageWarningNoLine{sagetex}{There were undefined Sage formulas
-and/or plots}%
-\PackageWarningNoLine{sagetex}{Run Sage on \jobname.sage, and then run
+and/or plots.^^JRun Sage on \jobname.sage, and then run
 LaTeX on \jobname.tex again}}}
 %    \end{macrocode}
 %
@@ -1207,7 +1219,7 @@ class SageTeXProcessor():
 %    \end{macrocode}
 %
 % \begin{macro}{progress}
-% This function justs prints stuff. It allows us to not print a
+% This function just prints stuff. It allows us to not print a
 % linebreak, so you can get ``|start...|'' (little time spent
 % processing) ``|end|'' on one line.
 %    \begin{macrocode}
@@ -1222,7 +1234,7 @@ class SageTeXProcessor():
 % \begin{macro}{initplot}
 % We only want to create the plots directory if the user actually plots
 % something. This function creates the directory and sets the
-% |initplot_done| flag after doing so. We make a directory based on the
+% |didinitplot| flag after doing so. We make a directory based on the
 % \LTX file being processed so that if there are multiple |.tex| files
 % in a directory, we don't overwrite plots from another file.
 %    \begin{macrocode}
@@ -1253,10 +1265,10 @@ class SageTeXProcessor():
 % \end{center}
 % to the |.aux| file. When you use the |hyperref| package, there are
 % more fields in the second argument, but the first two are the same.
-% The |\ref| command just pulls in what's in the first field, so we can
-% hijack this mechanism for our own nefarious purposes. The function
-% writes a |\newlabel| line with a label made from a counter and the
-% text from running Sage on |s|. 
+% The |\ref| command just pulls in what's in the first field of the
+% second argument, so we can hijack this mechanism for our own nefarious
+% purposes. The function writes a |\newlabel| line with a label made
+% from a counter and the text from running Sage on |s|.
 %
 % We print out the line number so if something goes wrong, the user can
 % more easily track down the offending |\sage| command in the source
@@ -1305,7 +1317,9 @@ class SageTeXProcessor():
 % PDF and EPS. This allows the user to transparently switch between
 % using a DVI previewer (which usually automatically updates when the
 % DVI changes, and has support for source specials, which makes the
-% writing process easier) and making PDFs. 
+% writing process easier) and making PDFs.\footnote{Yes, there's
+% \texttt{pdfsync}, but full support for that is still rare in Linux, so
+% producing EPS and PDF is the best solution for now.}
 %    \begin{macrocode}
     if format == 'notprovided':
       formats = ['eps', 'pdf']
@@ -1377,15 +1391,15 @@ class SageTeXProcessor():
 % \end{macro}
 % 
 % \begin{macro}{endofdoc}
-% When we're done processing, we have a couple little cleanup tasks. We
+% When we're done processing, we have some cleanup tasks. We
 % want to put the MD5 sum of the |.sage| file that produced the |.sout|
 % file we're about to write into the |.sout| file, so that external
-% programs that build \LTX documents can tell if they need to call Sage
+% programs that build \LTX documents can determine if they need to call Sage
 % to update the |.sout| file. But there is a problem: we write line
 % numbers to the |.sage| file so that we can provide useful error
-% messages---but that means that adding, say, a line break to your
+% messages---but that means that adding non-\ST text to your
 % source file will change the MD5 sum, and your program will think it
-% needs to rerun Sage even though none of the actual calls to Sage have
+% needs to rerun Sage even though none of the actual \ST macros
 % changed.
 %
 % How do we include line numbers for our error messages but still allow
@@ -1642,8 +1656,10 @@ class SoutParser():
 %  |\newlabel{@sageinline|\meta{integer}|}{|\marg{bunch of \LTX code}|{}{}{}{}}|
 % \end{quote}
 % which makes the parser definition below pretty obvious. We assign some
-% names to the interesting bits so the |newlabel| method can make them
-% into keys and values.
+% names to the interesting bits so the |newlabel| method can make the
+% \meta{integer} and \meta{bunch of \LTX code} into the keys and values
+% of a dictionary. The |DeSageTeX| class then uses that dictionary to
+% replace bits in the |.tex| file with their Sage-computed results.
 %    \begin{macrocode}
     parselabel = ('\\newlabel{@sageinline'
                  + Word(nums)('num')
