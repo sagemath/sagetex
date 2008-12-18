@@ -1,0 +1,33 @@
+This is the SageTeX package. It allows you to embed code, results of
+computations, and plots from the Sage mathematics software suite
+(http://sagemath.org) into LaTeX documents.
+====================================================================
+
+If you're reading this, you already have Sage, so if you also have TeX
+installed, you are ready to use SageTeX!
+
+To install SageTeX, you need only make the necessary files available to
+TeX; Sage already has the necessary bits built in. The easiest thing to
+do is copy this directory to a texmf directory in your home directory;
+something like this for Linux/Unix users:
+
+  cp -r $SAGE_ROOT/local/share/texmf/ $HOME/texmf/
+
+For OS X users with TeXLive:
+
+  cp -r $SAGE_ROOT/local/share/texmf/ $HOME/Library/texmf/
+
+I don't use Windows, so I don't know what MiKTeX users should do. Let me
+know and I'll add it here!
+
+After you've copied over the necessary files, you'll need to update
+TeX's database so that it can find them. Run "texhash $HOME/texmf"
+(replace the texmf directory as appropriate) to do this.
+
+Now check out the PDF files in this directory for more information on
+using SageTeX. If you have problems or suggestions see the sage-support
+group (http://groups.google.com/group/sage-support).
+
+Enjoy!
+
+Dan Drake

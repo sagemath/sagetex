@@ -1,5 +1,8 @@
 pkg=sagetexpackage
 dest=/home/drake/texmf/tex/latex/sagetex/
+# the subdir stuff makes the tarball have the directory correct
+srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
+ver=2.0
 
 all: ins
 	latex $(pkg).dtx
@@ -18,7 +21,7 @@ ins:
 
 clean: 
 	latexcleanup clean .
-	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST
 
 install:
 	cp sagetex.py $(dest)
@@ -27,8 +30,18 @@ install:
 	    -e 's|directory with sagetex.py|$(dest)|'\
 		-e '50,55 s/\\fi//' sagetex.sty > $(dest)/sagetex.sty
 
-dist: all
+# make a tarball suitable for CTAN uploads, or for someone who knows how
+# to handle .dtx files
+ctandist: all
 	@echo
 	@echo Did you turn off Imagemagick in example.tex?
 	@echo
-	@tar zcf sagetex.tar.gz ../sagetex/example.pdf ../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins ../sagetex/sagetexpackage.pdf
+	tar zcf sagetex.tar.gz $(srcs) ../sagetex/example.pdf ../sagetex/sagetexpackage.pdf
+
+# make a spkg for Sage
+spkg:
+	python setup.py sdist
+	cd dist
+	gunzip dist/sagetex-$(ver).tar.gz
+	bzip2 dist/sagetex-$(ver).tar
+	cp dist/sagetex-$(ver).tar.bz2 dist/sagetex-$(ver).spkg

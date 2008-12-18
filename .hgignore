@@ -13,3 +13,5 @@ makestatic.py
 extractsagecode.py
 sagetexparse.py
 auto/*.el
+dist/*
+MANIFEST
