@@ -1,9 +1,3 @@
-* should I switch over entirely to the Sweave strategy, where we parse a
-  file into LaTeX format?
-
-* hyperlinks in documentation between LaTeX and Python functions that
-  are interdependent
-
 * What about graphs and TikZ?
 
 * desagetexparser -- leave Sage commands in as comments? document usage!
@@ -12,4 +6,5 @@
 
 * UPDATE v2.0 date in .dtx file when it's ready!
 
-* Jason's suggestions from September
+* finish spkg-ification; don't include CTAN readme, make up a
+  README.spkg
