@@ -74,7 +74,7 @@
 % \changes{v1.4}{2008/03/11}{MD5 fix, percent sign macro, CTAN upload}
 % \changes{v2.0}{2008/12/16}{External Python scripts for parsing
 % SageTeX-ified documents, tons of documentation improvements,
-% sagetex.py refactored}
+% sagetex.py refactored, include in Sage as spkg}
 %
 % \GetFileInfo{sagetexpackage.dtx}
 %
@@ -189,42 +189,43 @@
 %
 % \section{Installation}
 %
-% The simplest way to ``install'' \ST is to copy the files |sagetex.sty|
-% and |sagetex.py| into the same directory as your document. This will
-% always work, as \LTX and Python search the current directory for
-% files. It is also convenient for zipping up a directory to send to a
-% colleague who is not yet enlightened enough to be using \ST.
+% \texttt{NB this is written assuming the \ST spkg is in Sage FIXME}
 %
-% Rather than make lots of copies of those files, you can keep them in
-% one place and use the |SAGE_PYTHONPATH| environment variable so that
-% Sage can find |sagetex.py|. It is slightly more complicated to get
-% \LTX to find |sagetex.sty|; the easiest thing to do is to create a
-% |texmf| directory in your home directory and use the |texhash| utility
-% so that your \TeX{} system can find the new files. See
+% In this section, ``\texttt{\$SAGE\_ROOT}'' refers to the root
+% directory of your Sage installation.
+%
+% The simplest way to ``install'' \ST is to copy the file |sagetex.sty|
+% from \texttt{\$SAGE\_ROOT/local/share/texmf} to the same directory as
+% your document. This will always work, as \LTX always searches the
+% current directory for files.
+%
+% Rather than make lots of copies of |sagetex.sty|, you can keep it (and
+% the rest of the \ST documentation) in a |texmf| directory. The easiest
+% thing to do is to create a |texmf| directory in your home directory
+% and use the |texhash| utility so that your \TeX{} system can find the
+% new files. See
 % \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=privinst}
 % {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=privinst}} which
 % describes the basic ideas, and also
 % \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}
 % {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}} which has
 % some information specific to MiK\TeX. Linux/Unix users can use
-% |$HOME/texmf| and users of \TeX Live on OS X should use
-% |$HOME/Library/texmf|.
+% |$HOME/texmf| and users of Mac\TeX should use |$HOME/Library/texmf|.
 %
-% Since modern \TeX{} distributions all automatically look for things in
-% your personal |texmf| directory, it's very convenient to put both
-% |sagetex.sty| and |sagetex.py| in your home |texmf| directory and edit
-% the |sagetex.sty| file so that the |.sage| files we generate update
-% Python's path appropriately---look for ``Python path'' in
-% |sagetex.sty|. This is also suitable for a system-wide installation.
+% To copy the files that \LTX needs into your |texmf| directory, simply
+% do
+% \begin{quote}
+%   \texttt{cp -r \$SAGE\_ROOT/local/share/texmf/* \$HOMEPREFIX/texmf/}
+% \end{quote}
+% where |$HOMEPREFIX| is the appropriate prefix for your own |texmf|
+% tree. Then you need to make \TeX aware of the new files by running
+% \begin{quote}
+%   \texttt{texhash \$HOMEPREFIX/texmf/}
+% \end{quote}
 %
-% A future version of Sage will include |sagetex.py|, so that you can
-% simply run Sage on the |.sage| files that \ST produces and it will
-% just work.
-%
-% When you extract everything using the |.ins| file, you also get
-% several Python files: |makestatic.py| and |extractsagecode.py| are
-% convenience scripts that you can use after you've written your
-% document. See \autoref{sec:makestatic} and
+% \ST also includes several Python files: |makestatic.py| and
+% |extractsagecode.py| are convenience scripts that you can use after
+% you've written your document. See \autoref{sec:makestatic} and
 % \autoref{sec:extractsagecode} for information on using those scripts.
 % The file |sagetexparse.py| is a module used by both those scripts.
 % These three file are independent of \ST.
@@ -627,10 +628,15 @@
 %   |python makestatic.py inputfile [outputfile]|
 % \end{quote}
 % where |inputfile| is your document. (You can also set the executable
-% bit of |makestatic.py| and use |./makestatic.py|.) You optionally
-% specify |outputfile|; if you do so, the results will be written to
-% that file. If the file exists, it won't be overwritten unless you also
-% specify the |-o| switch.
+% bit of |makestatic.py| and use |./makestatic.py|.) This script needs
+% the \href{http://pyparsing.wikispaces.com}{pyparsing} module to be
+% installed.\footnote{If you don't have pyparsing installed, you can
+% simply copy the file
+% \texttt{\$SAGE\_ROOT/local/lib/python/matplotlib/pyparsing.py} into
+% your directory.} You may optionally specify |outputfile|; if
+% you do so, the results will be written to that file. If the file
+% exists, it won't be overwritten unless you also specify the |-o|
+% switch.
 %
 % You will need to run this after you've compiled your document and run
 % Sage on the |.sage| file. The script reads in the |.sout| file and
@@ -722,25 +728,12 @@
 \newwrite\ST@sf%
 \immediate\openout\ST@sf=\jobname.sage%
 %    \end{macrocode}
-%
 % \begin{macro}{\ST@wsf}
 % We will write a lot of stuff to that file, so make a convenient
 % abbreviation, then use it to put the initial commands into the |.sage|
-% file. If you know what directory |sagetex.py| will be kept in, delete
-% the |\iffalse| and |\fi| lines in the generated style file
-% (\emph{don't} do it in the |.dtx| file) and change the directory
-% appropriately. This is useful if you have a |texmf| tree in your home
-% directory or are installing \ST system-wide; then you don't need to
-% copy |sagetex.py| into the same directory as your document.
+% file.
 %    \begin{macrocode}
 \newcommand{\ST@wsf}[1]{\immediate\write\ST@sf{#1}}%
-\iffalse
-%% To get .sage files to automatically change the Python path to find
-%% sagetex.py, delete the \iffalse and \fi lines surrounding this and
-%% change the directory below to where sagetex.py can be found.
-\ST@wsf{import sys}%
-\ST@wsf{sys.path.insert(0, 'directory with sagetex.py')}%
-\fi%
 \ST@wsf{import sagetex}%
 \ST@wsf{_st_ = sagetex.SageTeXProcessor('\jobname')}}%
 %    \end{macrocode}
@@ -1221,9 +1214,8 @@ if __name__ == "__main__":
   print("""This file is part of the SageTeX package.
 It is not meant to be called directly.
 
-This file will be used by Sage scripts generated from a LaTeX document
-using the sagetex package. Keep it somewhere where Sage and Python can
-find it and it will automatically be imported.""")
+This file will be automatically used by Sage scripts generated from a
+LaTeX document using the sagetex package.""")
   sys.exit()
 %    \end{macrocode}
 % Import what we need:
@@ -1478,7 +1470,8 @@ class SageTeXProcessor():
 % warning will be issued since all the |\ref|s find a |\newlabel|.)
 % Anyway, I think it's easier to grab an MD5 sum out of the end of the
 % file than parse the output from running |latex| on your file. (The
-% regular expression |^%[0-9a-f]{32}%| will find the MD5 sum.)
+% regular expression |^%[0-9a-f]{32}%| will find the MD5 sum. Note that
+% there are percent signs on each side of the hex string.)
 %
 % Now we are done with the |.sout.tmp| file. Close it, rename it, and
 % tell the user we're done.
@@ -1930,3 +1923,14 @@ class SageCodeExtractor():
 % \url{http://creativecommons.org/licenses/by-nc-sa/3.0/} or send a
 % letter to Creative Commons, 171 Second Street, Suite 300, San
 % Francisco, California, 94105, USA.
+% \iffalse
+%   I've run into a situation where the index wants to start on the very
+%   last line of the page, and I actually get errors: ``Package multicol
+%   Error: Error saving partial page.'' The problem goes away if I
+%   fiddle with some lines so that the index starts elsewhere. Putting
+%   in a clearpage below makes the index start nicely in the middle of a
+%   page (until my change history gets too long!) and solves all those
+%   problems. It can be removed if you're confident the pagebreak
+%   problems won't occur.
+% \fi
+% \clearpage
