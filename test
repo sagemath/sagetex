@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# run Sage on the generated .sage files and see what happens.
+
+# In an ideal world, this could be automatically run as part of
+# doctesting, but for now this is about as good as we can do.
+
+for F in example sagetexpackage
+do
+  if [ $(sage $F.sage 2>&1 | grep -c 'failed') -gt 0 ]
+  then
+    echo "Error running Sage on $F.sage!"
+  else
+    echo "No problem running Sage on $F.sage."
+  fi
+done

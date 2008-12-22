@@ -23,12 +23,8 @@ clean:
 	latexcleanup clean .
 	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST
 
-install:
-	cp sagetex.py $(dest)
-	sed -e '/\\iffalse/ d' \
-	    -e '/^%%/ d' \
-	    -e 's|directory with sagetex.py|$(dest)|'\
-		-e '50,55 s/\\fi//' sagetex.sty > $(dest)/sagetex.sty
+install: ins
+	cp sagetex.sty $(dest)
 
 # make a tarball suitable for CTAN uploads, or for someone who knows how
 # to handle .dtx files
@@ -38,9 +34,16 @@ ctandist: all
 	@echo
 	tar zcf sagetex.tar.gz $(srcs) ../sagetex/example.pdf ../sagetex/sagetexpackage.pdf
 
+# this may seem silly, since running 'all' runs Sage just like the test
+# script does, but sometimes it scrolls by too fast, and I want obvious
+# output in front of me that tells me the results.
+test: all
+	clear
+	./test
+
 # make a spkg for Sage
 spkg:
-	python setup.py sdist
+	python setup.py sdist --formats=bztar
 	cd dist
 	gunzip dist/sagetex-$(ver).tar.gz
 	bzip2 dist/sagetex-$(ver).tar
