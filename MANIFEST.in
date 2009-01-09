@@ -9,5 +9,3 @@ include sagetexpackage.pdf
 include sagetexpackage.sage
 include sagetexparse.py
 include sagetex.sty
-include README.spkg
-include spkg-install

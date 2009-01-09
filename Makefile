@@ -10,6 +10,8 @@ all: ins
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 	latex $(pkg).dtx
+	sage $(pkg).sage
+	latex $(pkg).dtx
 	pdflatex $(pkg).dtx
 	latex example.tex
 	sage example.sage
@@ -41,10 +43,6 @@ test: all
 	clear
 	./test
 
-# make a spkg for Sage
-spkg:
-	python setup.py sdist --formats=bztar
-	cd dist
-	gunzip dist/sagetex-$(ver).tar.gz
-	bzip2 dist/sagetex-$(ver).tar
-	cp dist/sagetex-$(ver).tar.bz2 dist/sagetex-$(ver).spkg
+# make a source distribution, used for building the spkg
+dist: all
+	python setup.py sdist --formats=tar
