@@ -19,7 +19,6 @@ setup(name='sagetex',
          'sagetexpackage.ins',
          'sagetexpackage.pdf',
          'sagetexparse.py',
-         'sagetex.sty',
-         'README.spkg'])])
+         'sagetex.sty'])])
 
 
