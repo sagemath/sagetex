@@ -117,13 +117,14 @@
 % digits. With this package, you can write something like this:
 % \begin{quote}
 %  |There are $26$ choices for each letter, and $10$ choices for|\\
-%  |each digit, for a total of $26^3*10^3 = \sage{26^3*10^3}$|\\
-%  |license plates.|
+%  |each digit, for a total of $26^3 \cdot 10^3 =|\\
+%  |\sage{26^3*10^3}$ license plates.|
 % \end{quote}
 % and it will produce
 % \begin{quote}
 %   There are $26$ choices for each letter, and $10$ choices for each
-%   digit, for a total of $\sage{26^3 * 10^3}$ license plates.
+%   digit, for a total of $26^3 \cdot 10^3 = \sage{26^3 * 10^3}$ license
+%   plates.
 % \end{quote}
 % The great thing is, you don't have to do the multiplication. Sage does
 % it for you. This process mirrors one of the great aspects of \LTX:
@@ -189,13 +190,13 @@
 %
 % \section{Installation}
 %
-% \texttt{NB this is written assuming the \ST spkg is in Sage FIXME}
+% \newcommand{\sageroot}{\$SAGE\_ROOT}
 %
-% In this section, ``\texttt{\$SAGE\_ROOT}'' refers to the root
+% In this section, ``\texttt{\sageroot}'' refers to the root
 % directory of your Sage installation.
 %
 % The simplest way to ``install'' \ST is to copy the file |sagetex.sty|
-% from \texttt{\$SAGE\_ROOT/local/share/texmf} to the same directory as
+% from \texttt{\sageroot/local/share/texmf} to the same directory as
 % your document. This will always work, as \LTX always searches the
 % current directory for files.
 %
@@ -210,12 +211,12 @@
 % \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}
 % {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}} which has
 % some information specific to MiK\TeX. Linux/Unix users can use
-% |$HOME/texmf| and users of Mac\TeX should use |$HOME/Library/texmf|.
+% |$HOME/texmf| and users of Mac\TeX{} should use |$HOME/Library/texmf|.
 %
 % To copy the files that \LTX needs into your |texmf| directory, simply
 % do
 % \begin{quote}
-%   \texttt{cp -r \$SAGE\_ROOT/local/share/texmf/* \$HOMEPREFIX/texmf/}
+%   \texttt{cp -r \sageroot/local/share/texmf/* \$HOMEPREFIX/texmf/}
 % \end{quote}
 % where |$HOMEPREFIX| is the appropriate prefix for your own |texmf|
 % tree. Then you need to make \TeX aware of the new files by running
@@ -228,7 +229,7 @@
 % you've written your document. See \autoref{sec:makestatic} and
 % \autoref{sec:extractsagecode} for information on using those scripts.
 % The file |sagetexparse.py| is a module used by both those scripts.
-% These three file are independent of \ST.
+% These three files are independent of \ST.
 %
 % \section{Usage} \label{s:usage}
 % 
@@ -631,12 +632,11 @@
 % bit of |makestatic.py| and use |./makestatic.py|.) This script needs
 % the \href{http://pyparsing.wikispaces.com}{pyparsing} module to be
 % installed.\footnote{If you don't have pyparsing installed, you can
-% simply copy the file
-% \texttt{\$SAGE\_ROOT/local/lib/python/matplotlib/pyparsing.py} into
-% your directory.} You may optionally specify |outputfile|; if
-% you do so, the results will be written to that file. If the file
-% exists, it won't be overwritten unless you also specify the |-o|
-% switch.
+%   simply copy the file
+%   \texttt{\sageroot/local/lib/python/matplotlib/pyparsing.py} into
+%   your directory.} You may optionally specify |outputfile|; if you do
+% so, the results will be written to that file. If the file exists, it
+% won't be overwritten unless you also specify the |-o| switch.
 %
 % You will need to run this after you've compiled your document and run
 % Sage on the |.sage| file. The script reads in the |.sout| file and
