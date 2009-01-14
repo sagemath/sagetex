@@ -27,7 +27,7 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-  [2008/01/09 v2.0 embedding Sage into LaTeX documents]
+  [2008/01/14 v2.0 embedding Sage into LaTeX documents]
 %</latex>
 %<*driver>
 \documentclass{ltxdoc}
@@ -190,16 +190,30 @@
 %
 %
 % \section{Installation}
+% \changes{v2.0}{2009/01/14}{Fixed up installation section, final
+% \emph{final} 2.0.}
+%
+% To install \ST, you need to do two things: make \ST known to Sage, and
+% to \LTX. There are two basic methods to do those two things.
 %
 % \newcommand{\sageroot}{\$SAGE\_ROOT}
 %
-% In this section, ``\texttt{\sageroot}'' refers to the root
-% directory of your Sage installation.
+% In what follows, ``\texttt{\sageroot}'' refers to the root directory
+% of your Sage installation.
 %
-% The simplest way to ``install'' \ST is to copy the file |sagetex.sty|
-% from \texttt{\sageroot/local/share/texmf} to the same directory as
-% your document. This will always work, as \LTX always searches the
-% current directory for files.
+% \subsection{As a Sage spkg}
+% \label{sec:install-spkg}
+%
+% The easiest way to install \ST is by using Sage's own spkg
+% installation facility; visit the
+% \href{http://sagemath.org/packages/optional/}{optional packages page}
+% and run \texttt{sage -i} with the appropriate version. This will let
+% Sage know about \ST; you still need to let \LTX know about it.
+%
+% The simplest way to ``install'' \ST for \LTX is to copy the file
+% |sagetex.sty| from \texttt{\sageroot/local/share/texmf} to the same
+% directory as your document. This will always work, as \LTX always
+% searches the current directory for files.
 %
 % Rather than make lots of copies of |sagetex.sty|, you can keep it (and
 % the rest of the \ST documentation) in a |texmf| directory. The easiest
@@ -220,17 +234,35 @@
 %   \texttt{cp -r \sageroot/local/share/texmf/* \$HOMEPREFIX/texmf/}
 % \end{quote}
 % where |$HOMEPREFIX| is the appropriate prefix for your own |texmf|
-% tree. Then you need to make \TeX aware of the new files by running
+% tree. Then you need to make \TeX{} aware of the new files by running
 % \begin{quote}
 %   \texttt{texhash \$HOMEPREFIX/texmf/}
 % \end{quote}
 %
-% \ST also includes several Python files: |makestatic.py| and
-% |extractsagecode.py| are convenience scripts that you can use after
-% you've written your document. See \autoref{sec:makestatic} and
+% \subsection{From CTAN}
+% \label{sec:install-ctan}
+%
+% You can also get \ST from \href{http://tug.ctan.org/pkg/sagetex}{its
+% CTAN page}. This is not the recommended way to get \ST, but it will
+% work.
+% 
+% If you get \ST from CTAN, you will need to make the |sagetex.sty| file
+% available to \LTX using any of the methods described above, and you
+% will also need to make |sagetex.py| known to Sage. You can either keep
+% a copy of that file in the same directory as your document or put it
+% where Sage will find it. You can use the |$SAGE_PATH| environment
+% variable (which is analogous to the |$PYTHONPATH| variable) to tell
+% Sage where the file is, or manually copy |sagetex.py| into
+% \texttt{\sageroot/local/lib/python/site-packages}.
+%
+% \ST includes several Python files which may be useful for working with
+% ``\ST-ified'' documents: |makestatic.py| and |extractsagecode.py| are
+% convenience scripts that you can use after you've written your
+% document. See \autoref{sec:makestatic} and
 % \autoref{sec:extractsagecode} for information on using those scripts.
 % The file |sagetexparse.py| is a module used by both those scripts.
-% These three files are independent of \ST.
+% These three files are independent of \ST. If you install from a spkg,
+% these scripts can be found in \texttt{\sageroot/local/share/texmf/}.
 %
 % \section{Usage} \label{s:usage}
 % 
