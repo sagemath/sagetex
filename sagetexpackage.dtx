@@ -27,7 +27,7 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-  [2008/01/27 v2.0 embedding Sage into LaTeX documents]
+  [2009/01/27 v2.0.1 embedding Sage into LaTeX documents]
 %</latex>
 %<*driver>
 \documentclass{ltxdoc}
@@ -254,6 +254,31 @@
 % variable (which is analogous to the |$PYTHONPATH| variable) to tell
 % Sage where the file is, or manually copy |sagetex.py| into
 % \texttt{\sageroot/local/lib/python/site-packages}.
+%
+%
+% \subsection{Using \TeX Shop}
+% \label{sec:using-texshop}
+% \changes{v2.0.1}{2009/03/10}{Add \TeX Shop info}
+% 
+% Starting with version 2.25,
+% \href{http://www.uoregon.edu/~koch/texshop/}{\TeX Shop} includes
+% support for \ST. If you move the file |sage.engine| from
+% |~/Library/TeXShop/Engines/Inactive/Sage| to
+% |~/Library/TeXShop/Engines| and put the line
+% \begin{quotation}
+%   |%!TEX TS-program = sage|
+% \end{quotation}
+% at the top of your document, then \TeX Shop will automatically run Sage
+% for you when compiling your document.
+%
+% Note that you will need to make |sagetex.sty| and |sagetex.py| known
+% to \LTX and Sage using any of the methods described above (although
+% note that \TeX Shop includes copies of these files for you). You also
+% might need to edit the |sage.engine| script to reflect the location of
+% your Sage installation.
+%
+% \subsection{Other scripts included with \ST}
+% \label{sec:inst-other-scripts}
 %
 % \ST includes several Python files which may be useful for working with
 % ``\ST-ified'' documents: |makestatic.py| and |extractsagecode.py| are
@@ -1946,10 +1971,10 @@ class SageCodeExtractor():
 % improvements and modifications. Almost all the examples in the
 % |example.tex| file are from Harald.
 %
-% Dan Drake rewrote and extended the style file (there is almost zero
-% original code there), made significant changes to the Python module,
-% put both files into \textsf{Docstrip} format, and wrote all the
-% documentation and extra Python scripts.
+% Dan Drake rewrote and extended the style file (there is effectively
+% zero original code there), made significant changes to the Python
+% module, put both files into \textsf{Docstrip} format, and wrote all
+% the documentation and extra Python scripts.
 %
 % Many thanks to Jason Grout for his numerous comments, suggestions, and
 % feedback.
