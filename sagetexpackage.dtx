@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2009 by Dan Drake <ddrake@member.ams.org>
+% Copyright (C) 2009 by Dan Drake <ddrake (at) member (dot) ams (dot) org>
 % -------------------------------------------------------
 %
 % See the "Copying and licenses" section at the end of this file for the
@@ -27,7 +27,7 @@
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
 %<*latex>
-  [2009/01/27 v2.0.1 embedding Sage into LaTeX documents]
+  [2009/04/21 v2.0.2 embedding Sage into LaTeX documents]
 %</latex>
 %<*driver>
 \documentclass{ltxdoc}
@@ -93,7 +93,7 @@
 %
 % \title{The \ST{} package\thanks{This document
 %   corresponds to \ST~\fileversion, dated \filedate.}}
-% \author{Dan Drake (\texttt{ddrake@member.ams.org}) and others}
+% \author{Dan Drake (\texttt{ddrake (at) member (dot) ams (dot) org}) and others}
 %
 % \maketitle
 %
@@ -365,22 +365,25 @@
 % |The prime factorization of the current page number plus foo|\\
 % |is $\sage{factor(foo + \thepage)}$|.
 % \end{quote}
+%
 % Here, I'll do just that right now: the prime factorization of the
-% current page number plus $12$ is $\sage{factor(\thepage + 12)}$.
-% (Wrong answer? See footnote.\footnote{Is the above factorization
-%   wrong? If the current page number plus $12$ is one larger than the
-%   claimed factorization, you need to do another Sage/\LTX cycle on
-%   this source file. Why? The first time you run \LTX on this file, the
-%   sine graph isn't available, so the text where I've talked about the
-%   prime factorization is back one page. Then you run Sage, and it
-%   creates the sine graph and does the factorization. When you run \LTX
-%   again, the sine graph pushes the text onto the next page, but it
-%   uses the Sage-computed value from the previous page. Meanwhile, the
-%   |.sage| file has been rewritten with the correct page number, so if
-%   you do another Sage/\LTX cycle, you'll get the correct value
-%   above.}) The |\sage| command doesn't automatically use math mode for
-% its output, so be sure to use dollar signs or a displayed math
-% environment
+% current page number plus $12$ is $\sage{factor(\thepage + 12)}$ and
+% \thepage. (Wrong answer? See footnote.\footnote{Is the above
+%   factorization wrong? If the current page number plus $12$ is one
+%   larger than the claimed factorization, another Sage/\LTX cycle on
+%   this source file should fix it. Why? The first time you run \LTX on
+%   this file, the sine graph isn't available, so the text where I've
+%   talked about the prime factorization is back one page. Then you run
+%   Sage, and it creates the sine graph and does the factorization. When
+%   you run \LTX again, the sine graph pushes the text onto the next
+%   page, but it uses the Sage-computed value from the previous page.
+%   Meanwhile, the |.sage| file has been rewritten with the correct page
+%   number, so if you do another Sage/\LTX cycle, you should get the
+%   correct value above. However, in some cases, even \emph{that}
+%   doesn't work because of some kind of \TeX{} weirdness in ending the
+%   one page a bit short and starting another.}) The |\sage| command
+% doesn't automatically use math mode for its output, so be sure to use
+% dollar signs or a displayed math environment
 % as appropriate.\\
 %
 % \DescribeMacro{\percent} If you are doing modular arithmetic or string
@@ -1505,8 +1508,13 @@ class SageTeXProcessor():
  again.' % ((self.filename,) * 2))
     self.souttmp.close()
     os.remove(self.filename + '.sout.tmp')
-    sys.exit(1)
+    sys.exit(int(1))
 %    \end{macrocode}
+% We use |int(1)| above to make sure |sys.exit| sees a Python integer;
+% see
+% \href{http://trac.sagemath.org/sage_trac/ticket/2861#comment:5}{ticket
+% \#2861}.
+% \changes{v2.0.2}{2008/04/21}{Make sure sys.exit sees a Python integer.}
 % \end{macro}
 % 
 % \begin{macro}{endofdoc}
@@ -2014,4 +2022,3 @@ class SageCodeExtractor():
 %  confident the pagebreak problems won't occur.
 % \clearpage
 % \fi
-
