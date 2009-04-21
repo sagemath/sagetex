@@ -2,7 +2,7 @@ pkg=sagetexpackage
 dest=/home/drake/texmf/tex/latex/sagetex/
 # the subdir stuff makes the tarball have the directory correct
 srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
-ver=2.0
+ver=2.0.2
 
 all: ins
 	latex $(pkg).dtx
