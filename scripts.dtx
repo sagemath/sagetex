@@ -1,0 +1,404 @@
+% \section{Included Python scripts}
+% \label{sec:included-scripts}
+%
+% Here we describe the Python code for |makestatic.py|, which removes
+% \ST commands to produce a ``static'' file, and |extractsagecode.py|,
+% which extracts all the Sage code from a |.tex| file.
+%
+% \subsection{makestatic.py}
+% \label{sec:makestatic}
+% \iffalse
+%<*staticscript>
+% \fi
+%
+% First, |makestatic.py| script. It's about the most basic, generic
+% Python script taking command-line arguments that you'll find. The
+% |#!/usr/bin/env python| line is provided for us by the |.ins| file's
+% preamble, so we don't put it here.
+%    \begin{macrocode}
+import sys
+import time
+import getopt
+import os.path
+from sagetexparse import DeSageTex
+
+def usage():
+  print("""Usage: %s [-h|--help] [-o|--overwrite] inputfile [outputfile]
+
+Removes SageTeX macros from `inputfile' and replaces them with the
+Sage-computed results to make a "static" file. You'll need to have run
+Sage on `inputfile' already.
+
+`inputfile' can include the .tex extension or not. If you provide
+`outputfile', the results will be written to a file of that name.
+Specify `-o' or `--overwrite' to overwrite the file if it exists.
+
+See the SageTeX documentation for more details.""" % sys.argv[0])
+
+try:
+  opts, args = getopt.getopt(sys.argv[1:], 'ho', ['help', 'overwrite'])
+except getopt.GetoptError, err:
+  print str(err)
+  usage()
+  sys.exit(2)
+
+overwrite = False
+for o, a in opts:
+  if o in ('-h', '--help'):
+    usage()
+    sys.exit()
+  elif o in ('-o', '--overwrite'):
+    overwrite = True
+
+if len(args) == 0 or len(args) > 2:
+  print('Error: wrong number of arguments. Make sure to specify options first.\n')
+  usage()
+  sys.exit(2)
+
+if len(args) == 2 and (os.path.exists(args[1]) and not overwrite):
+  print('Error: %s exists and overwrite option not specified.' % args[1])
+  sys.exit(1)
+
+src, ext = os.path.splitext(args[0])
+%    \end{macrocode}
+% All the real work gets done in the line below. Sorry it's not more
+% exciting-looking.
+%    \begin{macrocode}
+desagetexed = DeSageTex(src)
+%    \end{macrocode}
+% This part is cool: we need double percent signs at the beginning of
+% the line because Python needs them (so they get turned into single
+% percent signs) \emph{and} because \textsf{Docstrip} needs them (so the
+% line gets passed into the generated file). It's perfect!
+%    \begin{macrocode}
+header = """\
+%% SageTeX commands have been automatically removed from this file and
+%% replaced with plain LaTeX. Processed %s.
+
+""" % time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())
+
+if len(args) == 2:
+  dest = open(args[1], 'w')
+else:
+  dest = sys.stdout
+
+dest.write(header)
+dest.write(desagetexed.result)
+%    \end{macrocode}
+%
+% \iffalse
+%</staticscript>
+%<*extractscript>
+% \fi
+%
+% \subsection{extractsagecode.py}
+%
+% Same idea as |makestatic.py|, except this does basically the opposite
+% thing.
+%    \begin{macrocode}
+import sys
+import time
+import getopt
+import os.path
+from sagetexparse import SageCodeExtractor
+
+def usage():
+  print("""Usage: %s [-h|--help] [-o|--overwrite] inputfile [outputfile]
+
+Extracts Sage code from `inputfile'.
+
+`inputfile' can include the .tex extension or not. If you provide
+`outputfile', the results will be written to a file of that name,
+otherwise the result will be printed to stdout.
+
+Specify `-o' or `--overwrite' to overwrite the file if it exists.
+
+See the SageTeX documentation for more details.""" % sys.argv[0])
+
+try:
+  opts, args = getopt.getopt(sys.argv[1:], 'ho', ['help', 'overwrite'])
+except getopt.GetoptError, err:
+  print str(err)
+  usage()
+  sys.exit(2)
+
+overwrite = False
+for o, a in opts:
+  if o in ('-h', '--help'):
+    usage()
+    sys.exit()
+  elif o in ('-o', '--overwrite'):
+    overwrite = True
+
+if len(args) == 0 or len(args) > 2:
+  print('Error: wrong number of arguments. Make sure to specify options first.\n')
+  usage()
+  sys.exit(2)
+
+if len(args) == 2 and (os.path.exists(args[1]) and not overwrite):
+  print('Error: %s exists and overwrite option not specified.' % args[1])
+  sys.exit(1)
+
+src, ext = os.path.splitext(args[0])
+sagecode = SageCodeExtractor(src)
+header = """\
+# This file contains Sage code extracted from %s%s.
+# Processed %s.
+
+""" % (src, ext, time.strftime('%a %d %b %Y %H:%M:%S', time.localtime()))
+
+if len(args) == 2:
+  dest = open(args[1], 'w')
+else:
+  dest = sys.stdout
+
+dest.write(header)
+dest.write(sagecode.result)
+%    \end{macrocode}
+%
+% \iffalse
+%</extractscript>
+%<*parsermod>
+% \fi
+%
+% \subsection{The parser module}
+% 
+% Here's the module that does the actual parsing and replacing. It's
+% really quite simple, thanks to the awesome
+% \href{http://pyparsing.wikispaces.com}{Pyparsing module}. The parsing
+% code below is nearly self-documenting! Compare that to fancy regular
+% expressions, which sometimes look like someone sneezed punctuation all
+% over the screen.
+%    \begin{macrocode}
+import sys
+from pyparsing import *
+%    \end{macrocode}
+% First, we define this very helpful parser: it finds the matching
+% bracket, and doesn't parse any of the intervening text. It's basically
+% like hitting the percent sign in Vim. This is useful for parsing \LTX
+% stuff, when you want to just grab everything enclosed by matching
+% brackets.
+%    \begin{macrocode}
+def skipToMatching(opener, closer):
+  nest = nestedExpr(opener, closer)
+  nest.setParseAction(lambda l, s, t: l[s:getTokensEndLoc()])
+  return nest
+
+curlybrackets = skipToMatching('{', '}')
+squarebrackets = skipToMatching('[', ']')
+%    \end{macrocode}
+% Next, parser for |\sage| and |\sageplot| calls:
+%    \begin{macrocode}
+sagemacroparser = '\\sage' + curlybrackets('code')
+sageplotparser = ('\\sageplot'
+                 + Optional(squarebrackets)('opts') 
+                 + Optional(squarebrackets)('format')
+                 + curlybrackets('code'))
+%    \end{macrocode}
+%
+% With those defined, let's move on to our classes.
+%
+% \begin{macro}{SoutParser}
+% Here's the parser for the generated |.sout| file. The code below does
+% all the parsing of the |.sout| file and puts the results into a
+% dictionary. Notice that it's on the order of 10 lines of code---hooray
+% for Pyparsing!
+%    \begin{macrocode}
+class SoutParser():
+  def __init__(self, fn):
+    self.label = {}
+%    \end{macrocode}
+% A label line looks like
+% \begin{quote}
+%  |\newlabel{@sageinline|\meta{integer}|}{|\marg{bunch of \LTX code}|{}{}{}{}}|
+% \end{quote}
+% which makes the parser definition below pretty obvious. We assign some
+% names to the interesting bits so the |newlabel| method can make the
+% \meta{integer} and \meta{bunch of \LTX code} into the keys and values
+% of a dictionary. The |DeSageTeX| class then uses that dictionary to
+% replace bits in the |.tex| file with their Sage-computed results.
+%    \begin{macrocode}
+    parselabel = ('\\newlabel{@sageinline'
+                 + Word(nums)('num')
+                 + '}{'
+                 + curlybrackets('result')
+                 + '{}{}{}{}}')
+%    \end{macrocode}
+% We tell it to ignore comments, and hook up the dictionary-making
+% method. 
+%    \begin{macrocode}
+    parselabel.ignore('%' + restOfLine)
+    parselabel.setParseAction(self.newlabel)
+%    \end{macrocode}
+% A |.sout| file consists of one or more such lines. Now go parse the
+% file we were given.
+%    \begin{macrocode}
+    try:
+      OneOrMore(parselabel).parseFile(fn)
+    except IOError:
+      print 'Error accessing %s; exiting. Does your .sout file exist?' % fn
+      sys.exit(1)
+%    \end{macrocode}
+% Pyparser's parse actions get called with three arguments: the string
+% that matched, the location of the beginning, and the resulting parse
+% object. Here we just add a new key-value pair to the dictionary,
+% remembering to strip off the enclosing brackets from the ``result''
+% bit.
+%    \begin{macrocode}
+  def newlabel(self, s, l, t):
+    self.label[int(t.num)] = t.result[1:-1]
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{DeSageTeX}
+% Now we define a parser for \LTX files that use \ST commands. We assume
+% that the provided |fn| is just a basename.
+%    \begin{macrocode}
+class DeSageTex():
+  def __init__(self, fn):
+    self.sagen = 0
+    self.plotn = 0
+    self.fn = fn
+    self.sout = SoutParser(fn + '.sout')
+%    \end{macrocode}
+% Parse |\sage| macros. We just need to pull in the result from the
+% |.sout| file and increment the counter---that's what |self.sage| does.
+%    \begin{macrocode}
+    smacro = sagemacroparser
+    smacro.setParseAction(self.sage)
+%    \end{macrocode}
+% Parse the |\usepackage{sagetex}| line. Right now we don't support
+% comma-separated lists of packages.
+%    \begin{macrocode}
+    usepackage = ('\\usepackage'
+                 + Optional(squarebrackets)
+                 + '{sagetex}')
+    usepackage.setParseAction(replaceWith("""\\RequirePackage{verbatim}
+\\RequirePackage{graphicx}"""))
+%    \end{macrocode}
+% Parse |\sageplot| macros.
+%    \begin{macrocode}
+    splot = sageplotparser
+    splot.setParseAction(self.plot)
+%    \end{macrocode}
+% The printed environments (|sageblock| and |sageverbatim|) get turned
+% into |verbatim| environments.
+%    \begin{macrocode}
+    beginorend = oneOf('begin end')
+    blockorverb = 'sage' + oneOf('block verbatim')
+    blockorverb.setParseAction(replaceWith('verbatim'))
+    senv = '\\' + beginorend + '{' + blockorverb + '}'
+%    \end{macrocode}
+% The non-printed |sagesilent| environment gets commented out. We could
+% remove all the text, but this works and makes going back to \ST
+% commands (de-de-\ST{}ing?) easier.
+%    \begin{macrocode}
+    silent = Literal('sagesilent')
+    silent.setParseAction(replaceWith('comment'))
+    ssilent = '\\' + beginorend + '{' + silent + '}'
+%    \end{macrocode}
+% The |\sagetexindent| macro is no longer relevant, so remove it from
+% the output (``suppress'', in Pyparsing terms). 
+%    \begin{macrocode}
+    stexindent = Suppress('\\setlength{\\sagetexindent}' + curlybrackets)
+%    \end{macrocode}
+% Now we define the parser that actually goes through the file. It just
+% looks for any one of the above bits, while ignoring anything that
+% should be ignored.
+%    \begin{macrocode}
+    doit = smacro | senv | ssilent | usepackage | splot | stexindent
+    doit.ignore('%' + restOfLine)
+    doit.ignore('\\begin{verbatim}' + SkipTo('\\end{verbatim}'))
+    doit.ignore('\\begin{comment}' + SkipTo('\\end{comment}'))
+%    \end{macrocode}
+% We can't use the |parseFile| method, because that expects a ``complete
+% grammar'' in which everything falls into some piece of the parser.
+% Instead we suck in the whole file as a single string, and run
+% |transformString| on it, since that will just pick out the interesting
+% bits and munge them according to the above definitions.
+%    \begin{macrocode}
+    str = ''.join(open(fn + '.tex', 'r').readlines())
+    self.result = doit.transformString(str)
+%    \end{macrocode}
+% That's the end of the class constructor, and it's all we need to do
+% here. You access the results of parsing via the |result| string.
+%
+% We do have two methods to define. The first does the same thing that
+% |\ref| does in your \LTX file: returns the content of the label and
+% increments a counter.
+%    \begin{macrocode}
+  def sage(self, s, l, t):
+    self.sagen += 1
+    return self.sout.label[self.sagen - 1]
+%    \end{macrocode}
+% The second method returns the appropriate |\includegraphics| command.
+% It does need to account for the default argument.
+%    \begin{macrocode}
+  def plot(self, s, l, t):
+    self.plotn += 1
+    if len(t.opts) == 0:
+      opts = '[width=.75\\textwidth]'
+    else:
+      opts = t.opts[0]
+    return ('\\includegraphics%s{sage-plots-for-%s.tex/plot-%s}' % 
+      (opts, self.fn, self.plotn - 1))
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{SageCodeExtractor}
+% This class does the opposite of the first: instead of removing Sage
+% stuff and leaving only \LTX, this removes all the \LTX and leaves only
+% Sage.
+%    \begin{macrocode}
+class SageCodeExtractor():
+  def __init__(self, fn):
+    smacro = sagemacroparser
+    smacro.setParseAction(self.macroout)
+
+    splot = sageplotparser
+    splot.setParseAction(self.plotout)
+%    \end{macrocode}
+% Above, we used the general parsers for |\sage| and |\sageplot|. We
+% have to redo the environment parsers because it seems too hard to
+% define one parser object that will do both things we want: above, we
+% just wanted to change the environment name, and here we want to suck
+% out the code. Here, it's important that we find matching begin/end
+% pairs; above it wasn't. At any rate, it's not a big deal to redo this
+% parser.
+%    \begin{macrocode}
+    env_names = oneOf('sageblock sageverbatim sagesilent')
+    senv = '\\begin{' + env_names('env') + '}' + SkipTo(
+           '\\end{' + matchPreviousExpr(env_names) + '}')('code')
+    senv.leaveWhitespace()
+    senv.setParseAction(self.envout)
+
+    doit = smacro | splot | senv
+
+    str = ''.join(open(fn + '.tex', 'r').readlines())
+    self.result = ''
+
+    doit.transformString(str)
+
+  def macroout(self, s, l, t):
+    self.result += '# \\sage{} from line %s\n' % lineno(l, s)
+    self.result += t.code[1:-1] + '\n\n'
+
+  def plotout(self, s, l, t):
+    self.result += '# \\sageplot{} from line %s:\n' % lineno(l, s)
+    if t.format is not '':
+      self.result += '# format: %s' % t.format[0][1:-1] + '\n'
+    self.result += t.code[1:-1] + '\n\n'
+
+  def envout(self, s, l, t):
+    self.result += '# %s environment from line %s:' % (t.env,
+      lineno(l, s))
+    self.result += t.code[0] + '\n'
+%    \end{macrocode}
+% \end{macro}
+
+% \endinput
+%</parsermod>
+% Local Variables: 
+% mode: doctex
+% TeX-master: "sagetexpackage"
+% End: 
