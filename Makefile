@@ -4,11 +4,9 @@ dest=/home/drake/texmf/tex/latex/sagetex/
 srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
 ver=2.0.2
 
-all: ins
+all: ins index
 	latex $(pkg).dtx
 	sage $(pkg).sage
-	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
-	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 	latex $(pkg).dtx
 	sage $(pkg).sage
 	latex $(pkg).dtx
@@ -17,6 +15,11 @@ all: ins
 	sage example.sage
 	latex example.tex
 	pdflatex example.tex
+
+index:
+	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetexpackage.idx
+	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
+	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
 ins:
 	yes | latex $(pkg).ins

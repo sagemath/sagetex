@@ -48,7 +48,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 % doesn't clobber the very Python file we need to build the
 % documentation!
 
-\generate{\file{sagetex.sty}{\from{sagetexpackage.dtx}{latex}}}
+\generate{\file{sagetex.sty}{\from{py-and-sty.dtx}{latex}}}
 
 
 % Some trickery to get triple quotes around the {pre,post}amble. This is
@@ -65,8 +65,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
   \defaultpostamble^^J%
   """}
 
-\generate{\file{sagetex.py}{\from{sagetexpackage.dtx}{python}}}
-\generate{\file{sagetexparse.py}{\from{sagetexpackage.dtx}{parsermod}}}
+\generate{\file{sagetex.py}{\from{py-and-sty.dtx}{python}}}
+\generate{\file{sagetexparse.py}{\from{scripts.dtx}{parsermod}}}
 
 % Now we modify the preamble again to get the shebang line at the top.
 
@@ -75,8 +75,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 \catcode`\#=6
 \edef\defaultpreamble{\shebang/usr/bin/env python^^J\defaultpreamble}
 
-\generate{\file{makestatic.py}{\from{sagetexpackage.dtx}{staticscript}}}
-\generate{\file{extractsagecode.py}{\from{sagetexpackage.dtx}{extractscript}}}
+\generate{\file{makestatic.py}{\from{scripts.dtx}{staticscript}}}
+\generate{\file{extractsagecode.py}{\from{scripts.dtx}{extractscript}}}
 
 \obeyspaces
 \Msg{******************************************************************}
