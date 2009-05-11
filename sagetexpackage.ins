@@ -1,5 +1,5 @@
 %% This is `sagetexpackage.ins', part of the sagetex package.
-%
+%%
 %% Copyright (C) 2009 by Dan Drake <ddrake@member.ams.org>
 %%
 %% This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
 % doesn't clobber the very Python file we need to build the
 % documentation!
 
-\generate{\file{sagetex.sty}{\from{py-and-sty.dtx}{latex}}}
+\generate{\file{sagetex.sty}{\from{sagetexpackage.dtx}{latex}
+                             \from{py-and-sty.dtx}{latex}}}
 
 
 % Some trickery to get triple quotes around the {pre,post}amble. This is
@@ -66,6 +67,7 @@ with this program.  If not, see <http://www.gnu.org/licenses/>
   """}
 
 \generate{\file{sagetex.py}{\from{py-and-sty.dtx}{python}}}
+
 \generate{\file{sagetexparse.py}{\from{scripts.dtx}{parsermod}}}
 
 % Now we modify the preamble again to get the shebang line at the top.

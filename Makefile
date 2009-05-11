@@ -1,12 +1,14 @@
+SHELL=/bin/bash
 pkg=sagetexpackage
 dest=/home/drake/texmf/tex/latex/sagetex/
 # the subdir stuff makes the tarball have the directory correct
 srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
 ver=2.0.2
 
-all: ins index
+all: ins
 	latex $(pkg).dtx
 	sage $(pkg).sage
+	make index
 	latex $(pkg).dtx
 	sage $(pkg).sage
 	latex $(pkg).dtx
@@ -27,6 +29,10 @@ ins:
 clean: 
 	latexcleanup clean .
 	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST
+
+# the following bit requires SHELL=bash
+auxclean:
+	rm -f {$(pkg),example}.{glo,gls,aux,sout,out,toc,dvi,pdf,ps,log,ilg,ind,idx,sage}
 
 install: ins
 	cp sagetex.sty $(dest)

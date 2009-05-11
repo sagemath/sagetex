@@ -1,7 +1,10 @@
 % General example LaTeX file for including Sage calculations and plots
-% Build with: (pdf)latex example.tex; sage example.sage; pdflatex
-% example.tex Please read README and the documentation of the SageTeX
-% package for more information!
+% Build with:
+%
+%   (pdf)latex example.tex; sage example.sage; pdflatex example.tex
+%
+% Please read README and the documentation of the SageTeX package for
+% more information!
 
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
@@ -185,7 +188,7 @@ Here's the famous Sage cube graph:
 % passing an option to includegraphics
 \sageplot[][png]{G.plot3d(engine='tachyon')}
 
-\subsection{Make Sage write your \LaTeX{} for you}
+\section{Make Sage write your \LaTeX{} for you}
 
 With \textsf{Sage\TeX}, you can not only have Sage do your math for you,
 it can write parts of your \LaTeX{} document for you! For example, I
