@@ -156,9 +156,7 @@ California, 94105, USA.
 % sagetex.py refactored, include in Sage as spkg}
 % \changes{v2.0}{2009/01/09}{Miscellaneous fixes, final 2.0 version.}
 %
-% \GetFileInfo{sagetexpackage.dtx}
-% \GetFileInfo{py-and-sty.dtx}
-% \GetFileInfo{scripts.dtx}
+% \GetFileInfo{sagetex.sty}
 %
 % \DoNotIndex{\newcommand,\newenvironment,\the}
 % 
@@ -170,11 +168,17 @@ California, 94105, USA.
 %
 % \newcommand{\TikZ}{Ti\emph{k}Z\xspace}
 %
+% \newcommand{\warningbox}[1]{\colorbox[rgb]{1, 0.6, 0.6}%
+% {\parbox{.97\textwidth}{#1}}}
+%
 % \tikzstyle{box}=[draw, shape=rectangle, thick]
 %
-% \title{The \ST{} package\thanks{This document
-%   corresponds to \ST~\fileversion, dated \filedate.}}
-% \author{Dan Drake (\texttt{ddrake (at) member (dot) ams (dot) org}) and others}
+% \title{The \ST{} package\thanks{This document corresponds to
+%     \ST~\fileversion, dated \filedate.}}
+%
+% \author{Dan Drake and others\thanks{Author's website:
+%     \href{http://mathsci.kaist.ac.kr/~drake/}
+%     {\texttt{mathsci.kaist.ac.kr/$\sim$drake/}}.}}
 %
 % \maketitle
 %
@@ -182,11 +186,11 @@ California, 94105, USA.
 %
 % Why should the Haskell and R folks have all the fun?
 % \href{http://www.haskell.org/haskellwiki/Literate_programming}{Literate
-% Haskell} is a popular way to mix Haskell source code and \LTX
-% documents. (Actually any kind of text or document, but here
-% we're concerned only with \LTX.) You can even embed Haskell code in
-% your document that writes part of your document for you. Similarly,
-% the R statistical computing environment includes
+%   Haskell} is a popular way to mix Haskell source code and \LTX
+% documents. (Actually any kind of text or document, but here we're
+% concerned only with \LTX.) You can even embed Haskell code in your
+% document that writes part of your document for you. Similarly, the R
+% statistical computing environment includes
 % \href{http://tug.org/pracjourn/2008-1/zahn/}{Sweave}, which lets you
 % do the same thing with R code and \LTX.
 %
@@ -250,7 +254,7 @@ California, 94105, USA.
 %
 % Till Tantau has some good commentary on the use of graphics in
 % \href{http://www.ctan.org/tex-archive/graphics/pgf/}{section 6 of the
-% \textsc{pgf} manual}. You should always give careful thought and
+%   \textsc{pgf} manual}. You should always give careful thought and
 % attention to creating graphics for your document; I have in mind that
 % a good workflow for using \ST for plotting is something like this:
 %
@@ -336,7 +340,6 @@ California, 94105, USA.
 % Sage where the file is, or manually copy |sagetex.py| into
 % \texttt{\sageroot/local/lib/python/site-packages}.
 %
-%
 % \subsection{Using \TeX Shop}
 % \label{sec:using-texshop}
 % \changes{v2.0.1}{2009/03/10}{Add \TeX Shop info}
@@ -364,13 +367,14 @@ California, 94105, USA.
 % \ST includes several Python files which may be useful for working with
 % ``\ST-ified'' documents: |makestatic.py| and |extractsagecode.py| are
 % convenience scripts that you can use after you've written your
-% document. See \autoref{sec:makestatic} and
+% document. See \autoref{sec:makestatic-usage} and
 % \autoref{sec:extractsagecode} for information on using those scripts.
 % The file |sagetexparse.py| is a module used by both those scripts.
 % These three files are independent of \ST. If you install from a spkg,
 % these scripts can be found in \texttt{\sageroot/local/share/texmf/}.
 %
-% \section{Usage} \label{s:usage}
+% \section{Usage}
+% \label{s:usage}
 % 
 % Let's begin with a rough description of how \ST works. Naturally the
 % very first step is to put |\usepackage{sagetex}| in the preamble of
@@ -400,12 +404,12 @@ California, 94105, USA.
 % not reading this, and are already fiddling with
 % \texttt{example.tex}\dots}\\
 %
-% \noindent\fbox{\parbox{.97\textwidth}{\textbf{WARNING!} When you run
-% \LTX on a file named \texttt{\meta{filename}.tex}, the file
-% \texttt{\meta{filename}.sage} is created---and will be
-% \emph{automatically overwritten} if it already exists. If you keep
-% Sage scripts in the same directory as your \ST-ified \LTX
-% documents, use a different file name!}}
+% \noindent\warningbox{\textbf{WARNING!} When you run \LTX on a file
+%   named \texttt{\meta{filename}.tex}, the file
+%   \texttt{\meta{filename}.sage} is created---and will be
+%   \emph{automatically overwritten} if it already exists. If you keep
+%   Sage scripts in the same directory as your \ST-ified \LTX documents,
+%   use a different file name!}
 %
 % \paragraph{The final option} On a similar note, \ST, like many \LTX
 % packages, accepts the |final| option. When passed this option, either
@@ -448,23 +452,23 @@ California, 94105, USA.
 % \end{quote}
 %
 % Here, I'll do just that right now: the prime factorization of the
-% current page number plus $12$ is $\sage{factor(\thepage + 12)}$ and
-% \thepage. (Wrong answer? See footnote.\footnote{Is the above
-%   factorization wrong? If the current page number plus $12$ is one
-%   larger than the claimed factorization, another Sage/\LTX cycle on
-%   this source file should fix it. Why? The first time you run \LTX on
-%   this file, the sine graph isn't available, so the text where I've
-%   talked about the prime factorization is back one page. Then you run
-%   Sage, and it creates the sine graph and does the factorization. When
-%   you run \LTX again, the sine graph pushes the text onto the next
-%   page, but it uses the Sage-computed value from the previous page.
-%   Meanwhile, the |.sage| file has been rewritten with the correct page
-%   number, so if you do another Sage/\LTX cycle, you should get the
-%   correct value above. However, in some cases, even \emph{that}
-%   doesn't work because of some kind of \TeX{} weirdness in ending the
-%   one page a bit short and starting another.}) The |\sage| command
-% doesn't automatically use math mode for its output, so be sure to use
-% dollar signs or a displayed math environment
+% current page number plus $12$ is $\sage{factor(\thepage + 12)}$.
+% (Wrong answer? See footnote.\footnote{Is the above factorization
+%   wrong? If the current page number plus $12$ is one larger than the
+%   claimed factorization, another Sage/\LTX cycle on this source file
+%   should fix it. Why? The first time you run \LTX on this file, the
+%   sine graph isn't available, so the text where I've talked about the
+%   prime factorization is back one page. Then you run Sage, and it
+%   creates the sine graph and does the factorization. When you run \LTX
+%   again, the sine graph pushes the text onto the next page, but it
+%   uses the Sage-computed value from the previous page. Meanwhile, the
+%   |.sage| file has been rewritten with the correct page number, so if
+%   you do another Sage/\LTX cycle, you should get the correct value
+%   above. However, in some cases, even \emph{that} doesn't work because
+%   of some kind of \TeX{} weirdness in ending the one page a bit short
+%   and starting another.}) The |\sage| command doesn't automatically
+% use math mode for its output, so be sure to use dollar signs or a
+% displayed math environment
 % as appropriate.\\
 %
 % \DescribeMacro{\percent} If you are doing modular arithmetic or string
@@ -567,11 +571,11 @@ California, 94105, USA.
 % anytime; if \ST can't find the files, it will warn you to run Sage to
 % regenerate them.\\
 %
-% \noindent\fbox{\parbox{.97\textwidth}{\textbf{WARNING!} When you run
-% Sage on your |.sage| file, all files in the
-% \texttt{sage-plots-for-\meta{filename}.tex} directory \emph{will be
-% deleted!} Do not put any files into that directory that you do not
-% want to get automatically deleted.}}
+% \noindent\warningbox{\textbf{WARNING!} When you run Sage on your
+%   |.sage| file, all files in the
+%   \texttt{sage-plots-for-\meta{filename}.tex} directory \emph{will be
+%     deleted!} Do not put any files into that directory that you do not
+%   want to get automatically deleted.}
 %
 % \paragraph{The epstopdf option} One of the graphics-related options
 % supported by \ST is |epstopdf|. This option causes \ST to use the
@@ -649,9 +653,9 @@ California, 94105, USA.
 % \begin{quote}
 % |\begin{sageblock}|\\
 % |   var('x')|\\
-% |   f = sin(x) - 1|\\
-% |   g = log(x)|\\
-% |   h = diff(f(x) * g(x), x)|\\
+% |   f(x) = sin(x) - 1|\\
+% |   g(x) = log(x)|\\
+% |   h(x) = diff(f(x) * g(x), x)|\\
 % |\end{sageblock}|
 % \end{quote}
 % and then anytime later write in your source file
@@ -660,7 +664,7 @@ California, 94105, USA.
 %   |the product of $f$ and $g$.|
 % \end{quote}
 % and the |\sage| call will get correctly replaced by $\sage{
-% diff((sin(x) - 1)*log(x), x)(1)}$. You can use any Sage or Python
+% diff((sin(x) - 1)*log(x), x)(x=1)}$. You can use any Sage or Python
 % commands inside a |sageblock|; all the commands get sent directly to
 % Sage.\\
 %
@@ -747,7 +751,7 @@ California, 94105, USA.
 % commands are just meant to be a starting point.
 %
 % \subsection{Sending \ST files to others who don't use Sage}
-% \label{sec:makestatic}
+% \label{sec:makestatic-usage}
 %
 % What can you do when sending a \LTX document that uses \ST to a
 % colleague who doesn't use Sage?\footnote{Or who cannot use Sage, since
