@@ -273,7 +273,7 @@ California, 94105, USA.
 % Sage commands to make your lovely plot, but they do eliminate the need
 % to muck around with saving the result to a file, remembering the
 % filename, including it into your document, and so on. In
-% \autoref{s:usage}, we will see what what we can do with \ST.
+% \autoref{sec:usage}, we will see what what we can do with \ST.
 %
 %
 % \section{Installation}
@@ -377,7 +377,7 @@ California, 94105, USA.
 % these scripts can be found in \texttt{\sageroot/local/share/texmf/}.
 %
 % \section{Usage}
-% \label{s:usage}
+% \label{sec:usage}
 % 
 % Let's begin with a rough description of how \ST works. Naturally the
 % very first step is to put |\usepackage{sagetex}| in the preamble of
@@ -631,7 +631,8 @@ California, 94105, USA.
 % to see your graphics when you use |latex| and DVI files while writing
 % your document.
 %
-% \subsubsection{But that's not good enough!} \label{s:notgoodenough}
+% \subsubsection{But that's not good enough!}
+% \label{sec:notgoodenough}
 %
 % The |\sageplot| command tries to be both flexible and easy to use, but
 % if you are just not happy with it, you can always do things manually:
@@ -761,9 +762,9 @@ California, 94105, USA.
 % since it cannot get those plots into a Sage graphics object, you
 % cannot use |\sageplot| to use such graphics. You'll need to use the
 % method described in ``But that's not good enough!''
-% (\hyperref[s:notgoodenough]{page~\pageref*{s:notgoodenough}}) with
-% some additional bits to get the directory right---otherwise your file
-% will get saved to someplace in a hidden directory.
+% (\autoref{sec:notgoodenough}) with some additional bits to get the
+% directory right---otherwise your file will get saved to someplace in a
+% hidden directory.
 %
 % For Mathematica, you can do something like this inside a |sagesilent|
 % or |sageblock| environment:
