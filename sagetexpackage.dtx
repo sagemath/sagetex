@@ -26,9 +26,11 @@
 %</driver>
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
-%<*latex>
+%<python>version = """
+%<*latex|python>
   [2009/05/12 v2.1 embedding Sage into LaTeX documents]
-%</latex>
+%</latex|python>
+%<python>"""
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{sagetex}
@@ -148,15 +150,16 @@ California, 94105, USA.
 %
 % \changes{v1.0}{2008/03/03}{Initial version}
 % \changes{v1.1}{2008/03/05}{Wrapped user-provided Sage code in
-% try/except clauses; plotting now has optional format argument.}
+% try/except clauses; plotting now has optional format argument}
 % \changes{v1.2}{2008/03/07}{Imagemagick option; better documentation}
 % \changes{v1.3.1}{2008/03/10}{Internal variables renamed; fixed typos}
 % \changes{v1.4}{2008/03/11}{MD5 fix, percent sign macro, CTAN upload}
 % \changes{v2.0}{2008/12/16}{External Python scripts for parsing
 % SageTeX-ified documents, tons of documentation improvements,
 % sagetex.py refactored, include in Sage as spkg}
-% \changes{v2.0}{2009/01/09}{Miscellaneous fixes, final 2.0 version.}
-% \changes{v2.1}{2009/05/12}{Add pausing support.}
+% \changes{v2.0}{2009/01/09}{Miscellaneous fixes, final 2.0 version}
+% \changes{v2.1}{2009/05/12}{Add pausing support}
+% \changes{v2.1}{2009/05/12}{Get version written to .py file}
 %
 % \GetFileInfo{sagetex.sty}
 %
@@ -279,7 +282,7 @@ California, 94105, USA.
 % \section{Installation}
 % \label{sec:installation}
 % \changes{v2.0}{2009/01/14}{Fixed up installation section, final
-% \emph{final} 2.0.}
+% \emph{final} 2.0}
 %
 % To install \ST, you need to do two things: make \ST known to Sage, and
 % to \LTX. There are two basic methods to do those two things.
