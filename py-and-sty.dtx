@@ -38,7 +38,7 @@
 \RequirePackage{ifthen}
 %    \end{macrocode}
 %
-% Next set up the counters and the default indent.
+% Next set up the counters, default indent, and flags.
 %    \begin{macrocode}
 \newcounter{ST@inline}
 \newcounter{ST@plot}
@@ -46,6 +46,8 @@
 \setcounter{ST@plot}{0}
 \newlength{\sagetexindent}
 \setlength{\sagetexindent}{5ex}
+\newif\ifST@paused
+\ST@pausedfalse
 %    \end{macrocode}
 % Set up the file stuff, which will get run at the beginning of the
 % document, after we know what's happening with the |final| option. 
@@ -132,6 +134,15 @@
 \InputIfFileExists{\jobname.sout}{}{}
 %    \end{macrocode}
 %
+% The user might load the |hyperref| package after this one (indeed, the
+% |hyperref| documentation insists that it be loaded last) or not at
+% all---so when we hit the beginning of the document, provide a dummy
+% |NoHyper| environment if one hasn't been defined by the |hyperref|
+% package. We need this for the |\sage| macro below.
+%    \begin{macrocode}
+\AtBeginDocument{\provideenvironment{NoHyper}{}{}}
+%    \end{macrocode}
+%
 % \subsubsection{The \texttt{\bslash sage} macro}
 % \label{sec:sagemacro}
 %
@@ -158,35 +169,34 @@ try:^^J
  _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % The |inline| function of the Python module is documented on page
-% \pageref{inlinefn}.
-%
-% Our use of |\newlabel| and |\ref| seems awfully clever until you load
-% the |hyperref| package, which gleefully tries to hyperlink the hell
-% out of everything. This is great until it hits one of our special
-% |\newlabel|s and gets deeply confused. Fortunately the |hyperref|
-% folks are willing to accomodate people like us, and give us a
-% |NoHyper| environment.
+% \pageref{inlinefn}. Back in \LTX-land: if paused, say so.
 %    \begin{macrocode}
-\begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}%
+\ifST@paused
+  \mbox{(Sage\TeX{} is paused)}%
+%    \end{macrocode}
+% Otherwise\ldots our use of |\newlabel| and |\ref| seems awfully clever
+% until you load the |hyperref| package, which gleefully tries to
+% hyperlink the hell out of everything. This is great until it hits one
+% of our special |\newlabel|s and gets deeply confused. Fortunately the
+% |hyperref| folks are willing to accomodate people like us, and give us
+% a |NoHyper| environment.
+%    \begin{macrocode}
+\else
+  \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}
 %    \end{macrocode}
 % Now check if the label has already been defined. (The internal
 % implementation of labels in \LTX involves defining a macro called
 % ``|r@@labelname|''.) If it hasn't, we set a flag so that we can tell
 % the user to run Sage on the |.sage| file at the end of the run.
-% Finally, step the counter.
 %    \begin{macrocode}
-\@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}%
+  \@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}
+\fi
+%    \end{macrocode}
+% In any case, the last thing to do is step the counter.
+%    \begin{macrocode}
 \stepcounter{ST@inline}}
 %    \end{macrocode}
 % \end{macro}
-% The user might load the |hyperref| package after this one (indeed, the
-% |hyperref| documentation insists that it be loaded last) or not at
-% all---so when we hit the beginning of the document, provide a dummy
-% |NoHyper| environment if one hasn't been defined by the |hyperref|
-% package.
-%    \begin{macrocode}
-\AtBeginDocument{\provideenvironment{NoHyper}{}{}}
-%    \end{macrocode}
 %
 % \begin{macro}{\percent} 
 % A macro that inserts a percent sign. This is more-or-less stolen from the
@@ -263,13 +273,11 @@ try:^^J
 % \begin{macro}{\ST@sageplot}
 % \changes{v2.0}{2008/12/16}{Change to use only keyword arguments: see issue
 % 2 on bitbucket tracker}
-% Let's see the real code here. We write a
-% couple lines to the |.sage| file, including a counter, input line
-% number, and all of the mandatory argument; all this is wrapped in
-% another try/except. 
+% Let's see the real code here. We write a couple lines to the |.sage|
+% file, including a counter, input line number, and all of the mandatory
+% argument; all this is wrapped in another try/except.
 %    \begin{macrocode}
-\def\ST@sageplot[#1][#2]#3{\ST@wsf{%
-try:^^J
+\def\ST@sageplot[#1][#2]#3{\ST@wsf{try:^^J
  _st_.plot(\theST@plot, format='#2', _p_=#3)^^Jexcept:^^J
  _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
@@ -357,7 +365,7 @@ try:^^J
     {\ST@inclgrfx{#1}{eps}}}%
 \fi
 %    \end{macrocode}
-% Finally, step the counter and we're done.
+% Step the counter and we're done with the usual work.
 %    \begin{macrocode}
 \stepcounter{ST@plot}}
 %    \end{macrocode}
@@ -368,9 +376,12 @@ try:^^J
 % This command includes the requested graphics file (|#2| is the
 % extension) with the requested options (|#1|) if the file exists. Note
 % that it just needs to know the extension, since we use a counter for
-% the filename.
+% the filename. If we are paused, it just puts in a little box saying
+% so.
 %    \begin{macrocode}
-\newcommand{\ST@inclgrfx}[2]{%
+\newcommand{\ST@inclgrfx}[2]{\ifST@paused
+  \fbox{\rule[-1cm]{0cm}{2cm}Sage\TeX{} is paused; no graphic}
+\else
   \IfFileExists{\ST@plotdir/plot-\theST@plot.#2}%
     {\includegraphics[#1]{\ST@plotdir/plot-\theST@plot.#2}}%
 %    \end{macrocode}
@@ -383,18 +394,23 @@ try:^^J
      \PackageWarning{sagetex}{Graphics file
      \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
      exist. Plot command is}%
-     \gdef\ST@rerun{x}}}
+     \gdef\ST@rerun{x}}
+\fi}
 %    \end{macrocode}
 % \autoref{f:stig} makes this a bit clearer. 
 % \begin{figure}
 %   \centering
 %   \begin{tikzpicture}
 %     \tikzstyle{level 1}=[sibling distance=4cm]
-%     \node [box] {Does EXT file exist?}
-%       child {node [box, text width = 2.125cm] {Warn user to rerun Sage}
-%         edge from parent node[left] {no}}
-%       child {node [box] {Use \texttt{includegraphics}}
-%         edge from parent node[right] {yes}};
+%     \node [box] {Paused?}
+%       child {node [box] {Insert ``we're paused'' box}
+%         edge from parent node[left] {yes}}
+%       child {node [box] {Does EXT file exist?}
+%         child {node [box, text width = 2.125cm] {Warn user to rerun Sage}
+%           edge from parent node[left] {no}}
+%         child {node [box] {Use \texttt{includegraphics}}
+%           edge from parent node[right] {yes}}
+%         edge from parent node[right] {no}};
 %   \end{tikzpicture}
 %   \caption{The logic used by the \texttt{\bslash ST@inclgrfx}
 %   command.}
@@ -488,13 +504,59 @@ _st_.blockbegin()^^Jtry:}%
 % \emph{nor} writes code to the |.sage| file. The verbatim package's
 % |comment| environment does that.\\
 %
-% Now we deal with some end-of-file cleanup.
+% \subsubsection{Pausing \ST}
+% \label{sec:pausing-sagetex}
+%
+% How can one have Sage to stop processing \ST output for a little
+% while, and then start again? At first I thought I would need some sort
+% of ``goto'' statement in Python, but later realized that there's a
+% dead simple solution: write triple quotes to the |.sage| file to
+% comment out the code. Okay, so this isn't \emph{really} commenting out
+% the code; PEP 8 says block comments should use ``|#|'' and Sage will
+% read in the ``commented-out'' code as a string literal. For the
+% purposes of \ST, I think this is a good decision, though, since (1)
+% the pausing mechanism is orthogonal to everything else, which makes it
+% easier to not screw up other code, and (2) it will always work.
+%
+% This illustrates what I really like about \ST: it mixes \LTX and
+% Sage/Python, and often what is difficult or impossible in one system
+% is trivial in the other.
+%
+% \begin{macro}{sagetexpause}
+% This macro pauses \ST by effectively commenting out code in the
+% |.sage| file. When running the corresponding |.sage| file, Sage will
+% skip over any commands issued while \ST is paused.
+%    \begin{macrocode}
+\newcommand{\sagetexpause}{\ifST@paused\relax\else
+\ST@wsf{print 'SageTeX paused on \jobname.tex line \the\inputlineno'^^J"""}
+\ST@pausedtrue
+\fi}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{sagetexunpause}
+% This is the obvious companion to |\sagetexpause|.
+%    \begin{macrocode}
+\newcommand{\sagetexunpause}{\ifST@paused
+\ST@wsf{"""^^Jprint 'SageTeX unpaused on \jobname.tex line \the\inputlineno'}
+\ST@pausedfalse
+\fi}
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{End-of-document cleanup}
+% \label{sec:end-of-doc-cleanup}
 %
 % We tell the Sage script to write some information to the |.sout| file,
 % then check to see if |ST@rerun| ever got defined. If not, all the
-% inline formulas and plots worked, so do nothing.
+% inline formulas and plots worked, so do nothing. We check to see if
+% we're paused first, so that we can finish the triple-quoted string in
+% the |.sage| file.
 %    \begin{macrocode}
-\AtEndDocument{\ST@wsf{_st_.endofdoc()}%
+\AtEndDocument{\ifST@paused
+\ST@wsf{"""^^Jprint 'SageTeX unpaused at end of \jobname.tex'}
+\fi
+\ST@wsf{_st_.endofdoc()}%
 \@ifundefined{ST@rerun}{}%
 %    \end{macrocode}
 % Otherwise, we issue a warning to tell the user to run Sage on the
@@ -515,6 +577,7 @@ LaTeX on \jobname.tex again}}}
 %
 %
 % \subsection{The Python module}
+% \label{sec:py-file}
 %
 % \iffalse
 % Hey, docstrip! Stop putting code into the .sty file, and start
@@ -537,13 +600,12 @@ LaTeX on \jobname.tex again}}}
 % a problem if you \emph{begin} the line with a (single) percent sign;
 % there are no troubles otherwise.\\
 %
-% On to the code:
-%
-% The |sagetex.py| file is intended to be used as a module and doesn't
-% do anything useful when called directly, so if someone does that, warn
-% them. We do this right away so that we print this and exit before
-% trying to import any Sage modules; that way, this error message gets
-% printed whether you run the script with Sage or with Python.
+% On to the code: the |sagetex.py| file is intended to be used as a
+% module and doesn't do anything useful when called directly, so if
+% someone does that, warn them. We do this right away so that we print
+% this and exit before trying to import any Sage modules; that way, this
+% error message gets printed whether you run the script with Sage or
+% with Python.
 %    \begin{macrocode}
 import sys
 if __name__ == "__main__":
@@ -551,7 +613,7 @@ if __name__ == "__main__":
 It is not meant to be called directly.
 
 This file will be automatically used by Sage scripts generated from a
-LaTeX document using the sagetex package.""")
+LaTeX document using the SageTeX package.""")
   sys.exit()
 %    \end{macrocode}
 % Import what we need:
@@ -571,11 +633,11 @@ import shutil
 class SageTeXProcessor():
   def __init__(self, jobname):
     self.progress('Processing Sage code for %s.tex...' % jobname)
-    self.didinitplot    = False
+    self.didinitplot = False
     self.useimagemagick = False
-    self.useepstopdf    = False
-    self.plotdir        = 'sage-plots-for-' + jobname + '.tex'
-    self.filename       = jobname
+    self.useepstopdf = False
+    self.plotdir = 'sage-plots-for-' + jobname + '.tex'
+    self.filename = jobname
 %    \end{macrocode}
 % Open a |.sout.tmp| file and write all our output to that. Then, when
 % we're done, we move that to |.sout|. The ``autogenerated'' line is
@@ -583,7 +645,7 @@ class SageTeXProcessor():
 % Sage files; we are automatically generating a file with Sage, so it
 % seems reasonable to add it.
 %    \begin{macrocode}
-    self.souttmp        = open(self.filename + '.sout.tmp', 'w')
+    self.souttmp = open(self.filename + '.sout.tmp', 'w')
     s = '% This file was *autogenerated* from the file ' + \
         os.path.splitext(jobname)[0] + '.sage.\n'
     self.souttmp.write(s)
@@ -599,6 +661,7 @@ class SageTeXProcessor():
       print(t)
     else:
       sys.stdout.write(t)
+      sys.stdout.flush()
 %    \end{macrocode}
 % \end{macro}
 %
