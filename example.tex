@@ -166,6 +166,9 @@ And here's the picture:
 
 \sageplot{matrixprogram}
 
+Reset \texttt{x} in Sage so that it's not a generator for the polynomial
+ring: \sage{var('x')}
+
 \subsection{3D plotting}
 
 3D plotting right now is problematic because there's no convenient way
@@ -187,6 +190,28 @@ Here's the famous Sage cube graph:
 % need empty [] so sageplot knows you want png format, and aren't
 % passing an option to includegraphics
 \sageplot[][png]{G.plot3d(engine='tachyon')}
+
+\section{Pausing Sage\TeX}
+\label{sec:pausing-sagetex}
+
+Sometimes you want to ``pause'' for a bit while writing your document if
+you have embedded a long calculation or just want to concentrate on the
+\LaTeX{} and ignore any Sage stuff. You can use the \verb|\sagetexpause|
+and \verb|\sagetexunpause| macros to do that.
+
+\sagetexpause
+
+A calculation: $\sage{factor(2^325 + 1)}$ and a code environment that
+simulates a time-consuming calculation. While paused, this will get
+skipped over.
+\begin{sageblock}
+  import time
+  time.sleep(15)
+\end{sageblock}
+
+Graphics are also skipped: \sageplot{plot(2*sin(x^2) + x^2, (x, 0, 5))}
+
+\sagetexunpause
 
 \section{Make Sage write your \LaTeX{} for you}
 
