@@ -1,29 +1,40 @@
 SHELL=/bin/bash
 pkg=sagetexpackage
 dest=/home/drake/texmf/tex/latex/sagetex/
+dtxs=$(wildcard *.dtx)
 # the subdir stuff makes the tarball have the directory correct
 srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
-ver=2.0.2
+ver=2.1
 
-all: ins
+.SUFFIXES:
+
+all: sagetex.sty sagetex.py example.pdf $(pkg).pdf
+
+# just depend on the .ind file, since we'll make the .gls and .ind together
+$(pkg).pdf: $(dtxs) $(pkg).ind
 	latex $(pkg).dtx
 	sage $(pkg).sage
-	make index
 	latex $(pkg).dtx
 	sage $(pkg).sage
 	latex $(pkg).dtx
 	pdflatex $(pkg).dtx
+
+example.pdf: example.tex sagetex.sty sagetex.py
 	latex example.tex
 	sage example.sage
 	latex example.tex
 	pdflatex example.tex
 
-index:
+%.ind: $(dtxs)
+	latex $(pkg).dtx
 	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetexpackage.idx
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
-ins:
+sagetex.sty: py-and-sty.dtx
+	yes | latex $(pkg).ins
+
+sagetex.py: py-and-sty.dtx
 	yes | latex $(pkg).ins
 
 clean: 
@@ -34,7 +45,7 @@ clean:
 auxclean:
 	rm -f {$(pkg),example}.{glo,gls,aux,sout,out,toc,dvi,pdf,ps,log,ilg,ind,idx,sage}
 
-install: ins
+install: sagetex.sty sagetex.py
 	cp sagetex.sty $(dest)
 
 # make a tarball suitable for CTAN uploads, or for someone who knows how
@@ -45,13 +56,12 @@ ctandist: all
 	@echo
 	tar zcf sagetex.tar.gz $(srcs) ../sagetex/example.pdf ../sagetex/sagetexpackage.pdf
 
-# this may seem silly, since running 'all' runs Sage just like the test
-# script does, but sometimes it scrolls by too fast, and I want obvious
-# output in front of me that tells me the results.
-test: all
-	clear
+# otherwise, make gets confused since there's a file named "test"
+.PHONY: test
+test:
 	./test
 
 # make a source distribution, used for building the spkg
 dist: all
 	python setup.py sdist --formats=tar
+
