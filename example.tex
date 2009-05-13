@@ -78,9 +78,9 @@ but we can refer to whatever we did in that code block: $e=\sage{e}$.
 
 \begin{sageblock}
   var('x')
-  f = log(sin(x)/x)
+  f(x) = log(sin(x)/x)
 \end{sageblock}
-The Taylor Series of $f$ is: $\sage{ f.taylor(x, 0, 10) }$.
+The Taylor Series of $f$ begins: $\sage{ f.taylor(x, 0, 10) }$.
 
 \section{Plotting}
 
@@ -89,8 +89,10 @@ Here's a plot of the elliptic curve $E$.
 \sageplot{E.plot(-3,3)}
 
 \begin{sagesilent}
+  # the var line is unecessary unless you've defined x to be something
+  # other than a symbolic variable
   var('x')
-  f=-x^3+3*x^2+7*x-4
+  f(x) = -x^3+3*x^2+7*x-4
 \end{sagesilent}
 
 You can use variables to hold plot objects and do stuff with them.
@@ -174,7 +176,7 @@ ring: \sage{var('x')}
 3D plotting right now is problematic because there's no convenient way
 to produce vector graphics. We can make PNGs, though, and since the
 \verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
-a valid format for 3D plotting}. Sage right now (version 3.2.2) can't
+a valid format for 3D plotting}. Sage right now (version 3.4.2) can't
 produce EPS or PDF files from plot3d objects, so if you don't specify a
 valid format, things will go badly. You can specify the
 ``\texttt{imagemagick}'' option, which will use the Imagemagick

@@ -1,16 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# run Sage on the generated .sage files and see what happens.
+# this runs Sage on the generated .sage files to see if they work ok
+# this is basically the spkg-check file
 
-# In an ideal world, this could be automatically run as part of
-# doctesting, but for now this is about as good as we can do.
+function checkdotsage
+{
+    sage $1.sage
+    if [ $? -ne 0 ]
+    then
+        echo "Error running Sage on $1.sage!"
+        exit 1
+    else
+        echo "No problem that spkg-check can detect running Sage on $1.sage."
+    fi
+}
 
-for F in example sagetexpackage
-do
-  if [ $(sage $F.sage 2>&1 | grep -c 'failed') -gt 0 ]
-  then
-    echo "Error running Sage on $F.sage!"
-  else
-    echo "No problem running Sage on $F.sage."
-  fi
-done
+latex example.tex > /dev/null
+checkdotsage example
+
+latex sagetexpackage.dtx > /dev/null
+checkdotsage sagetexpackage
+
+# if we get here, we assume the .sage files are good, and exit successfully
+exit 0
