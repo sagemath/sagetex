@@ -4,7 +4,7 @@ dest=/home/drake/texmf/tex/latex/sagetex/
 dtxs=$(wildcard *.dtx)
 # the subdir stuff makes the tarball have the directory correct
 srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
-ver=2.1
+ver=2.1.1
 
 .SUFFIXES:
 
@@ -31,10 +31,10 @@ example.pdf: example.tex sagetex.sty sagetex.py
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
-sagetex.sty: py-and-sty.dtx
+sagetex.sty: py-and-sty.dtx $(pkg).dtx
 	yes | latex $(pkg).ins
 
-sagetex.py: py-and-sty.dtx
+sagetex.py: py-and-sty.dtx $(pkg).dtx
 	yes | latex $(pkg).ins
 
 clean: 
@@ -43,7 +43,7 @@ clean:
 
 # the following bit requires SHELL=bash
 auxclean:
-	rm -f {$(pkg),example}.{glo,gls,aux,sout,out,toc,dvi,pdf,ps,log,ilg,ind,idx,sage}
+	rm -f {$(pkg),example}.{glo,gls,aux,sout,out,toc,dvi,pdf,ps,log,ilg,ind,idx,sage,fdb_latexmk}
 
 install: sagetex.sty sagetex.py
 	cp sagetex.sty $(dest)

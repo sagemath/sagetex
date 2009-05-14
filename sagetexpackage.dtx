@@ -28,7 +28,7 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>version = """
 %<*latex|python>
-  [2009/05/12 v2.1 embedding Sage into LaTeX documents]
+  [2009/05/14 v2.1.1 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>"""
 %<*driver>
@@ -130,7 +130,7 @@ California, 94105, USA.
 %</driver>
 % \fi
 %
-% \CheckSum{313}
+% \CheckSum{315}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -184,6 +184,13 @@ California, 94105, USA.
 % \author{Dan Drake and others\thanks{Author's website:
 %     \href{http://mathsci.kaist.ac.kr/~drake/}
 %     {\texttt{mathsci.kaist.ac.kr/$\sim$drake/}}.}}
+%
+% \iffalse
+% Don't put any other code from this file into the .sty or .py
+% file:
+%<*!latex&!python>
+% This lets us use verbatim environments in the documentation.
+% \fi
 %
 % \maketitle
 %
@@ -743,9 +750,11 @@ California, 94105, USA.
 %
 % Here are some other notes on using \ST.
 %
-% \paragraph{Using Beamer} The \textsc{beamer} package does not play
-% nicely with verbatim-like environments unless you ask it to. To use
-% code block environments in a \textsc{beamer} presentation, do:
+% \subsection{Using Beamer}
+%
+% The \textsc{beamer} package does not play nicely with verbatim-like
+% environments unless you ask it to. To use code block environments in a
+% \textsc{beamer} presentation, do:
 % \begin{quote}
 %  |\begin{frame}[fragile]|\\
 %  |\begin{sageblock}|\\
@@ -760,11 +769,12 @@ California, 94105, USA.
 %
 % Thanks to Franco Saliola for reporting this.
 %
-% \paragraph{Plotting from Mathematica, Maple, etc.} Sage can use
-% Mathematica, Maple, and friends and can tell them to do plotting, but
-% since it cannot get those plots into a Sage graphics object, you
-% cannot use |\sageplot| to use such graphics. You'll need to use the
-% method described in ``But that's not good enough!''
+% \subsection{Plotting from Mathematica, Maple, etc.}
+%
+% Sage can use Mathematica, Maple, and friends and can tell them to do
+% plotting, but since it cannot get those plots into a Sage graphics
+% object, you cannot use |\sageplot| to use such graphics. You'll need
+% to use the method described in ``But that's not good enough!''
 % (\autoref{sec:notgoodenough}) with some additional bits to get the
 % directory right---otherwise your file will get saved to someplace in a
 % hidden directory.
