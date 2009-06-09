@@ -723,7 +723,7 @@ class SageTeXProcessor():
   def inline(self, counter, s):
     self.progress('Inline formula %s' % counter)
     self.souttmp.write('\\newlabel{@sageinline' + str(counter) + '}{{' + \
-                 latex(s) + '}{}{}{}{}}\n')
+                 latex(s).rstrip() + '}{}{}{}{}}\n')
 %    \end{macrocode}
 % We are using five fields, just like |hyperref| does, because that
 % works whether or not |hyperref| is loaded. Using two fields, as in
@@ -785,7 +785,6 @@ class SageTeXProcessor():
         subprocess.check_call(['epstopdf', epsfile])
         continue
       plotfilename = os.path.join(self.plotdir, 'plot-%s.%s' % (counter, fmt))
-      #print('  plotting %s with args %s' % (plotfilename, kwargs))
       _p_.save(filename=plotfilename, **kwargs)
 %    \end{macrocode}
 % If the user provides a format \emph{and} specifies the |imagemagick|
