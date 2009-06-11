@@ -37,9 +37,12 @@ sagetex.sty: py-and-sty.dtx $(pkg).dtx
 sagetex.py: py-and-sty.dtx $(pkg).dtx
 	yes | latex $(pkg).ins
 
+remote-sagetex.py: remote-sagetex.dtx
+	yes | latex $(pkg).inx
+
 clean: 
 	latexcleanup clean .
-	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py
 
 # the following bit requires SHELL=bash
 auxclean:
