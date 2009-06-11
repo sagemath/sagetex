@@ -12,6 +12,7 @@ sagetex.py
 makestatic.py
 extractsagecode.py
 sagetexparse.py
+remote-sagetex.py
 auto/*.el
 dist/*
 MANIFEST

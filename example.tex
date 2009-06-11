@@ -9,9 +9,9 @@
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
 \author{Dan Drake and others}
-\usepackage{amsmath} 
+\usepackage{amsmath}
 \usepackage{sagetex}
-% 
+%
 % If you want SageTeX to use Imagemagick's `convert' utility to make eps
 % files from png files when generating a dvi file, add the "imagemagick"
 % option above:
@@ -54,7 +54,7 @@ E = EllipticCurve("37a")
 You can't do assignment inside \verb|\sage| macros, since Sage doesn't
 know how to typeset the output of such a thing. So you have to use a
 code block. The elliptic curve $E$ given by $\sage{E}$ has discriminant
-$\sage{E.discriminant()}$. 
+$\sage{E.discriminant()}$.
 
 You can do anything in a code block that you can do in Sage and/or
 Python. Here we save an elliptic curve into a file.
@@ -67,8 +67,8 @@ except IOError:
     E.save('E2')
 \end{sageblock}
 
-The 9999th Fourier coefficient of $\sage{E}$ is 
-$\sage{E.anlist(100000)[9999]}$. 
+The 9999th Fourier coefficient of $\sage{E}$ is
+$\sage{E.anlist(100000)[9999]}$.
 
 The following code block doesn't appear in the typeset file\dots
 \begin{sagesilent}
