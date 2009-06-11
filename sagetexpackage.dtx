@@ -11,13 +11,13 @@
 % to say:
 %
 %   This work has the LPPL maintenance status `maintained'.
-%   
+%
 %   The Current Maintainer of this work is Dan Drake.
 %
 %   This work consists of the files sagetexpackage.dtx,
 %   sagetexpackage.ins, example.tex, and the derived files sagetex.sty,
 %   sagetex.py, sagetexparse.py, makestatic.py, and extractsagecode.py.
-% 
+%
 % \fi
 %
 % \iffalse
@@ -63,7 +63,7 @@
 
 \renewcommand{\subsubsectionautorefname}{section}
 \renewcommand{\subsectionautorefname}{section}
-\EnableCrossrefs         
+\EnableCrossrefs
 \CodelineIndex
 \RecordChanges
 \begin{document}
@@ -123,6 +123,7 @@ California, 94105, USA.
 
 \DocInput{py-and-sty.dtx}
 \DocInput{scripts.dtx}
+\DocInput{remote-sagetex.dtx}
 \Finale
 \PrintChanges
 \PrintIndex
@@ -130,7 +131,7 @@ California, 94105, USA.
 %</driver>
 % \fi
 %
-% \CheckSum{315}
+% \CheckSum{341}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -164,7 +165,7 @@ California, 94105, USA.
 % \GetFileInfo{sagetex.sty}
 %
 % \DoNotIndex{\newcommand,\newenvironment,\the}
-% 
+%
 % \newcommand{\ST}{\textsf{Sage\TeX}\xspace}
 % \iffalse
 % so I don't have to put \ or {} after \LaTeX:
@@ -343,7 +344,7 @@ California, 94105, USA.
 % You can also get \ST from \href{http://tug.ctan.org/pkg/sagetex}{its
 % CTAN page}. This is not the recommended way to get \ST, but it will
 % work.
-% 
+%
 % If you get \ST from CTAN, you will need to make the |sagetex.sty| file
 % available to \LTX using any of the methods described above, and you
 % will also need to make |sagetex.py| known to Sage. You can either keep
@@ -356,7 +357,7 @@ California, 94105, USA.
 % \subsection{Using \TeX Shop}
 % \label{sec:using-texshop}
 % \changes{v2.0.1}{2009/03/10}{Add \TeX Shop info}
-% 
+%
 % Starting with version 2.25,
 % \href{http://www.uoregon.edu/~koch/texshop/}{\TeX Shop} includes
 % support for \ST. If you move the file |sage.engine| from
@@ -388,7 +389,7 @@ California, 94105, USA.
 %
 % \section{Usage}
 % \label{sec:usage}
-% 
+%
 % Let's begin with a rough description of how \ST works. Naturally the
 % very first step is to put |\usepackage{sagetex}| in the preamble of
 % your document. When you use macros from this package and run \LTX on
@@ -400,7 +401,7 @@ California, 94105, USA.
 % will pull in all the results of Sage's computation.
 %
 % All you really need to know is that to typeset your document, you need
-% to run \LTX, then run Sage, then run \LTX again. 
+% to run \LTX, then run Sage, then run \LTX again.
 %
 % Also keep in mind that everything you send to Sage is done within one
 % Sage session. This means you can define variables and reuse them
@@ -575,7 +576,7 @@ California, 94105, USA.
 % \begin{center}
 %   \framebox[2cm]{\rule[-1cm]{0cm}{2cm}\textbf{??}}
 % \end{center}
-% 
+%
 % \noindent That's supposed to resemble the image-not-found graphics
 % used by web browsers and use the traditional ``\textbf{??}'' that \LTX
 % uses to indicate missing references.
@@ -617,7 +618,7 @@ California, 94105, USA.
 % specify one that Tachyon does not understand, it will produce files in
 % the Targa format with an incorrect extension and \LTX (both |latex|
 % and |pdflatex|) will be profoundly confused. Don't do that.
-% 
+%
 % Since |latex| does not support PNGs, when using 3D plotting (and
 % therefore a bitmap format like PNG), \ST will always issue a warning
 % about incompatible graphics if you use |latex|, provided you've
@@ -691,9 +692,9 @@ California, 94105, USA.
 %   *don't* prefix the lines with percent signs, those lines get written
 %   into the .sty or .py file. It's just too tricky to get docstrip and
 %   the verbatim stuff to play nicely together. I'd have to redefine how
-%   those environments work, and get them to strip off initial percents. 
+%   those environments work, and get them to strip off initial percents.
 % \fi
-% 
+%
 % \DescribeEnv{sagesilent} This environment is like |sageblock|, but it
 % does not typeset any of the code; it just writes it to the |.sage|
 % file. This is useful if you have to do some setup in Sage that is not
@@ -714,7 +715,7 @@ California, 94105, USA.
 % verbatim-like environments: the indentation. The \ST package defines a
 % length |\sagetexindent|, which controls how much the Sage code is
 % indented when typeset. You can change this length however you like
-% with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or whatever. 
+% with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or whatever.
 %
 % \subsection{Pausing \ST}
 % \label{sec:pausing-st-usage}
@@ -866,7 +867,7 @@ California, 94105, USA.
 % this was pretty easy. The |extractsagecode.py| script does the
 % opposite of |makestatic.py|, in some sense: given a document, it
 % extracts all the Sage code and removes all the \LTX.
-% 
+%
 % Its usage is the same as |makestatic.py|.
 %
 % Note that the resulting file will almost certainly \emph{not} be a
@@ -874,9 +875,14 @@ California, 94105, USA.
 % indentation may not be correct, and the plot options just get written
 % verbatim to the file. Nevertheless, it might be useful if you just
 % want to look at the Sage code in a file.
+%
+% \section{Using \ST without Sage installed}
+% \label{sec:remote-sagetex}
+%
+% foo
 
 % \iffalse
-% Local Variables: 
+% Local Variables:
 % mode: doctex
 % TeX-master: t
 % End:
