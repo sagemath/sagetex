@@ -95,22 +95,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 \generate{\file{makestatic.py}{\from{scripts.dtx}{staticscript}}}
 \generate{\file{extractsagecode.py}{\from{scripts.dtx}{extractscript}}}
-
-% ...and, for remote-sagetex, define yet another preamble with some
-% variables at the top, so it's easy for users to find them and alter
-% them.
-
-\def\rspypreamble{\hash!/usr/bin/env python^^J^^J%
-\hash\space You can fill in your information here, or you can set^^J%
-\hash\space any of these to None and the script will ask you to^^J%
-\hash\space provide them if you don't specify them as command-line^^J%
-\hash\space arguments.
-server = None \hash\space 'http://foo.com:8000', https works too^^J%
-username = None \hash\space 'my_name'^^J%
-password = None \hash\space 's33krit'^^J^^J%
-\pypreamble}
-\usepreamble\rspypreamble
-
 \generate{\file{remote-sagetex.py}{\from{remote-sagetex.dtx}{remotesagetex}}}
 
 \obeyspaces
