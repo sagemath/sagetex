@@ -50,7 +50,7 @@
 \ST@pausedfalse
 %    \end{macrocode}
 % Set up the file stuff, which will get run at the beginning of the
-% document, after we know what's happening with the |final| option. 
+% document, after we know what's happening with the |final| option.
 % First, we open the |.sage| file:
 %    \begin{macrocode}
 \AtBeginDocument{\@ifundefined{ST@final}{%
@@ -206,7 +206,7 @@ try:^^J
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\percent} 
+% \begin{macro}{\percent}
 % A macro that inserts a percent sign. This is more-or-less stolen from the
 % \textsf{Docstrip} manual; there they change the catcode inside a group
 % and use |gdef|, but here we try to be more \LaTeX y and use
@@ -259,7 +259,7 @@ try:^^J
 %\end{center}
 % Observe that we are using a Python script to write \LTX code which
 % writes Python code which writes \LTX code. Crazy!
-% 
+%
 % Here's the wrapper command which does whatever magic we need to get
 % two optional arguments.
 %    \begin{macrocode}
@@ -405,7 +405,7 @@ try:^^J
      \gdef\ST@rerun{x}}
 \fi}
 %    \end{macrocode}
-% \autoref{f:stig} makes this a bit clearer. 
+% \autoref{f:stig} makes this a bit clearer.
 % \begin{figure}
 %   \centering
 %   \begin{tikzpicture}
@@ -449,7 +449,7 @@ _st_.blockbegin()^^Jtry:}%
 % \end{macro}
 %
 % \begin{macro}{\ST@endsfbl}
-% The companion to |\ST@beginsfbl|. 
+% The companion to |\ST@beginsfbl|.
 %    \begin{macrocode}
 \newcommand{\ST@endsfbl}{%
 \ST@wsf{except:^^J
@@ -743,8 +743,8 @@ class SageTeXProcessor():
   def blockend(self):
     self.progress('end')
 %    \end{macrocode}
-% \end{macro} 
-% \end{macro} 
+% \end{macro}
+% \end{macro}
 %
 % \begin{macro}{plot}
 % \phantomsection\label{plotfn}
@@ -816,6 +816,7 @@ class SageTeXProcessor():
 % \end{macro}
 %
 % \begin{macro}{goboom}
+% \phantomsection\label{macro:goboom}
 % When a chunk of Sage code blows up, this function bears the bad news
 % to the user. Normally in Python the traceback is good enough for
 % this, but in this case, we start with a |.sage| file (which is
@@ -841,7 +842,7 @@ class SageTeXProcessor():
 % \#2861}.
 % \changes{v2.0.2}{2008/04/21}{Make sure sys.exit sees a Python integer}
 % \end{macro}
-% 
+%
 % \begin{macro}{endofdoc}
 % When we're done processing, we have some cleanup tasks. We
 % want to put the MD5 sum of the |.sage| file that produced the |.sout|
@@ -855,7 +856,7 @@ class SageTeXProcessor():
 % changed.
 %
 % How do we include line numbers for our error messages but still allow
-% a program to discover a ``genuine'' change to the |.sage| file? 
+% a program to discover a ``genuine'' change to the |.sage| file?
 %
 % The answer is to only find the MD5 sum of \emph{part} of the |.sage|
 % file. By design, the source file line numbers only appear in calls to
@@ -900,7 +901,7 @@ class SageTeXProcessor():
 
 % \endinput
 %</python>
-% Local Variables: 
+% Local Variables:
 % mode: doctex
 % TeX-master: "sagetexpackage"
-% End: 
+% End:
