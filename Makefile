@@ -38,7 +38,7 @@ sagetex.py: py-and-sty.dtx $(pkg).dtx
 	yes | latex $(pkg).ins
 
 remote-sagetex.py: remote-sagetex.dtx
-	yes | latex $(pkg).inx
+	yes | latex $(pkg).ins
 
 clean: 
 	latexcleanup clean .

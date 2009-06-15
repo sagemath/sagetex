@@ -64,7 +64,6 @@ try:
                                ['help', 'server=', 'user=', 'password='])
 except getopt.GetoptError as err:
     print(str(err), usage, sep='\n\n')
-    #    usage()
     sys.exit(2)
 
 for o, a in opts:
@@ -130,7 +129,7 @@ def parsedotsage(fn):
 % \begin{itemize}
 % \item |type|: one of |inline|, |plot|, and |block|.
 % \item |goboom|: used to help the user pinpoint errors, just like the
-% |goboom| function (\pageref{macro:goboom}) does.
+% |goboom| function (page \pageref{macro:goboom}) does.
 % \item |code|: the code to be executed.
 % \end{itemize}
 % Additionally, the |inline| and |plot| dicts have a |num| key for the
@@ -173,8 +172,7 @@ def parsedotsage(fn):
                     cmds[-1]['code'] += line
                 if blockbegin.match(line):
                     cmds.append({'type': 'block',
-                                 'code': '',
-                                 'indent': 0})
+                                 'code': ''})
                     in_block = True
     return cmds
 %    \end{macrocode}
@@ -191,10 +189,11 @@ def parsedotsage(fn):
 debug = False
 class RemoteSage:
     def __init__(self, server, user, password):
-        self._srv = server
+        self._srv = server.rstrip('/')
         sep = '___S_A_G_E___'
         self._response = re.compile('(?P<header>.*)' + sep +
                                    '\n*(?P<output>.*)', re.DOTALL)
+        self._404 = re.compile('404 Not Found')
         self._session = self._get_url('login',
                                     urllib.urlencode({'username': user,
                                     'password':
@@ -233,11 +232,17 @@ except:
         return result
 
     def _get_file(self, fn, cell, ofn=None):
-        with closing(urllib.urlopen(server + '/simple/' + 'file' + '?' +
+        with closing(urllib.urlopen(self._srv + '/simple/' + 'file' + '?' +
                      self._encode({'cell': cell, 'file': fn}))) as h:
             myfn = ofn if ofn else fn
-            with open(myfn, 'w') as f:
-                f.write(h.read())
+            data = h.read()
+            if not self._404.search(data):
+                with open(myfn, 'w') as f:
+                    f.write(data)
+            else:
+                print('Remote server reported {0} could not be found:'.format(
+                      fn))
+                print(data)
 %    \end{macrocode}
 % The |code| below gets stuffed between a try/except, so make sure it's
 % indented!
@@ -289,7 +294,7 @@ except:
 % use the traceback string in the error-finding regular expression.
 %    \begin{macrocode}
 def do_plot_setup(plotdir):
-    print('Initializing plots directory')
+    printc('initializing plots directory...')
     if os.path.isdir(plotdir):
         shutil.rmtree(plotdir)
     os.mkdir(plotdir)
@@ -363,7 +368,7 @@ with closing(RemoteSage(server, username, password)) as sage:
                 did_plot_setup = do_plot_setup(plotdir)
             result = sage.do_plot(cmd['num'], cmd['code'], plotdir)
             check_for_error(result['output'], cmd['goboom'])
-            print('end.')
+            print('done.')
         if cmd['type'] == 'pause':
             print(cmd['msg'])
         if int(time.time()) % 2280 == 0:
@@ -374,7 +379,7 @@ with closing(RemoteSage(server, username, password)) as sage:
 with open(jobname + '.sage', 'r') as sagef:
     h = hashlib.md5()
     for line in sagef:
-        if (not line.startswith(' _st_.goboom') and 
+        if (not line.startswith(' _st_.goboom') and
             not line.startswith("print 'SageT")):
             h.update(line)
     sout += """%{0}% md5sum of corresponding .sage file
