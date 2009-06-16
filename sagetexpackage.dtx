@@ -14,9 +14,10 @@
 %
 %   The Current Maintainer of this work is Dan Drake.
 %
-%   This work consists of the files sagetexpackage.dtx,
-%   sagetexpackage.ins, example.tex, and the derived files sagetex.sty,
-%   sagetex.py, sagetexparse.py, makestatic.py, and extractsagecode.py.
+%   This work consists of the files sagetexpackage.dtx, py-and-sty.dtx,
+%   scripts.dtx, remote-sagetex.dtx, sagetexpackage.ins, example.tex,
+%   and the derived files sagetex.sty, sagetex.py, sagetexparse.py,
+%   makestatic.py, extractsagecode.py, and remote-sagetex.py.
 %
 % \fi
 %
@@ -26,7 +27,7 @@
 %</driver>
 %<latex>\NeedsTeXFormat{LaTeX2e}
 %<latex>\ProvidesPackage{sagetex}
-%<python>version = """
+%<python>__version__ = """
 %<*latex|python>
   [2009/05/14 v2.1.1 embedding Sage into LaTeX documents]
 %</latex|python>
@@ -131,7 +132,7 @@ California, 94105, USA.
 %</driver>
 % \fi
 %
-% \CheckSum{341}
+% \CheckSum{335}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
