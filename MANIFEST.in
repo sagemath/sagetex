@@ -7,3 +7,7 @@ include sagetexpackage.ins
 include sagetexpackage.pdf
 include sagetexparse.py
 include sagetex.sty
+include remote-sagetex.dtx
+include remote-sagetex.py
+include scripts.dtx
+include py-and-sty.dtx
