@@ -13,12 +13,8 @@
 % file's preamble, so we don't put it here.
 %    \begin{macrocode}
 from __future__ import print_function
+import json
 import sys
-try:
-    import json
-except ImportError:
-    print('You need Python 2.6 or later to run this! Exiting.')
-    sys.exit(1)
 import time
 import re
 import urllib
@@ -85,14 +81,15 @@ if len(args) != 1:
 jobname = os.path.splitext(args[0])[0]
 %    \end{macrocode}
 % When we send things to the server, we get everything back as a string,
-% including tracebacks. We can search through output using regexps, but
-% there's a more robust way: put in a special string that changes every
-% time, and look for that. Then it is massively unlikely that a user's
-% code could produce output that we'll mistake for an actual traceback.
-% System time will work well enough for these purposes. We produce this
-% string now, and we it when parsing the |.sage| file (we insert it into
-% code blocks) and when parsing the output that the remote server gives
-% us.
+% including tracebacks. We can search through output using regexps to
+% look for typical traceback strings, but there's a more robust way: put
+% in a special string that changes every time and is printed when
+% there's an error, and look for that. Then it is massively unlikely
+% that a user's code could produce output that we'll mistake for an
+% actual traceback. System time will work well enough for these
+% purposes. We produce this string now, and we it when parsing the
+% |.sage| file (we insert it into code blocks) and when parsing the
+% output that the remote server gives us.
 %    \begin{macrocode}
 traceback_str = 'Exception in SageTeX session {0}:'.format(time.time())
 %    \end{macrocode}
