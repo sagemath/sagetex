@@ -29,7 +29,7 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>__version__ = """
 %<*latex|python>
-  [2009/05/14 v2.1.1 embedding Sage into LaTeX documents]
+  [2009/06/17 v2.2 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>"""
 %<*driver>
@@ -162,6 +162,7 @@ California, 94105, USA.
 % \changes{v2.0}{2009/01/09}{Miscellaneous fixes, final 2.0 version}
 % \changes{v2.1}{2009/05/12}{Add pausing support}
 % \changes{v2.1}{2009/05/12}{Get version written to .py file}
+% \changes{v2.2}{2009/06/17}{Add remote-sagetex.py script}
 %
 % \GetFileInfo{sagetex.sty}
 %
@@ -307,7 +308,7 @@ California, 94105, USA.
 % The easiest way to install \ST is by using Sage's own spkg
 % installation facility; visit the
 % \href{http://sagemath.org/packages/optional/}{optional packages page}
-% and run \texttt{sage -i} with the appropriate version. This will let
+% and run \texttt{sage -i} with the appropriate file name. This will let
 % Sage know about \ST; you still need to let \LTX know about it.
 %
 % The simplest way to ``install'' \ST for \LTX is to copy the file
@@ -331,12 +332,12 @@ California, 94105, USA.
 % To copy the files that \LTX needs into your |texmf| directory, simply
 % do
 % \begin{quote}
-%   \texttt{cp -r \sageroot/local/share/texmf/* \$HOMEPREFIX/texmf/}
+%   \texttt{cp -r \sageroot/local/share/texmf/* HOMEPREFIX/texmf/}
 % \end{quote}
-% where |$HOMEPREFIX| is the appropriate prefix for your own |texmf|
+% where |HOMEPREFIX| is the appropriate prefix for your own |texmf|
 % tree. Then you need to make \TeX{} aware of the new files by running
 % \begin{quote}
-%   \texttt{texhash \$HOMEPREFIX/texmf/}
+%   \texttt{texhash HOMEPREFIX/texmf/}
 % \end{quote}
 %
 % \subsection{From CTAN}
@@ -380,7 +381,11 @@ California, 94105, USA.
 % \label{sec:inst-other-scripts}
 %
 % \ST includes several Python files which may be useful for working with
-% ``\ST-ified'' documents: |makestatic.py| and |extractsagecode.py| are
+% ``\ST-ified'' documents. The |remote-sagetex.py| script allows you to
+% use \ST on a computer that doesn't have Sage installed; see
+% \autoref{sec:remote-sagetex} for more information.
+%
+% Also included are |makestatic.py| and |extractsagecode.py|, which are
 % convenience scripts that you can use after you've written your
 % document. See \autoref{sec:makestatic-usage} and
 % \autoref{sec:extractsagecode} for information on using those scripts.
@@ -402,7 +407,11 @@ California, 94105, USA.
 % will pull in all the results of Sage's computation.
 %
 % All you really need to know is that to typeset your document, you need
-% to run \LTX, then run Sage, then run \LTX again.
+% to run \LTX, then run Sage, then run \LTX again. You can even ``run
+% Sage'' on a computer that doesn't have Sage installed by using the
+% |remote-sagetex.py| script; see \autoref{sec:remote-sagetex}. Whenever
+% this manual says ``run Sage'', you can either directly run Sage, or
+% use the |remote-sagetex.py| script.
 %
 % Also keep in mind that everything you send to Sage is done within one
 % Sage session. This means you can define variables and reuse them
@@ -854,6 +863,13 @@ California, 94105, USA.
 % document should compile to something identical, or very nearly so, to
 % the original file.
 %
+% One large limitation of this script is that it can't change anything
+% while \ST is paused, since Sage doesn't compute anything for such
+% parts of your document. It also doesn't check to see if pause and
+% unpause commands are inside comments or verbatim environments. If
+% you're going to use |makestatic.py|, just remove all pause/unpause
+% statements.
+%
 % The parsing that |makestatic.py| does is pretty good, but not perfect.
 % Right now it doesn't support having a comma-separated list of
 % packages, so you can't have |\usepackage{sagetex, foo}|. You need to
@@ -880,7 +896,75 @@ California, 94105, USA.
 % \section{Using \ST without Sage installed}
 % \label{sec:remote-sagetex}
 %
-% foo
+% You may want to edit and typeset a \ST-ified file on a computer that
+% doesn't have Sage installed. How can you do that? We need to somehow
+% run Sage on the |.sage| file. The included script
+% \texttt{remote-sagetex.py} takes advantage of Sage's network
+% transparency and will use a remote server to do all the computations.
+% Anywhere in this manual where you are told to ``run Sage'', instead of
+% actually running Sage, you can run
+% \begin{center}
+%   \texttt{python remote-sagetex.py filename.sage}
+% \end{center}
+% The script will ask you for a server, username, and password, then
+% process all your code and write a |.sout| file and graphics files
+% exactly as if you had used a local copy of Sage to process the |.sage|
+% script. (With some minor limitations and differences; see below.)
+%
+% One important point: \emph{the script requires Python 2.6}. It will
+% not work with earlier versions. (It will work with Python 3.0 or later
+% with some trivial changes.)
+%
+% You can provide the server, username and password with the
+% command-line switches |--server|, |--username|, and |--password|, or
+% you can put that information into a file and use the |--file| switch
+% to specify that file. The format of the file must be like the
+% following:
+% \begin{verbatim}
+    # hash mark at beginning of line marks a comment
+    server = "http://example.com:1234"
+    username = 'my_user_name'
+    password = 's33krit'\end{verbatim}
+% As you can see, it's really just like assigning a string to a variable
+% in Python. You can use single or double quotes and use hash marks to
+% start comments. You can't have comments on the same line as an
+% assignment, though. You can omit any of those pieces of information
+% information; the script will ask for anything it needs to know.
+% Information provided as a command line switch takes precedence over
+% anything found in the file.
+%
+% You can keep this file separate from your \LTX documents in a secure
+% location; for example, on a USB thumb drive or in an automatically
+% encrypted directory (like |~/Private| in Ubuntu). This makes it much
+% harder to accidentally upload your private login information to the
+% arXiv, put it on a website, send it to a colleague, or otherwise make
+% your private information public.
+%
+% \subsection{Limitations of \texttt{remote-sagetex.py}}
+% \label{sec:remote-sagetex-limitations}
+%
+% The |remote-sagetex.py| script has several limitations. It completely
+% ignores the |epstopdf| and |imagemagick| flags. The |epstopdf| flag is
+% not a big deal, since it was originally introduced to work around a
+% matplotlib bug which has since been fixed. Not having |imagemagick|
+% support means that you cannot automatically convert 3D graphics to eps
+% format; using |pdflatex| to make PDFs works around this issue.
+%
+%
+% \subsection{Other caveats}
+% \label{sec:remote-sagetex-caveats}
+%
+% Right now, the ``simple server API'' that |remote-sagetex.py| uses is
+% not terribly robust, and if you interrupt the script, it's possible to
+% leave an idle session running on the server. If many idle sessions
+% accumulate on the server, it can use up a lot of memory and cause the
+% server to be slow, unresponsive, or maybe even crash. For now, I
+% recommend that you only run the script manually. It's probably best to
+% not configure your \TeX{} editing environment to automatically run
+% |remote-sagetex.py| whenever you typeset your document, at least not
+% without showing you the output or alerting you about errors.
+%
+
 
 % \iffalse
 % Local Variables:

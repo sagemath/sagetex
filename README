@@ -3,13 +3,21 @@ computations, and plots from the Sage mathematics software suite
 (http://sagemath.org) into LaTeX documents.
 ====================================================================
 
-To use SageTeX, you need the files sagetex.sty and sagetex.py. If those
-haven't been extracted from the .dtx file, you'll need to do:
+The recommended way to acquire and install SageTeX is by installing the
+Sage spkg; visit http://sagemath.org/packages/optional/, find the
+current version number, and run "sage -i sagetex-[version]" in a
+terminal. Then you'll need to make the file sagetex.sty known to TeX;
+that file will be in SAGE_ROOT/local/share/texmf/tex/generic/sagetex,
+along with documentation and examples.
+
+If you can't or don't want to install SageTeX by using Sage, you can use
+this CTAN package. If sagetex.py and sagetex.sty haven't been extracted
+from the .dtx file, you'll need to do:
 
   0. Run `latex sagetexpackage.ins'
 
 If a PDF file of the documentation wasn't included with this
-distribution of SageTex, you will need to build the documentation
+distribution of SageTeX, you will need to build the documentation
 yourself. To do that:
 
   1. Run `latex sagetexpackage.dtx'
