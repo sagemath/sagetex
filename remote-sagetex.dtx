@@ -1,6 +1,7 @@
 % \section{The \texttt{remote-sagetex} script}
 % \label{sec:remote-sagetex-code}
 %
+%
 % Here we describe the Python code for |remote-sagetex.py|. Since its
 % job is to replicate the functionality of using Sage and |sagetex.py|,
 % there is some overlap with the Python module.
@@ -26,13 +27,19 @@ import getopt
 from contextlib import closing
 
 #########################################################################
-# You can fill in your information here, or you can set any of these to #
-# None and the script will ask you to provide them if you don't specify #
-# them as command-line arguments.                                       #
+# You can provide a filename here and the script will read your login   #
+# information from that file. The format must be:                       #
+#                                                                       #
+# server = 'http://foo.com:8000'                                        #
+# username = 'my_name'                                                  #
+# password = 's33krit'                                                  #
+#                                                                       #
+# You can omit one or more of those lines, use " quotes, and put hash   #
+# marks at the beginning of a line for comments. Command-line args      #
+# take precedence over information from the file.                       #
 #########################################################################
-server = None       # 'http://foo.com:8000', https works too
-username = None     # 'my_name'
-password = None     # 's33krit'
+login_info_file = None       # e.g. '/home/foo/Private/sagetex-login.txt'
+
 
 usage = """Process a SageTeX-generated .sage file using a remote Sage server.
 
@@ -44,20 +51,27 @@ Options:
     -s, --server:       the Sage server to contact
     -u, --username:     username on the server
     -p, --password:     your password
+    -f, --file:         get login information from a file
 
 If the server does not begin with the four characters `http', then
 `https://' will be prepended to the server name.
 
-You can hard-code the server, username, and password values in the
-remote-sagetex script. If any are omitted, you will be asked to provide
-them.
+You can hard-code the filename from which to read login information into
+the remote-sagetex script. Command-line arguments take precedence over
+the contents of that file. See the SageTeX documentation for formatting
+details.
+
+If any of the server, username, and password are omitted, you will be
+asked to provide them.
 
 See the SageTeX documentation for more details on usage and limitations
 of remote-sagetex.""".format(sys.argv[0])
 
+server, username, password = (None,) * 3
+
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'hs:u:p:',
-                               ['help', 'server=', 'user=', 'password='])
+    opts, args = getopt.getopt(sys.argv[1:], 'hs:u:p:f:',
+                    ['help', 'server=', 'user=', 'password=', 'file='])
 except getopt.GetoptError as err:
     print(str(err), usage, sep='\n\n')
     sys.exit(2)
@@ -72,6 +86,8 @@ for o, a in opts:
         username = a
     elif o in ('-p', '--password'):
         password = a
+    elif o in ('-f', '--file'):
+        login_info_file = a
 
 if len(args) != 1:
     print('Error: must specify exactly one file. Please specify options first.',
@@ -323,8 +339,25 @@ def check_for_error(string, line):
 print('Processing Sage code for {0}.tex using remote Sage server.'.format(
       jobname))
 
+if login_info_file:
+    with open(login_info_file, 'r') as f:
+        print('Reading login information from {0}.'.format(login_info_file))
+        get_val = lambda x: x.split('=')[1].strip().strip('\'"')
+        for line in f:
+            print(line)
+            if not line.startswith('#'):
+                if line.startswith('server') and not server:
+                    server = get_val(line)
+                if line.startswith('username') and not username:
+                    username = get_val(line)
+                if line.startswith('password') and not password:
+                    password = get_val(line)
+
 if not server:
     server = raw_input('Enter server: ')
+
+if not server.startswith('http'):
+    server = 'https://' + server
 
 if not username:
     username = raw_input('Enter username: ')
@@ -333,9 +366,6 @@ if not password:
     from getpass import getpass
     password = getpass('Please enter password for user {0} on {1}: '.format(
         username, server))
-
-if not server.startswith('http'):
-    server = 'https://' + server
 
 printc('Parsing {0}.sage...'.format(jobname))
 cmds = parsedotsage(jobname + '.sage')

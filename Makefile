@@ -4,7 +4,7 @@ dest=/home/drake/texmf/tex/latex/sagetex/
 dtxs=$(wildcard *.dtx)
 # the subdir stuff makes the tarball have the directory correct
 srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
-ver=2.1.1
+ver=2.2
 
 .SUFFIXES:
 
