@@ -162,7 +162,8 @@ dest.write(sagecode.result)
 % \fi
 %
 % \subsection{The parser module}
-% 
+% \changes{v2.2}{2009/06/17}{Update parser module to handle pause/unpause}
+%
 % Here's the module that does the actual parsing and replacing. It's
 % really quite simple, thanks to the awesome
 % \href{http://pyparsing.wikispaces.com}{Pyparsing module}. The parsing
@@ -187,13 +188,15 @@ def skipToMatching(opener, closer):
 curlybrackets = skipToMatching('{', '}')
 squarebrackets = skipToMatching('[', ']')
 %    \end{macrocode}
-% Next, parser for |\sage| and |\sageplot| calls:
+% Next, parser for |\sage|, |\sageplot|, and pause/unpause calls:
 %    \begin{macrocode}
-sagemacroparser = '\\sage' + curlybrackets('code')
-sageplotparser = ('\\sageplot'
-                 + Optional(squarebrackets)('opts') 
+sagemacroparser = r'\sage' + curlybrackets('code')
+sageplotparser = (r'\sageplot'
+                 + Optional(squarebrackets)('opts')
                  + Optional(squarebrackets)('format')
                  + curlybrackets('code'))
+sagetexpause = Literal(r'\sagetexpause')
+sagetexunpause = Literal(r'\sagetexunpause')
 %    \end{macrocode}
 %
 % With those defined, let's move on to our classes.
@@ -201,12 +204,12 @@ sageplotparser = ('\\sageplot'
 % \begin{macro}{SoutParser}
 % Here's the parser for the generated |.sout| file. The code below does
 % all the parsing of the |.sout| file and puts the results into a
-% dictionary. Notice that it's on the order of 10 lines of code---hooray
+% list. Notice that it's on the order of 10 lines of code---hooray
 % for Pyparsing!
 %    \begin{macrocode}
 class SoutParser():
   def __init__(self, fn):
-    self.label = {}
+    self.label = []
 %    \end{macrocode}
 % A label line looks like
 % \begin{quote}
@@ -218,14 +221,13 @@ class SoutParser():
 % of a dictionary. The |DeSageTeX| class then uses that dictionary to
 % replace bits in the |.tex| file with their Sage-computed results.
 %    \begin{macrocode}
-    parselabel = ('\\newlabel{@sageinline'
+    parselabel = (r'\newlabel{@sageinline'
                  + Word(nums)('num')
                  + '}{'
                  + curlybrackets('result')
                  + '{}{}{}{}}')
 %    \end{macrocode}
-% We tell it to ignore comments, and hook up the dictionary-making
-% method. 
+% We tell it to ignore comments, and hook up the list-making method.
 %    \begin{macrocode}
     parselabel.ignore('%' + restOfLine)
     parselabel.setParseAction(self.newlabel)
@@ -246,7 +248,7 @@ class SoutParser():
 % bit.
 %    \begin{macrocode}
   def newlabel(self, s, l, t):
-    self.label[int(t.num)] = t.result[1:-1]
+    self.label.append(t.result[1:-1])
 %    \end{macrocode}
 % \end{macro}
 %
@@ -270,11 +272,14 @@ class DeSageTex():
 % Parse the |\usepackage{sagetex}| line. Right now we don't support
 % comma-separated lists of packages.
 %    \begin{macrocode}
-    usepackage = ('\\usepackage'
+    usepackage = (r'\usepackage'
                  + Optional(squarebrackets)
                  + '{sagetex}')
-    usepackage.setParseAction(replaceWith("""\\RequirePackage{verbatim}
-\\RequirePackage{graphicx}"""))
+    usepackage.setParseAction(replaceWith(r"""% "\usepackage{sagetex}" line was here:
+\RequirePackage{verbatim}
+\RequirePackage{graphicx}
+\newcommand{\sagetexpause}{\relax}
+\newcommand{\sagetexunpause}{\relax}"""))
 %    \end{macrocode}
 % Parse |\sageplot| macros.
 %    \begin{macrocode}
@@ -298,9 +303,9 @@ class DeSageTex():
     ssilent = '\\' + beginorend + '{' + silent + '}'
 %    \end{macrocode}
 % The |\sagetexindent| macro is no longer relevant, so remove it from
-% the output (``suppress'', in Pyparsing terms). 
+% the output (``suppress'', in Pyparsing terms).
 %    \begin{macrocode}
-    stexindent = Suppress('\\setlength{\\sagetexindent}' + curlybrackets)
+    stexindent = Suppress(r'\setlength{\sagetexindent}' + curlybrackets)
 %    \end{macrocode}
 % Now we define the parser that actually goes through the file. It just
 % looks for any one of the above bits, while ignoring anything that
@@ -308,8 +313,9 @@ class DeSageTex():
 %    \begin{macrocode}
     doit = smacro | senv | ssilent | usepackage | splot | stexindent
     doit.ignore('%' + restOfLine)
-    doit.ignore('\\begin{verbatim}' + SkipTo('\\end{verbatim}'))
-    doit.ignore('\\begin{comment}' + SkipTo('\\end{comment}'))
+    doit.ignore(r'\begin{verbatim}' + SkipTo(r'\end{verbatim}'))
+    doit.ignore(r'\begin{comment}' + SkipTo(r'\end{comment}'))
+    doit.ignore(r'\sagetexpause' + SkipTo(r'\sagetexunpause'))
 %    \end{macrocode}
 % We can't use the |parseFile| method, because that expects a ``complete
 % grammar'' in which everything falls into some piece of the parser.
@@ -337,10 +343,10 @@ class DeSageTex():
   def plot(self, s, l, t):
     self.plotn += 1
     if len(t.opts) == 0:
-      opts = '[width=.75\\textwidth]'
+      opts = r'[width=.75\textwidth]'
     else:
       opts = t.opts[0]
-    return ('\\includegraphics%s{sage-plots-for-%s.tex/plot-%s}' % 
+    return (r'\includegraphics%s{sage-plots-for-%s.tex/plot-%s}' %
       (opts, self.fn, self.plotn - 1))
 %    \end{macrocode}
 % \end{macro}
@@ -367,12 +373,18 @@ class SageCodeExtractor():
 % parser.
 %    \begin{macrocode}
     env_names = oneOf('sageblock sageverbatim sagesilent')
-    senv = '\\begin{' + env_names('env') + '}' + SkipTo(
-           '\\end{' + matchPreviousExpr(env_names) + '}')('code')
+    senv = r'\begin{' + env_names('env') + '}' + SkipTo(
+           r'\end{' + matchPreviousExpr(env_names) + '}')('code')
     senv.leaveWhitespace()
     senv.setParseAction(self.envout)
 
-    doit = smacro | splot | senv
+    spause = sagetexpause
+    spause.setParseAction(self.pause)
+
+    sunpause = sagetexunpause
+    sunpause.setParseAction(self.unpause)
+
+    doit = smacro | splot | senv | spause | sunpause
 
     str = ''.join(open(fn + '.tex', 'r').readlines())
     self.result = ''
@@ -393,12 +405,20 @@ class SageCodeExtractor():
     self.result += '# %s environment from line %s:' % (t.env,
       lineno(l, s))
     self.result += t.code[0] + '\n'
+
+  def pause(self, s, l, t):
+    self.result += ('# SageTeX (probably) paused on input line %s.\n\n' %
+                    (lineno(l, s)))
+
+  def unpause(self, s, l, t):
+    self.result += ('# SageTeX (probably) unpaused on input line %s.\n\n' %
+                    (lineno(l, s)))
 %    \end{macrocode}
 % \end{macro}
 
 % \endinput
 %</parsermod>
-% Local Variables: 
+% Local Variables:
 % mode: doctex
 % TeX-master: "sagetexpackage"
-% End: 
+% End:
