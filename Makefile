@@ -3,8 +3,8 @@ pkg=sagetexpackage
 dest=/home/drake/texmf/tex/latex/sagetex/
 dtxs=$(wildcard *.dtx)
 # the subdir stuff makes the tarball have the directory correct
-srcs=../sagetex/example.tex ../sagetex/README ../sagetex/sagetexpackage.dtx ../sagetex/sagetexpackage.ins
-ver=2.2
+srcs=example.tex README sagetexpackage.ins
+ver=2.2.1
 
 .SUFFIXES:
 
@@ -42,7 +42,7 @@ remote-sagetex.py: remote-sagetex.dtx
 
 clean: 
 	latexcleanup clean .
-	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py auto
 
 # the following bit requires SHELL=bash
 auxclean:
@@ -57,7 +57,7 @@ ctandist: all
 	@echo
 	@echo Did you turn off Imagemagick in example.tex?
 	@echo
-	tar zcf sagetex.tar.gz $(srcs) ../sagetex/example.pdf ../sagetex/sagetexpackage.pdf
+	tar zcf sagetex.tar.gz --transform "s|^|sagetex/|" $(srcs) $(dtxs) example.pdf sagetexpackage.pdf
 
 # otherwise, make gets confused since there's a file named "test"
 .PHONY: test
