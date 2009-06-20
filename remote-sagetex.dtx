@@ -196,6 +196,9 @@ def parsedotsage(fn):
 % class.
 %
 % \begin{macro}{RemoteSage}
+% \changes{v2.2.1}{2009/06/20}{Fix stupid bug in \texttt{do\_inline()}
+% so that we actually write output to .sout file}
+%
 % This is pretty simple; it's more or less a translation of the examples
 % in \texttt{sage/server/simple/twist.py}.
 %    \begin{macrocode}
@@ -276,7 +279,7 @@ except:
         return result
 
     def do_inline(self, code):
-        return self._do_cell(' latex({0})'.format(code))
+        return self._do_cell(' print(latex({0}))'.format(code))
 
     def do_block(self, code):
         result = self._do_cell(code)
@@ -409,9 +412,16 @@ with open(jobname + '.sage', 'r') as sagef:
         if (not line.startswith(' _st_.goboom') and
             not line.startswith("print 'SageT")):
             h.update(line)
+%    \end{macrocode}
+% Putting the |{1}| in the string, just to replace it with |%|, seems a
+% bit weird, but if I put a single percent sign there, Docstrip won't
+% put that line into the resulting |.py| file---and if I put two percent
+% signs, it replaces them with |\MetaPrefix| which is |##| when this
+% file is generated. This is a quick and easy workaround.
+%    \begin{macrocode}
     sout += """%{0}% md5sum of corresponding .sage file
-% (minus "goboom" and pause/unpause lines)
-""".format(h.hexdigest())
+{1} (minus "goboom" and pause/unpause lines)
+""".format(h.hexdigest(), '%')
 
 printc('Writing .sout file...')
 with open(jobname + '.sout', 'w') as soutf:
