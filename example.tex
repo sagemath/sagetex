@@ -10,6 +10,9 @@
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
 \author{Dan Drake and others}
 \usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{tkz-berge}
+
 \usepackage{sagetex}
 %
 % If you want SageTeX to use Imagemagick's `convert' utility to make eps
@@ -172,19 +175,57 @@ And here's the picture:
 Reset \texttt{x} in Sage so that it's not a generator for the polynomial
 ring: \sage{var('x')}
 
+\subsection{Plotting (combinatorial) graphs with TikZ}
+\label{sec:plotting-graphs-with}
+
+Sage now includes some nice support for plotting graphs using
+\href{http://www.texample.net/tikz/}{TikZ}. Here, we mean things with
+vertices and edges, not graphs of a function of one or two variables.
+
+First define our graph:
+
+\begin{sageblock}
+  g = graphs.PetersenGraph()
+  g.set_latex_options(tkz_style='Art')
+\end{sageblock}
+
+Now just do \verb|\sage{}| on it to plot it. You'll need to use the
+\href{http://altermundus.com/pages/graphtheory.html}{\texttt{tkz-berge}}
+package for this to work; that package in turn depends on
+\href{http://altermundus.com/pages/graph.html}{\texttt{tkz-graph}} and
+TikZ. See
+\href{http://sagemath.org/doc/reference/sage/graphs/graph_latex.html}{``\LaTeX{}
+  Options for Graphs''} in the Sage reference manual for more details.
+
+\begin{center}
+  \sage{g}
+\end{center}
+
+The above command just outputs a \texttt{tikzpicture} environment, and
+you can control that environment using anything supported by
+TikZ---although the output of \verb|\sage{g}| explicitly hard-codes a
+lot of things and cannot be flexibly controlled in its current form.
+
+\tikzstyle{every picture}=[rotate=45, scale=1/2]
+
+\begin{center}
+  \sage{g}
+\end{center}
+
+
 \subsection{3D plotting}
 
 3D plotting right now is problematic because there's no convenient way
 to produce vector graphics. We can make PNGs, though, and since the
 \verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
-a valid format for 3D plotting}. Sage right now (version 3.4.2) can't
+a valid format for 3D plotting}. Sage right now (version 4.02) can't
 produce EPS or PDF files from plot3d objects, so if you don't specify a
 valid format, things will go badly. You can specify the
 ``\texttt{imagemagick}'' option, which will use the Imagemagick
 \texttt{convert} utility to make EPS files. See the documentation for
 details.
 
-Here's the famous Sage cube graph:
+Here's the famous Sage cube graph in 3D.
 
 \begin{sageblock}
   G = graphs.CubeGraph(5)
@@ -193,6 +234,25 @@ Here's the famous Sage cube graph:
 % need empty [] so sageplot knows you want png format, and aren't
 % passing an option to includegraphics
 \sageplot[][png]{G.plot3d(engine='tachyon')}
+
+And here's a regular sort of 3D plot. Since \texttt{plot3d} objects
+don't properly support the kind of \texttt{.save()} method that we need,
+so we have to work around it a bit and do things manually. Note that we
+can't use \verb|\jobname| below. The \texttt{sage.misc.viewer.BROWSER}
+bit tells Sage to not pop up a viewer program; otherwise, when you run
+the \texttt{.sage} script, it will try to start a viewer program on the
+resulting image, which we don't want.
+
+% FIXME: get this working with remote sagetex
+
+\begin{sageblock}
+  sage.misc.viewer.BROWSER=''
+  x, y = var('x y')
+  g = plot3d(sin(pi*(x^2+y^2))/2,(x,-1,1),(y,-1,1))
+  g.show(filename='my_cool_name', viewer='tachyon')
+\end{sageblock}
+
+\includegraphics[scale=.5]{sage-plots-for-\jobname.tex/my-3d-plot.png}
 
 \section{Pausing Sage\TeX}
 \label{sec:pausing-sagetex}
@@ -229,25 +289,25 @@ of what Sage does when producing a \LaTeX{} representation of a string.
 
 \begin{sageblock}
 def pascals_triangle(n):
-  # start of the table
-  s  = r"\begin{tabular}{cc|" + "r" * (n+1) + "}"
-  s += r"  & & $k$: & \\"
-  # second row, with k values:
-  s += r"  & "
-  for k in [0..n]:
-    s += "& %d " % k
-  s += r"\\"
-  # the n = 0 row:
-  s += r"\hline" + "\n" + r"$n$: & 0 & 1 & \\"
-  # now the rest of the rows
-  for r in [1..n]:
-    s += " & %d " % r
-    for k in [0..r]:
-      s += "& %d " % binomial(r, k)
+    # start of the table
+    s  = r"\begin{tabular}{cc|" + "r" * (n+1) + "}"
+    s += r"  & & $k$: & \\"
+    # second row, with k values:
+    s += r"  & "
+    for k in [0..n]:
+        s += "& %d " % k
     s += r"\\"
-  # add the last line and return
-  s += r"\end{tabular}"
-  return s
+    # the n = 0 row:
+    s += r"\hline" + "\n" + r"$n$: & 0 & 1 & \\"
+    # now the rest of the rows
+    for r in [1..n]:
+        s += " & %d " % r
+        for k in [0..r]:
+            s += "& %d " % binomial(r, k)
+        s += r"\\"
+    # add the last line and return
+    s += r"\end{tabular}"
+    return s
 
 # how big should the table be?
 n = 8
@@ -261,4 +321,8 @@ size, while changing only one thing.
   \sage{pascals_triangle(n)}
 \end{center}
 
+\begin{sagesilent}
+  import time
+  time.sleep(30)
+\end{sagesilent}
 \end{document}
