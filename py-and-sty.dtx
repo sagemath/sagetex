@@ -151,10 +151,12 @@
 \AtBeginDocument{\provideenvironment{NoHyper}{}{}}
 %    \end{macrocode}
 %
-% \subsubsection{The \texttt{\protect\bslash sage} macro}
+% \subsubsection{The \texttt{\protect\bslash sage} and
+% \texttt{\protect\bslash sagestr} macros}
 % \label{sec:sagemacro}
 %
-% \begin{macro}{\sage}
+% \begin{macro}{\ST@sage}
+% \changes{v2.1.1}{2009/05/14}{Add ST@sage, sagestr, and refactor.}
 % This macro combines |\ref|, |\label|, and Sage all at once. First, we
 % use Sage to get a \LTX representation of whatever you give this
 % function. The Sage script writes a |\newlabel| line into the |.sout|
@@ -171,7 +173,7 @@
 % \LTX wants to put a space after that, which is why we don't put the
 % ``except'' on its own line here in the source.
 %    \begin{macrocode}
-\newcommand{\sage}[1]{\ST@wsf{%
+\newcommand{\ST@sage}[1]{\ST@wsf{%
 try:^^J
  _st_.inline(\theST@inline, #1)^^Jexcept:^^J
  _st_.goboom(\the\inputlineno)}%
@@ -204,6 +206,22 @@ try:^^J
 %    \begin{macrocode}
 \stepcounter{ST@inline}}
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\sage}
+% This is the user-visible macro; it runs Sage's |latex()| on its
+% argument.
+%    \begin{macrocode}
+\newcommand{\sage}[1]{\ST@sage{latex(#1)}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\sagestr}
+% ilike above, but doesn't run latex
+%    \begin{macrocode}
+\newcommand{\sagestr}[1]{\ST@sage{#1}}
+%    \end{macrocode}
+%
 % \end{macro}
 %
 % \begin{macro}{\percent}
@@ -723,7 +741,7 @@ class SageTeXProcessor():
   def inline(self, counter, s):
     self.progress('Inline formula %s' % counter)
     self.souttmp.write('\\newlabel{@sageinline' + str(counter) + '}{{' + \
-                 latex(s).rstrip() + '}{}{}{}{}}\n')
+                 s.rstrip() + '}{}{}{}{}}\n')
 %    \end{macrocode}
 % We are using five fields, just like |hyperref| does, because that
 % works whether or not |hyperref| is loaded. Using two fields, as in

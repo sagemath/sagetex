@@ -9,7 +9,7 @@
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
 \author{Dan Drake and others}
-\usepackage{amsmath}
+%\usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{tkz-berge}
 
@@ -152,6 +152,17 @@ G4plot = G4.plot(layout='circular')
 
 \sageplot{G4plot, axes=False}
 
+To fiddle with aspect ratio, first save the plot object:
+
+\begin{sageblock}
+  p = plot(x, 0, 1) + circle((0,0), 1)
+  p.set_aspect_ratio(1)
+\end{sageblock}
+
+Now plot it and see the circular circle and nice 45 degree angle:
+
+\sageplot[scale=.33]{p}
+
 Indentation and so on works fine.
 \begin{sageblock}
  s     = 7
@@ -218,9 +229,9 @@ lot of things and cannot be flexibly controlled in its current form.
 3D plotting right now is problematic because there's no convenient way
 to produce vector graphics. We can make PNGs, though, and since the
 \verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
-a valid format for 3D plotting}. Sage right now (version 4.02) can't
-produce EPS or PDF files from plot3d objects, so if you don't specify a
-valid format, things will go badly. You can specify the
+  a valid format for 3D plotting}. Sage right now (version 4.2.1) can't
+produce EPS or PDF files from \texttt{plot3d} objects, so if you don't
+specify a valid format, things will go badly. You can specify the
 ``\texttt{imagemagick}'' option, which will use the Imagemagick
 \texttt{convert} utility to make EPS files. See the documentation for
 details.
@@ -249,10 +260,12 @@ resulting image, which we don't want.
   sage.misc.viewer.BROWSER=''
   x, y = var('x y')
   g = plot3d(sin(pi*(x^2+y^2))/2,(x,-1,1),(y,-1,1))
-  g.show(filename='my_cool_name', viewer='tachyon')
+  g.show(filename='sage-plots-for-example.tex/my-3d-plot', viewer='tachyon')
 \end{sageblock}
 
-\includegraphics[scale=.5]{sage-plots-for-\jobname.tex/my-3d-plot.png}
+\IfFileExists{sage-plots-for-\jobname.tex/my-3d-plot.png}{
+\includegraphics[scale=.5]{sage-plots-for-\jobname.tex/my-3d-plot.png}}
+{Hey! Run Sage so that this plot exists!}
 
 \section{Pausing Sage\TeX}
 \label{sec:pausing-sagetex}
@@ -318,11 +331,7 @@ If you have several tables, you can use this to get them all the same
 size, while changing only one thing.
 
 \begin{center}
-  \sage{pascals_triangle(n)}
+  \sagestr{pascals_triangle(n)}
 \end{center}
 
-\begin{sagesilent}
-  import time
-  time.sleep(30)
-\end{sagesilent}
 \end{document}

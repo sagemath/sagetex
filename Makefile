@@ -20,15 +20,15 @@ $(pkg).pdf: $(dtxs) $(pkg).ind
 	pdflatex $(pkg).dtx
 
 example.pdf: example.tex sagetex.sty sagetex.py
-	latex example.tex
+	pdflatex example.tex
 	sage example.sage
-	latex example.tex
+	pdflatex example.tex
 	pdflatex example.tex
 
 %.ind: $(dtxs)
 	latex $(pkg).dtx
 	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetexpackage.idx
-	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo 
+	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
 sagetex.sty: py-and-sty.dtx $(pkg).dtx
@@ -40,7 +40,7 @@ sagetex.py: py-and-sty.dtx $(pkg).dtx
 remote-sagetex.py: remote-sagetex.dtx
 	yes | latex $(pkg).ins
 
-clean: 
+clean:
 	latexcleanup clean .
 	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py auto
 
@@ -67,4 +67,3 @@ test:
 # make a source distribution, used for building the spkg
 dist: all
 	python setup.py sdist --formats=tar
-

@@ -29,7 +29,7 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>__version__ = """
 %<*latex|python>
-  [2009/06/17 v2.2.1 embedding Sage into LaTeX documents]
+  [2009/07/27 v2.2.2 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>"""
 %<*driver>
@@ -132,7 +132,7 @@ California, 94105, USA.
 %</driver>
 % \fi
 %
-% \CheckSum{335}
+% \CheckSum{341}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -294,67 +294,9 @@ California, 94105, USA.
 % \changes{v2.0}{2009/01/14}{Fixed up installation section, final
 % \emph{final} 2.0}
 %
-% To install \ST, you need to do two things: make \ST known to Sage, and
-% to \LTX. There are two basic methods to do those two things.
-%
 % \newcommand{\sageroot}{\$SAGE\_ROOT}
 %
-% In what follows, ``\texttt{\sageroot}'' refers to the root directory
-% of your Sage installation.
-%
-% \subsection{As a Sage spkg}
-% \label{sec:install-spkg}
-%
-% The easiest way to install \ST is by using Sage's own spkg
-% installation facility; visit the
-% \href{http://sagemath.org/packages/optional/}{optional packages page}
-% and run \texttt{sage -i} with the appropriate file name. This will let
-% Sage know about \ST; you still need to let \LTX know about it.
-%
-% The simplest way to ``install'' \ST for \LTX is to copy the file
-% |sagetex.sty| from \texttt{\sageroot/local/share/texmf} to the same
-% directory as your document. This will always work, as \LTX always
-% searches the current directory for files.
-%
-% Rather than make lots of copies of |sagetex.sty|, you can keep it (and
-% the rest of the \ST documentation) in a |texmf| directory. The easiest
-% thing to do is to create a |texmf| directory in your home directory
-% and use the |texhash| utility so that your \TeX{} system can find the
-% new files. See
-% \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=privinst}
-% {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=privinst}} which
-% describes the basic ideas, and also
-% \href{http://www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}
-% {\texttt{www.tex.ac.uk/cgi-bin/texfaq2html?label=what-TDS}} which has
-% some information specific to MiK\TeX. Linux/Unix users can use
-% |$HOME/texmf| and users of Mac\TeX{} should use |$HOME/Library/texmf|.
-%
-% To copy the files that \LTX needs into your |texmf| directory, simply
-% do
-% \begin{quote}
-%   \texttt{cp -r \sageroot/local/share/texmf/* HOMEPREFIX/texmf/}
-% \end{quote}
-% where |HOMEPREFIX| is the appropriate prefix for your own |texmf|
-% tree. Then you need to make \TeX{} aware of the new files by running
-% \begin{quote}
-%   \texttt{texhash HOMEPREFIX/texmf/}
-% \end{quote}
-%
-% \subsection{From CTAN}
-% \label{sec:install-ctan}
-%
-% You can also get \ST from \href{http://tug.ctan.org/pkg/sagetex}{its
-% CTAN page}. This is not the recommended way to get \ST, but it will
-% work.
-%
-% If you get \ST from CTAN, you will need to make the |sagetex.sty| file
-% available to \LTX using any of the methods described above, and you
-% will also need to make |sagetex.py| known to Sage. You can either keep
-% a copy of that file in the same directory as your document or put it
-% where Sage will find it. You can use the |$SAGE_PATH| environment
-% variable (which is analogous to the |$PYTHONPATH| variable) to tell
-% Sage where the file is, or manually copy |sagetex.py| into
-% \texttt{\sageroot/local/lib/python/site-packages}.
+% new installation section FIXME FIXME FIXME
 %
 % \subsection{Using \TeX Shop}
 % \label{sec:using-texshop}
@@ -495,6 +437,15 @@ California, 94105, USA.
 % use math mode for its output, so be sure to use dollar signs or a
 % displayed math environment
 % as appropriate.\\
+%
+% \DescribeMacro{\sagestr}
+% \fbox{\texttt{\bslash sagestr}\marg{Sage code}}
+% is identical to |\sage|, but is does \emph{not} run Sage's |latex|
+% function on the code you give it; it simply runs the Sage code and
+% pulls the result into your \LTX file. This is useful for calling
+% functions that return \LTX code; see the example file distributed
+% along with \ST for a demonstration of using this command to easily
+% produce a table.
 %
 % \DescribeMacro{\percent} If you are doing modular arithmetic or string
 % formatting and need a percent sign in a call to |\sage| (or
