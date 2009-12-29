@@ -29,7 +29,7 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>__version__ = """
 %<*latex|python>
-  [2009/07/27 v2.2.2 embedding Sage into LaTeX documents]
+  [2009/07/27 v2.2.3 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>"""
 %<*driver>
@@ -293,10 +293,47 @@ California, 94105, USA.
 % \label{sec:installation}
 % \changes{v2.0}{2009/01/14}{Fixed up installation section, final
 % \emph{final} 2.0}
+% \changes{v2.2.3}{2009/12/29}{Rewrote installation section to reflect
+% inclusion as standard spkg}
 %
 % \newcommand{\sageroot}{\$SAGE\_ROOT}
 %
 % new installation section FIXME FIXME FIXME
+% 
+% \ST needs two parts to work: a Python module known to Sage, and a
+% \LTX package known to \TeX. As of Sage version 4.3.1, \ST comes
+% included with Sage, so you only need to make sagetex.sty, the \LTX
+% package, known to \TeX. Full details of this are in the Sage
+% Installation guide at http://sagemath.org/doc/installation/ in the
+% obviously-named section ``Make \ST known to \TeX''. Here's a brief
+% summary of how to do that:
+%
+% \begin{itemize}
+%
+% \item Copy sagetex.sty to the same directory as your document. This
+% always works, but requires lots of copies off sagetex.sty and is prone
+% to version skew.
+%
+% \item Set the environment variable TEXINPUTS to
+% ``\sageroot/local/share/texmf//:'', where \sageroot refers to the
+% location of your Sage install.
+%
+% \item Copy the above directory to your home directory with a command
+% like ``cp -R \sageroot/local/share/texmf ~/''. 
+%
+% \end{itemize}
+%
+% I prefer using TEXINPUTS, as it guarantees that both Sage and \TeX are
+% using synchronized code.
+%
+% \subsection{\ST and \TeX Live}
+%
+% \ST is included in \TeX Live, which is very nice, but because the Python
+% module and \LTX package for \ST need to be synchronized, if you use
+% the \LTX package from \TeX Live and the Python module from Sage, they
+% may not work together if they are from different versions of \ST.
+% Because of this, I strongly recommend using \ST only from what is
+% included with Sage and ignoring what's included with \TeX Live. 
 %
 % \subsection{Using \TeX Shop}
 % \label{sec:using-texshop}
