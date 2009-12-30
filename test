@@ -15,10 +15,10 @@ function checkdotsage
     fi
 }
 
-latex example.tex > /dev/null
+pdflatex example.tex > /dev/null
 checkdotsage example
 
-latex sagetexpackage.dtx > /dev/null
+pdflatex sagetexpackage.dtx > /dev/null
 checkdotsage sagetexpackage
 
 # if we get here, we assume the .sage files are good, and exit successfully
