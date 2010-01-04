@@ -312,26 +312,29 @@ California, 94105, USA.
 %   document. This always works, but requires lots of copies of
 %   \texttt{sagetex.sty} and is prone to version skew.
 %
+% \item Copy the directory containing \texttt{sagetex.sty} to your home
+%   directory with a command like
+%   \begin{quotation}
+%     \texttt{cp -R \sageroot/local/share/texmf \textasciitilde/}
+%   \end{quotation}
+%   where \texttt{\sageroot} is replaced with the location of your
+%   Sage installation.
+%
 % \item Use the environment variable \texttt{TEXINPUTS} to tell \TeX{}
 %   to search the directory containing \texttt{sagetex.sty}; in the bash
 %   shell, you can do
 %   \begin{quotation}
 %     \texttt{export TEXINPUTS=\sageroot/local/share/texmf//:}
 %   \end{quotation}
-%   You should replace \texttt{\sageroot} with the location of your Sage
-%   installation.
-%
-% \item Copy the directory containing \texttt{sagetex.sty} to your home
-%   directory with a command like
-%   \begin{quotation}
-%     \texttt{cp -R \sageroot/local/share/texmf \textasciitilde/}
-%   \end{quotation}
-%   where again you replace \texttt{\sageroot} with the location of your
-%   Sage installation.
+%   You should again replace \texttt{\sageroot} with the location of
+%   your Sage installation.
 % \end{itemize}
 %
-% I prefer using \texttt{TEXINPUTS}, as it guarantees that both Sage and
-% \TeX{} are synchronized and doesn't require you to copy any files.
+% The best method is likely the second; while that does require you to
+% recopy the files every time you update your copy of Sage, it does not
+% depend on your shell, so if you use, say, Emacs with Auc\TeX{} or some
+% other editor environment, everything will still work since \TeX's
+% internal path-searching mechanisms can find \texttt{sagetex.sty}.
 %
 % Note that along with \texttt{sagetex.sty}, this documentation, an
 % example file, and other useful scripts are all located in the
