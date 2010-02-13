@@ -881,7 +881,7 @@ class SageTeXProcessor():
 % |goboom| and pause/unpause lines, so we will strip those lines out.
 % What we do below is exactly equivalent to running
 % \begin{center}
-% \verb+egrep '^( _st_.goboom|print .SageT)' filename.sage | md5sum+
+% \verb+egrep -v '^( _st_.goboom|print .SageT)' filename.sage | md5sum+
 % \end{center}
 % in a shell.
 %    \begin{macrocode}
