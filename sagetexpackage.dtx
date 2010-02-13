@@ -781,6 +781,19 @@ California, 94105, USA.
 %
 % Thanks to Franco Saliola for reporting this.
 %
+% \subsection{Using the \texttt{rccol} package}
+%
+% If you are trying to use the |\sage| macro inside a table when using
+% the
+% \href{http://www.ctan.org/tex-archive/macros/latex/contrib/rccol/}{\texttt{rccol}}
+% package, you need to use an extra pair of braces or typesetting will
+% fail. That is, you need to do something like this:
+% \begin{quote}
+%   | abc & {\sage{foo.n()}} & {\sage{bar}} \\|
+% \end{quote}
+% with each ``|\sage{}|'' enclosed in an extra |{}|. Thanks to Sette
+% Diop for reporting this.
+%
 % \subsection{Plotting from Mathematica, Maple, etc.}
 %
 % Sage can use Mathematica, Maple, and friends and can tell them to do
