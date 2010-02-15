@@ -31,7 +31,7 @@
 %<*latex|python>
   [2010/02/15 v2.2.4 embedding Sage into LaTeX documents]
 %</latex|python>
-%<python>"""
+%<python>""".strip()
 %<latex>\newcommand{\ST@ver}{2010/02/15 v2.2.4}
 %<*driver>
 \documentclass{ltxdoc}
@@ -137,7 +137,7 @@ suggestions.
 %</driver>
 % \fi
 %
-% \CheckSum{341}
+% \CheckSum{357}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -353,6 +353,23 @@ suggestions.
 % may not work together if they are from different versions of \ST.
 % Because of this, I strongly recommend using \ST only from what is
 % included with Sage and ignoring what's included with \TeX Live.
+%
+% \paragraph{The noversioncheck option}
+%
+% As of version 2.2.4, \ST automatically checks to see if the versions
+% of the style file and Python module match. This is intended to prevent
+% strange version mismatch problems, but if you would like to use
+% mismatched sources, you can---at your peril---give the
+% |noversioncheck| option when you load the \ST package. Don't be
+% surprised if things don't work when you do this.
+%
+% If you are considering using this option because the Sage script
+% complained and exited, you really should just get the \LTX and Python
+% modules synchronized. Every copy of Sage starting with version 4.3.2
+% comes with a copy of |sagetex.sty| that is matched up to Sage's
+% baked-in \ST support, so you can always use that. See the
+% \href{http://sagemath.org/doc/installation/}{\ST section of the Sage
+%   installation guide}.
 %
 % \subsection{Using \TeX Shop}
 % \label{sec:using-texshop}
