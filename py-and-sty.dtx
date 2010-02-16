@@ -689,7 +689,7 @@ import shutil
 %    \begin{macrocode}
 class SageTeXProcessor():
   def __init__(self, jobname):
-    self.progress('Processing Sage code for %s.tex...' % jobname)
+    self.progress('Processing Sage code for {0}.tex...'.format(jobname))
     self.didinitplot = False
     self.useimagemagick = False
     self.useepstopdf = False
@@ -771,7 +771,7 @@ class SageTeXProcessor():
 % That's a lot of explanation for a very short function:
 %    \begin{macrocode}
   def inline(self, counter, s):
-    self.progress('Inline formula %s' % counter)
+    self.progress('Inline formula {0}'.format(counter))
     self.souttmp.write('\\newlabel{@sageinline' + str(counter) + '}{{' + \
                  s.rstrip() + '}{}{}{}{}}\n')
 %    \end{macrocode}
@@ -809,7 +809,7 @@ class SageTeXProcessor():
   def plot(self, counter, _p_, format='notprovided', **kwargs):
     if not self.didinitplot:
       self.initplot()
-    self.progress('Plot %s' % counter)
+    self.progress('Plot {0}'.format(counter))
 %    \end{macrocode}
 % If the user says nothing about file formats, we default to producing
 % PDF and EPS. This allows the user to transparently switch between
@@ -829,20 +829,20 @@ class SageTeXProcessor():
 % then skip the rest of the loop.
 %    \begin{macrocode}
       if fmt == 'pdf' and self.useepstopdf:
-        epsfile = os.path.join(self.plotdir, 'plot-%s.eps' % counter)
-        self.progress('Calling epstopdf to convert plot-%s.eps to PDF' % \
-            counter)
+        epsfile = os.path.join(self.plotdir, 'plot-{0}.eps'.format(counter))
+        self.progress('Calling epstopdf to convert plot-{0}.eps to PDF'.format(
+            counter))
         subprocess.check_call(['epstopdf', epsfile])
         continue
-      plotfilename = os.path.join(self.plotdir, 'plot-%s.%s' % (counter, fmt))
+      plotfilename = os.path.join(self.plotdir, 'plot-{0}.{1}'.format(counter, fmt))
       _p_.save(filename=plotfilename, **kwargs)
 %    \end{macrocode}
 % If the user provides a format \emph{and} specifies the |imagemagick|
 % option, we try to convert the newly-created file into EPS format.
 %    \begin{macrocode}
       if format != 'notprovided' and self.useimagemagick:
-        self.progress('Calling Imagemagick to convert plot-%s.%s to EPS' % \
-          (counter, format))
+        self.progress('Calling Imagemagick to convert plot-{0}.{1} to EPS'.format(
+          counter, format))
         self.toeps(counter, format)
 %    \end{macrocode}
 % \end{macro}
@@ -855,8 +855,8 @@ class SageTeXProcessor():
 %    \begin{macrocode}
   def toeps(self, counter, ext):
     subprocess.check_call(['convert',\
-      '%s/plot-%s.%s' % (self.plotdir, counter, ext), \
-      '%s/plot-%s.eps' % (self.plotdir, counter)])
+      '{0}/plot-{1}.{2}'.format(self.plotdir, counter, ext), \
+      '{0}/plot-{1}.eps'.format(self.plotdir, counter)])
 %    \end{macrocode}
 % We are blindly assuming that the |convert| command exists and will do
 % the conversion for us; the |check_call| function raises an exception
@@ -877,11 +877,11 @@ class SageTeXProcessor():
 % after removing the |.sout.tmp| file.
 %    \begin{macrocode}
   def goboom(self, line):
-    print('\n**** Error in Sage code on line %s of %s.tex! Traceback\
- follows.' % (line, self.filename))
+    print('\n**** Error in Sage code on line {0} of {1}.tex! Traceback\
+ follows.'.format(line, self.filename))
     traceback.print_exc()
-    print('\n**** Running Sage on %s.sage failed! Fix %s.tex and try\
- again.' % ((self.filename,) * 2))
+    print('\n**** Running Sage on {0}.sage failed! Fix {0}.tex and try\
+ again.'.format(self.filename))
     self.souttmp.close()
     os.remove(self.filename + '.sout.tmp')
     sys.exit(int(1))
@@ -942,8 +942,8 @@ class SageTeXProcessor():
 %    \begin{macrocode}
     self.souttmp.close()
     os.rename(self.filename + '.sout.tmp', self.filename + '.sout')
-    self.progress('Sage processing complete. Run LaTeX on %s.tex again.' %\
-             self.filename)
+    self.progress('Sage processing complete. Run LaTeX on {0}.tex again.'.format(
+             self.filename))
 %    \end{macrocode}
 % % \changes{v2.1.1}{2009/05/14}{Fix bug in finding md5 sum introduced by
 % pause facility}
