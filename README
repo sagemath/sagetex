@@ -7,17 +7,17 @@ SageTeX is included with Sage, so to use it, you only need to make the
 file sagetex.sty known to TeX; that file will be in
 SAGE_ROOT/local/share/texmf/tex/generic/sagetex, along with
 documentation and examples. See the Sage installation guide at
-http://sagemath.org/doc/installation/ for complete instructions.
+http://sagemath.org/doc/installation/ for complete instructions and
+http://sagemath.org/doc/tutorial/sagetex.html for a quick usage
+introduction. The complete documentation is in sagetexpackage.pdf, in
+the SAGE_ROOT/... directory mentioned above.
 
-If you can't or don't want to install SageTeX by using Sage, you can use
-the CTAN package. If sagetex.py and sagetex.sty haven't been extracted
-from the .dtx file, you'll need to do:
+If you want to extract any of SageTeX's files from the .dtx sources, you
+can do
 
   0. Run `latex sagetexpackage.ins'
 
-If a PDF file of the documentation wasn't included with this
-distribution of SageTeX, you will need to build the documentation
-yourself. To do that:
+To regenerate the documentation, do
 
   1. Run `latex sagetexpackage.dtx'
   2. Run `sage sagetexpackage.sage'
