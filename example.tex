@@ -9,7 +9,6 @@
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
 \author{Dan Drake and others}
-%\usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{tkz-berge}
 
@@ -142,16 +141,6 @@ Sage can call \verb|.save()| on to produce a graphics file:
 \sageplot{plot1 + plot(f.sage(),x,-1,2*pi,rgbcolor=hue(0.4)), figsize=[1,2]}
 \end{center}
 
-\sageplot{graphs.FlowerSnark().plot()}
-
-\begin{sageblock}
-G4 = DiGraph({1:[2,2,3,5], 2:[3,4], 3:[4], 4:[5,7], 5:[6]},\
-             multiedges=True)
-G4plot = G4.plot(layout='circular')
-\end{sageblock}
-
-\sageplot{G4plot, axes=False}
-
 To fiddle with aspect ratio, first save the plot object:
 
 \begin{sageblock}
@@ -224,6 +213,17 @@ lot of things and cannot be flexibly controlled in its current form.
   \sage{g}
 \end{center}
 
+Here's some more graphs, plotted using the usual plot routines.
+
+\sageplot[scale=.5]{graphs.FlowerSnark().plot()}
+
+\begin{sageblock}
+G4 = DiGraph({1:[2,2,3,5], 2:[3,4], 3:[4], 4:[5,7], 5:[6]},\
+             multiedges=True)
+G4plot = G4.plot(layout='circular')
+\end{sageblock}
+
+\sageplot[scale=.5]{G4plot, axes=False}
 
 \subsection{3D plotting}
 
@@ -237,7 +237,15 @@ specify a valid format, things will go badly. You can specify the
 \texttt{convert} utility to make EPS files. See the documentation for
 details.
 
-Here's the famous Sage cube graph in 3D.
+% FIXME: not sure this works with remote sagetex
+
+\begin{sagesilent}
+  x, y = var('x y')
+\end{sagesilent}
+
+\sageplot[scale=.5][png]{plot3d(sin(pi*(x^2+y^2))/2,(x,-1,1),(y,-1,1))}
+
+Here's the (perhaps-not-so-) famous Sage cube graph in 3D.
 
 \begin{sageblock}
   G = graphs.CubeGraph(5)
@@ -245,28 +253,7 @@ Here's the famous Sage cube graph in 3D.
 
 % need empty [] so sageplot knows you want png format, and aren't
 % passing an option to includegraphics
-\sageplot[][png]{G.plot3d(engine='tachyon')}
-
-And here's a regular sort of 3D plot. Since \texttt{plot3d} objects
-don't properly support the kind of \texttt{.save()} method that we need,
-so we have to work around it a bit and do things manually. Note that we
-can't use \verb|\jobname| below. The \texttt{sage.misc.viewer.BROWSER}
-bit tells Sage to not pop up a viewer program; otherwise, when you run
-the \texttt{.sage} script, it will try to start a viewer program on the
-resulting image, which we don't want.
-
-% FIXME: get this working with remote sagetex
-
-\begin{sageblock}
-  sage.misc.viewer.BROWSER=''
-  x, y = var('x y')
-  g = plot3d(sin(pi*(x^2+y^2))/2,(x,-1,1),(y,-1,1))
-  g.show(filename='sage-plots-for-example.tex/my-3d-plot', viewer='tachyon')
-\end{sageblock}
-
-\IfFileExists{sage-plots-for-\jobname.tex/my-3d-plot.png}{
-\includegraphics[scale=.5]{sage-plots-for-\jobname.tex/my-3d-plot.png}}
-{Hey! Run Sage so that this plot exists!}
+\sageplot[][png]{G.plot3d()}
 
 \section{Pausing Sage\TeX}
 \label{sec:pausing-sagetex}
@@ -296,32 +283,31 @@ With \textsf{Sage\TeX}, you can not only have Sage do your math for you,
 it can write parts of your \LaTeX{} document for you! For example, I
 hate writing \texttt{tabular} environments; there's too many fiddly
 little bits of punctuation and whatnot\ldots and what if you want to add
-a column? It's a pain---or rather, it \emph{was} a pain. Here's how to
-make Pascal's triangle. It requires the \texttt{amsmath} package because
-of what Sage does when producing a \LaTeX{} representation of a string.
-(It puts it inside a \verb|\text| macro.)
+a column? It's a pain---or rather, it \emph{was} a pain. Just write a
+Sage/Python function that outputs a string of \LaTeX{} code, and use
+\verb|\sagestr|. Here's how to make Pascal's triangle.
 
 \begin{sageblock}
 def pascals_triangle(n):
     # start of the table
-    s  = r"\begin{tabular}{cc|" + "r" * (n+1) + "}"
-    s += r"  & & $k$: & \\"
+    s  = [r"\begin{tabular}{cc|" + "r" * (n+1) + "}"]
+    s.append(r"  & & $k$: & \\")
     # second row, with k values:
-    s += r"  & "
+    s.append(r"  & ")
     for k in [0..n]:
-        s += "& %d " % k
-    s += r"\\"
+        s.append("& {0} ".format(k))
+    s.append(r"\\")
     # the n = 0 row:
-    s += r"\hline" + "\n" + r"$n$: & 0 & 1 & \\"
+    s.append(r"\hline" + "\n" + r"$n$: & 0 & 1 & \\")
     # now the rest of the rows
     for r in [1..n]:
-        s += " & %d " % r
+        s.append(" & {0} ".format(r))
         for k in [0..r]:
-            s += "& %d " % binomial(r, k)
-        s += r"\\"
+            s.append("& {0} ".format(binomial(r, k)))
+        s.append(r"\\")
     # add the last line and return
-    s += r"\end{tabular}"
-    return s
+    s.append(r"\end{tabular}")
+    return ''.join(s)
 
 # how big should the table be?
 n = 8
