@@ -437,16 +437,28 @@ except:^^J
   \IfFileExists{\ST@plotdir/plot-\theST@plot.#2}%
     {\includegraphics[#1]{\ST@plotdir/plot-\theST@plot.#2}}%
 %    \end{macrocode}
-% If the file doesn't exist, we insert a little box to indicate it
-% wasn't found, issue a warning that we didn't find a graphics file,
-% then set a flag that, at the end of the run, tells the user to run
-% Sage again.
+% If the file doesn't exist, we try one more thing before giving up: the
+% Python module will automatically fall back to saving as a PNG file if
+% saving as an EPS or PDF file fails. So if making a PDF, we look for a
+% PNG file.
+%
+% If the file isn't there, we insert a little box to indicate it wasn't
+% found, issue a warning that we didn't find a graphics file, then set a
+% flag that, at the end of the run, tells the user to run Sage again.
 %    \begin{macrocode}
-    {\ST@missingfilebox%
-     \PackageWarning{sagetex}{Graphics file
-     \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
-     exist. Plot command is}%
-     \gdef\ST@rerun{x}}
+    {\IfFileExists{\ST@plotdir/plot-\theST@plot.png}%
+       {\ifpdf
+           \ST@inclgrfx{#1}{png}
+         \else
+           \PackageWarning{sagetex}{Graphics file
+           \ST@plotdir/plot-\theST@plot.png on page \thepage\space not
+            supported; try using pdflatex. Plot command is}%
+        \fi}%
+       {\ST@missingfilebox%
+       \PackageWarning{sagetex}{Graphics file
+       \ST@plotdir/plot-\theST@plot.#2\space on page \thepage\space does not
+       exist. Plot command is}%
+       \gdef\ST@rerun{x}}}
 \fi}
 %    \end{macrocode}
 % \autoref{f:stig} makes this a bit clearer.
@@ -834,8 +846,24 @@ class SageTeXProcessor():
             counter))
         subprocess.check_call(['epstopdf', epsfile])
         continue
+%    \end{macrocode}
+% Some plot objects (mostly 3-D plots) do not support saving to EPS or
+% PDF files (yet), but everything can be saved to a PNG file. For the
+% user's convenience, we catch the error when we run into such an
+% object, save it to a PNG file, then exit the loop.
+%    \begin{macrocode}
       plotfilename = os.path.join(self.plotdir, 'plot-{0}.{1}'.format(counter, fmt))
-      _p_.save(filename=plotfilename, **kwargs)
+      try:
+        _p_.save(filename=plotfilename, **kwargs)
+      except ValueError as inst:
+        if 'filetype not supported by save' in str(inst):
+          newfilename = plotfilename[:-3] + 'png'
+          print '  saving {0} failed; saving to {1} instead.'.format(plotfilename,
+                                                                     newfilename)
+          _p_.save(filename=newfilename, **kwargs)
+          break
+        else:
+          raise
 %    \end{macrocode}
 % If the user provides a format \emph{and} specifies the |imagemagick|
 % option, we try to convert the newly-created file into EPS format.
