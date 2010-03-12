@@ -20,9 +20,11 @@
 %
 % Let's begin by loading some packages. The key bits of |sageblock| and
 % friends are stol---um, adapted from the |verbatim| package manual. So
-% grab the |verbatim| package.
+% grab the |verbatim| package. We also need the |fancyvrb| package for
+% the |sageexample| environment.
 %    \begin{macrocode}
 \RequirePackage{verbatim}
+\RequirePackage{fancyvrb}
 %    \end{macrocode}
 % Unsurprisingly, the |\sageplot| command works poorly without graphics
 % support.
@@ -568,6 +570,42 @@ _st_.blockbegin()^^Jtry:}%
 % \emph{nor} writes code to the |.sage| file. The verbatim package's
 % |comment| environment does that.\\
 %
+% \begin{environment}{sageexample}
+% Finally, we have an environment which is mostly-but-not-entirely
+% verbatim; this is the example environment, which takes input like
+% Sage doctests, and prints out the commands verbatim but nicely
+% typesets the output of those commands. This and the corresponding
+% Python function are due to Nicolas Thi\'ery.
+%    \begin{macrocode}
+\newcommand{\sageexampleincludetextoutput}{False}
+\newenvironment{sageexample}{\ST@wsf{%
+try:^^J
+ _st_.doctest(\theST@inline, r"""}
+   \begingroup
+   \@bsphack
+   \let\do\@makeother\dospecials
+   \catcode`\^^M\active
+   \def\verbatim@processline{%
+     \ST@wsf{\the\verbatim@line}%
+   }%
+   \verbatim@start%
+}
+{
+  \@esphack%
+  \endgroup%
+  \ST@wsf{%
+    """, globals(), locals(), \sageexampleincludetextoutput)^^Jexcept:^^J
+    _st_.goboom(\the\inputlineno)}%
+  \ifST@paused
+    \mbox{(Sage\TeX{} is paused)}%
+  \else%
+    \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}%
+    \@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}%
+  \fi%
+  \stepcounter{ST@inline}}
+%    \end{macrocode}
+% \end{environment}
+%
 % \subsubsection{Pausing \ST}
 % \label{sec:pausing-sagetex}
 %
@@ -806,6 +844,60 @@ class SageTeXProcessor():
     self.progress('end')
 %    \end{macrocode}
 % \end{macro}
+% \end{macro}
+%
+% \begin{macro}{doctest}
+% This function handles the |sageexample| environment, which typesets
+% Sage code and its output. We call it doctest because the format is
+% just like that for doctests in the Sage library.
+%    \begin{macrocode}
+  def doctest(self, counter, str, globals, locals, include_text_output):
+      current_statement = None
+      current_lines = None
+      latex_string = ""
+      line_iterator = (line.lstrip() for line in str.splitlines())
+  
+      # Gobbles everything until the first "sage: ..." block
+      for line in line_iterator:
+          if line.startswith("sage: "):
+              break
+      else:
+          return
+      sage_block = 0
+      while True:
+          # At each
+          assert line.startswith("sage: ")
+          current_statement  = line[6:]
+          current_lines = "  "+line
+          for line in line_iterator:
+              if line.startswith("sage: "):
+                  break
+              elif line.startswith("..."):
+                  current_statement +="\n"+line[6:]
+                  current_lines +="\n  "+line
+              elif include_text_output:
+                  current_lines +="\n  "+line
+          else:
+              line = None # we reached the last line
+          # Now we have digested everything from the current sage: ... to the next one or to the last line
+          # Let us handle it
+          verbatimboxname = "@sageinline%s-code%s"%(counter,sage_block)
+          self.souttmp.write("\\begin{SaveVerbatim}{%s}\n"%verbatimboxname)
+          self.souttmp.write(current_lines)
+          self.souttmp.write("\n\\end{SaveVerbatim}\n")
+          latex_string += "\UseVerbatim{%s}\n"%verbatimboxname
+          current_statement = preparse(current_statement)
+          try: # How to test whether the code is an Python expression or a statement?
+              # In the first case, we compute the result and include it in the latex
+              result = eval(current_statement, globals, locals)
+              latex_string += "\\begin{displaymath}\n  %s\n\\end{displaymath}\n"%latex(result)
+          except:
+              # If this fails, we assume that the code was a statement, and just execute it
+              exec current_statement in globals, locals
+          current_lines = current_statement = None
+          if line is None: break
+          sage_block += 1
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{plot}
