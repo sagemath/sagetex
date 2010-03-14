@@ -29,10 +29,10 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>__version__ = """
 %<*latex|python>
-  [2010/02/15 v2.2.4 embedding Sage into LaTeX documents]
+  [2010/03/14 v2.2.4 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>""".strip()
-%<latex>\newcommand{\ST@ver}{2010/02/15 v2.2.4}
+%<latex>\newcommand{\ST@ver}{2010/03/14 v2.2.4}
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{sagetex}
@@ -84,7 +84,8 @@ both files into \textsf{Docstrip} format, and wrote all the
 documentation and extra Python scripts.
 
 Many thanks to Jason Grout for his numerous comments, suggestions, and
-feedback.
+feedback. Thanks to Nicolas Thi\'ery for the initial code for the
+\texttt{sageexample} environment.
 
 \section{Copying and licenses}
 \label{sec:copying-licenses}
@@ -769,13 +770,16 @@ suggestions.
 % typeset output, you can issue
 % |\renewcommand{\sageexampleincludetextoutput}{True}| in your
 % document. You can do the same thing with ``False'' to later turn it
-% off. In the above example, this would cause \ST to output both 
+% off. In the above example, this would cause \ST to output both
 % |(x + 1)^2| and $(x + 1)^{2}$ in your typeset document.
 %
 % Just as in doctests, multiline statements are acceptable. The only
-% limitation is that triple-quoted strings delimited by |"""| cannot be used in
-% a |sageexample| environment; instead, you can use triple-quoted
-% strings delimited by |'''|.\\
+% limitation is that triple-quoted strings delimited by |"""| cannot be
+% used in a |sageexample| environment; instead, you can use
+% triple-quoted strings delimited by |'''|.
+%
+% The initial implementation of this environment is due to Nicolas
+% Thi\'ery.\\
 %
 % \DescribeMacro{\sagetexindent} There is one final bit to our
 % verbatim-like environments: the indentation. The \ST package defines a

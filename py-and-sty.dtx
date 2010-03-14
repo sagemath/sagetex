@@ -604,6 +604,8 @@ try:^^J
   \fi%
   \stepcounter{ST@inline}}
 %    \end{macrocode}
+% \changes{v2.2.4}{2010/03/14}{Add first support for
+%   \texttt{sageexample} environment}
 % \end{environment}
 %
 % \subsubsection{Pausing \ST}
@@ -857,7 +859,7 @@ class SageTeXProcessor():
       current_lines = None
       latex_string = ""
       line_iterator = (line.lstrip() for line in str.splitlines())
-  
+
       # Gobbles everything until the first "sage: ..." block
       for line in line_iterator:
           if line.startswith("sage: "):
@@ -898,6 +900,7 @@ class SageTeXProcessor():
           current_lines = current_statement = None
           if line is None: break
           sage_block += 1
+      self.inline(counter, latex_string)
 %    \end{macrocode}
 % \end{macro}
 %
