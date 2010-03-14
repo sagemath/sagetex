@@ -321,4 +321,62 @@ size, while changing only one thing.
   \sagestr{pascals_triangle(n)}
 \end{center}
 
+\section{Include doctest-like examples in your document}
+
+Here are some examples of using the \texttt{sageexample} environment:
+\begin{sageexample}
+  sage: 1+1
+  2
+  sage: factor(x^2 + 2*x + 1)
+  (x + 1)^2
+\end{sageexample}
+If you want to see the plain-text output as well as the typeset
+output, renew the \texttt{sageexampleincludetextoutput} variable to
+True:
+\renewcommand{\sageexampleincludetextoutput}{True}
+\begin{sageexample}
+  sage: 1+1
+  2
+  sage: factor(x^2 + 2*x + 1)
+  (x + 1)^2
+\end{sageexample}
+Multiline statements are support, as are triple-quoted strings
+delimited by single quotes:
+\renewcommand{\sageexampleincludetextoutput}{False}
+\begin{sageexample}
+  sage: def f(a):
+  ....:     '''This function is really quite nice,
+  ....:     although perhaps not very useful.'''
+  ....:     print "f called with a = ", a
+  ....:     y = integrate(SR(cyclotomic_polynomial(10)) + a, x)
+  ....:     return y + 1
+  sage: f(x)
+  f called with a =  x
+  1/5*x^5 - 1/4*x^4 + 1/3*x^3 + x + 1
+\end{sageexample}
+When typesetting your document, the validity of the outputs is not
+checked (go ahead and try changing something above) but it should be
+possible to run the usual Sage doctest mechanism on the generated
+\texttt{.sage} file---or perhaps the \texttt{.py} file. Running
+doctests on files outside the main Sage library does not always work,
+so contact sage-support if you run into troubles.
+
+Some more examples. This environment is implemented a little bit
+differently than the other environments, so it's good to make sure
+that definitions are preserved across multiple uses:
+\begin{sageexample}
+  sage: 1; 2; a=4; 3; a
+  1
+  2
+  3
+  4
+\end{sageexample}
+After that, Sage should remember that $a = \sage{a}$, and be able to
+use that in future \texttt{sageexample} blocks:
+\begin{sageexample}
+  sage: f(a)
+  1/5*x^5 - 1/4*x^4 + 1/3*x^3 - 1/2*x^2 + 5*x + 1  
+\end{sageexample}
+
+
 \end{document}

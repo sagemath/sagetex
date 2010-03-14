@@ -745,6 +745,38 @@ suggestions.
 % environment: |comment|. Another way to do this is to put stuff between
 % |\iffalse| and |\fi|.\\
 %
+% \DescribeEnv{sageexample} This environment allow you to include
+% doctest-like snippets in your document that will be nicely typeset.
+% For example,
+% \begin{quote}
+% |\begin{sageexample}|\\
+% |  sage: 1+1|\\
+% |  2|\\
+% |  sage: factor(x^2 + 2*x + 1)|\\
+% |  (x + 1)^2|\\
+% |\end{sageexample}|
+% \end{quote}
+% in your document will be typeset with the Sage inputs in the usual
+% fixed-width font, and the outputs will be typeset as if given to a
+% |\sage| macro. When typesetting the document, there is no test of
+% the validity of the outputs (that is, typesetting with a typical
+% \LTX-Sage-\LTX cycle does not do doctesting), but you should be able
+% to doctest your document with ``|sage -t my_file.sage|''. (This does
+% not always work; if this fails for you, please contact the
+% sage-support group.)
+%
+% If you would like to see both the original text input and the
+% typeset output, you can issue
+% |\renewcommand{\sageexampleincludetextoutput}{True}| in your
+% document. You can do the same thing with ``False'' to later turn it
+% off. In the above example, this would cause \ST to output both 
+% |(x + 1)^2| and $(x + 1)^{2}$ in your typeset document.
+%
+% Just as in doctests, multiline statements are acceptable. The only
+% limitation is that triple-quoted strings delimited by |"""| cannot be used in
+% a |sageexample| environment; instead, you can use triple-quoted
+% strings delimited by |'''|.\\
+%
 % \DescribeMacro{\sagetexindent} There is one final bit to our
 % verbatim-like environments: the indentation. The \ST package defines a
 % length |\sagetexindent|, which controls how much the Sage code is
