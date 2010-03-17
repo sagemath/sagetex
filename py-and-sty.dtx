@@ -58,6 +58,12 @@
 \AtBeginDocument{\@ifundefined{ST@final}{%
 \newwrite\ST@sf%
 \immediate\openout\ST@sf=\jobname.sage%
+
+\newwrite\ST@sftest%
+\immediate\openout\ST@sftest=\jobname_test.sage
+\immediate\write\ST@sftest{r"""}
+\AtEndDocument{\immediate\write\ST@sftest{"""}}
+
 %    \end{macrocode}
 % \begin{macro}{\ST@wsf}
 %   We will write a lot of stuff to that file, so make a convenient
@@ -583,18 +589,26 @@ _st_.blockbegin()^^Jtry:}%
 % verbatim; this is the example environment, which takes input like
 % Sage doctests, and prints out the commands verbatim but nicely
 % typesets the output of those commands. This and the corresponding
-% Python function are due to Nicolas Thi\'ery.
+% Python function are due to Nicolas M. Thi\'ery.
 %    \begin{macrocode}
 \newcommand{\sageexampleincludetextoutput}{False}
-\newenvironment{sageexample}{\ST@wsf{%
+\newenvironment{sageexample}{%
+   \ST@wsf{%
 try:^^J
  _st_.doctest(\theST@inline, r"""}
+   % It would be good to include the name of the file as well!!!
+   % But I don't know how to do it, and it might be non trivial:
+   % look for inputlineno in 7.7 of:
+   % http://mirror.ctan.org/macros/latex/contrib/examplep/eurotex_2005_examplep.pdf
+   \immediate\write\ST@sftest{Sage example, line \the\inputlineno::}
+   \immediate\write\ST@sftest{}
    \begingroup
    \@bsphack
    \let\do\@makeother\dospecials
    \catcode`\^^M\active
    \def\verbatim@processline{%
      \ST@wsf{\the\verbatim@line}%
+     \immediate\write\ST@sftest{\the\verbatim@line}%
    }%
    \verbatim@start%
 }
@@ -610,6 +624,7 @@ try:^^J
     \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}%
     \@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}%
   \fi%
+  \immediate\write\ST@sftest{}
   \stepcounter{ST@inline}}
 %    \end{macrocode}
 % \changes{v2.2.4}{2010/03/14}{Add first support for
@@ -833,7 +848,7 @@ class SageTeXProcessor():
 %    \begin{macrocode}
   def inline(self, counter, s):
     self.progress('Inline formula {0}'.format(counter))
-    self.souttmp.write('\\newlabel{@sageinline' + str(counter) + '}{{' + \
+    self.souttmp.write('\\newlabel{@sageinline' + str(counter) + '}{{%\n' + \
                  s.rstrip() + '}{}{}{}{}}\n')
 %    \end{macrocode}
 % We are using five fields, just like |hyperref| does, because that
@@ -901,7 +916,11 @@ class SageTeXProcessor():
           try: # How to test whether the code is an Python expression or a statement?
               # In the first case, we compute the result and include it in the latex
               result = eval(current_statement, globals, locals)
-              latex_string += "\\begin{displaymath}\n  %s\n\\end{displaymath}\n"%latex(result)
+              # LaTeX includes a lot of vertical space between two
+              # successive verbatim and displaymath environment.
+              # We try to compensate this with a vspace, but this
+              # might not be very robust; anything better welcome.
+              latex_string += "\\vspace{-3ex}\n\\begin{displaymath}\n  %s\n\\end{displaymath}\n"%latex(result)
           except:
               # If this fails, we assume that the code was a statement, and just execute it
               exec current_statement in globals, locals
