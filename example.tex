@@ -335,8 +335,11 @@ Here are some examples of using the \texttt{sageexample} environment:
 \end{sageexample}
 If you want to see the plain-text output as well as the typeset output,
 renew the \texttt{sageexampleincludetextoutput} command to True:
+\begin{verbatim}
+  \renewcommand{\sageexampleincludetextoutput}{True}
+\end{verbatim}
 \renewcommand{\sageexampleincludetextoutput}{True}
-
+This can be useful to check that the two outputs are consistent.
 % fiddle with spacing to demonstrate the kind of thing mentioned in the
 % next paragraph:
 \vspace{10mm}
@@ -345,6 +348,7 @@ When this environment is near the bottom of the page, it may look like
 the page number is the output of a command, when in fact the real output
 is on the next page. If the output of a command below looks like
 \thepage, don't worry, that's just the page number.
+
 \begin{sageexample}
   sage: 1+1
   2
@@ -356,11 +360,11 @@ delimited by single quotes:
 \renewcommand{\sageexampleincludetextoutput}{False}
 \begin{sageexample}
   sage: def f(a):
-  ....:     '''This function is really quite nice,
-  ....:     although perhaps not very useful.'''
-  ....:     print "f called with a = ", a
-  ....:     y = integrate(SR(cyclotomic_polynomial(10)) + a, x)
-  ....:     return y + 1
+  ...       '''This function is really quite nice,
+  ...       although perhaps not very useful.'''
+  ...       print "f called with a = ", a
+  ...       y = integrate(SR(cyclotomic_polynomial(10)) + a, x)
+  ...       return y + 1
   sage: f(x)
   f called with a =  x
   1/5*x^5 - 1/4*x^4 + 1/3*x^3 + x + 1
@@ -377,10 +381,38 @@ checked. In fact, the provided outputs are completely ignored:
   toothpaste
 \end{sageexample}
 \renewcommand{\sageexampleincludetextoutput}{False}
-\ldots but it should be possible to run the usual Sage doctest mechanism
-on the generated \texttt{.sage} file---or perhaps the \texttt{.py} file.
-Running doctests on files outside the main Sage library does not always
-work, so contact sage-support if you run into troubles.
+
+However, typesetting your document produces a file named
+\texttt{example\_test.sage} containing all the doctest-like examples,
+and you can have Sage check them for you with:
+\begin{verbatim}
+> sage -t  example_test.sage
+sage -t  "example_test.sage"
+**********************************************************************
+File "/home/nthiery/Sage-Combinat/sagetex/example_test.sage", line 30:
+    sage: is_prime(57)
+Expected:
+    toothpaste
+Got:
+    False
+**********************************************************************
+1 items had failures:
+   1 of  11 in __main__.example_0
+***Test Failed*** 1 failures.
+For whitespace errors, see the file /.../.sage//tmp/.doctest_example_test.py
+         [3.7 s]
+----------------------------------------------------------------------
+The following tests failed:
+        sage -t  "example_test.sage"
+Total time for all tests: 3.7 seconds
+\end{verbatim}
+Please look into this file for the original line numbers.
+
+Beware that \texttt{sage -t} does not handle well file names with
+special characters in them (even just \texttt{example-test.sage}).
+Also, running doctests on files outside the main Sage library does not
+always work, so contact \texttt{sage-support} if you run into
+troubles.
 
 Some more examples. This environment is implemented a little bit
 differently than the other environments, so it's good to make sure that
@@ -398,6 +430,7 @@ After that, Sage should remember that $a = \sage{a}$ and be able to use
 that in future \texttt{sageexample} blocks:
 \begin{sageexample}
   sage: f(a)
+  f called with a =  4
   1/5*x^5 - 1/4*x^4 + 1/3*x^3 - 1/2*x^2 + 5*x + 1
 \end{sageexample}
 
