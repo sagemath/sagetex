@@ -227,21 +227,24 @@ G4plot = G4.plot(layout='circular')
 
 \subsection{3D plotting}
 
-3D plotting right now is problematic because there's no convenient way
-to produce vector graphics. We can make PNGs, though, and since the
-\verb|sageplot| command defaults to EPS and PDF, \emph{you must specify
-  a valid format for 3D plotting}. Sage right now (version 4.2.1) can't
-produce EPS or PDF files from \texttt{plot3d} objects, so if you don't
-specify a valid format, things will go badly. You can specify the
-``\texttt{imagemagick}'' option, which will use the Imagemagick
-\texttt{convert} utility to make EPS files. See the documentation for
-details.
+3D plotting right now (Sage version 4.3.4) is problematic because
+there's no convenient way to produce vector graphics. We can make PNGs,
+though, so if you pass \verb|sageplot| a graphics object that cannot be
+saved to EPS or PDF format, we will automatically save to a PNG file,
+which can be used when typesetting a PDF file, but not when creating a
+DVI file. However, you can specify the ``\texttt{imagemagick}'' option,
+which will use the Imagemagick \texttt{convert} utility to make EPS
+files. See the documentation for details.
 
 % FIXME: not sure this works with remote sagetex
 
 \begin{sagesilent}
   x, y = var('x y')
 \end{sagesilent}
+
+Here's a 3D plot whose format we do not specify; it will automatically
+get saved as a PNG file and won't work when using \texttt{latex} to make
+a DVI file.
 
 \sageplot[scale=.5]{plot3d(sin(pi*(x^2+y^2))/2,(x,-1,1),(y,-1,1))}
 

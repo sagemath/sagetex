@@ -75,7 +75,7 @@
 
 According to the original README file, this system was originally done
 by Gonzalo Tornaria and Joe Wetherell. Later Harald Schilly made some
-improvements and modifications. Almost all the examples in the
+improvements and modifications. Many of the examples in the
 |example.tex| file are from Harald.
 
 Dan Drake rewrote and extended the style file (there is effectively zero
@@ -84,8 +84,8 @@ both files into \textsf{Docstrip} format, and wrote all the
 documentation and extra Python scripts.
 
 Many thanks to Jason Grout for his numerous comments, suggestions, and
-feedback. Thanks to Nicolas Thi\'ery for the initial code for the
-\texttt{sageexample} environment.
+feedback. Thanks to Nicolas Thi\'ery for the initial code and
+contributions to the \texttt{sageexample} environment.
 
 \section{Copying and licenses}
 \label{sec:copying-licenses}
@@ -556,7 +556,8 @@ suggestions.
 %   ``|width=.75\textwidth|'' will be used.\\
 %   \meta{fmt} & You can optionally specify a file extension here; Sage
 %   will then try to save the graphics object to a file with extension
-%   \emph{fmt}. If not specified, \ST\ will save to EPS and PDF files.\\
+%   \emph{fmt}. If not specified, \ST\ will save to EPS and PDF files;
+%   if saving to those formats does not work, \ST will save to a PNG file.\\
 %   \meta{graphics obj} & A Sage object on which you can call |.save()|
 %   with a graphics filename.\\
 %   \meta{keyword args} & Any keyword arguments you put here will
@@ -594,14 +595,18 @@ suggestions.
 % freely switch between using, say, a DVI viewer (many of which have
 % support for automatic reloading, source specials and make the writing
 % process easier) and creating PDFs for posting on the web or emailing
-% to colleagues.
+% to colleagues. \ST will fall back to creating a PNG file for any
+% graphics object that cannot be saved as an EPS or PDF file; this is
+% useful for three dimensional plot objects, which currently cannot be
+% saved as EPS or PDF files.
 %
-% If you ask for, say, a PNG file, keep in mind that ordinary |latex|
-% and DVI files have no support for PNG files; \ST detects this and will
+% If you ask for, say, a PNG file (or if one is automatically generated
+% for you as described above), keep in mind that ordinary |latex| and
+% DVI files have no support for PNG files; \ST detects this and will
 % warn you that it cannot find a suitable file if using
 % |latex|.\footnote{We use a typewriter font here to indicate the
-% executables which produce DVI and PDF files, respectively, as
-% opposed to ``\LTX'' which refers to the entire typesetting system.}
+%   executables which produce DVI and PDF files, respectively, as
+%   opposed to ``\LTX'' which refers to the entire typesetting system.}
 % If you use |pdflatex|, there will be no problems because PDF files can
 % include PNG graphics.
 %
@@ -637,6 +642,8 @@ suggestions.
 % to create invalid PDFs. Ideally, this option should never be
 % necessary; if you do need to use it, file a bug!
 %
+% This option will eventually be removed, so do not use it.
+%
 % \subsubsection{3D plotting}
 %
 % Right now there is, to put it nicely, a bit of tension between the
@@ -646,20 +653,13 @@ suggestions.
 % are vector formats. Tachyon, Sage's 3D plotting system, produces
 % bitmap formats like BMP and PNG.
 %
-% Because of this, when producing 3D plots with |\sageplot|, \emph{you
-% must specify a file format}. The PNG format is compressed and lossless
-% and is by far the best choice, so use that whenever possible. (Right
-% now, it is always possible.) If you do not specify a file format, or
-% specify one that Tachyon does not understand, it will produce files in
-% the Targa format with an incorrect extension and \LTX (both |latex|
-% and |pdflatex|) will be profoundly confused. Don't do that.
-%
-% Since |latex| does not support PNGs, when using 3D plotting (and
-% therefore a bitmap format like PNG), \ST will always issue a warning
-% about incompatible graphics if you use |latex|, provided you've
-% processed the |.sage| file and the PNG file exists. The only exception
-% is if you're using the |imagemagick| option below. (Running |pdflatex|
-% on the same file will work, since PDF files can include PNG files.)
+% \ST will automatically fall back to saving plot objects in PNG format
+% if saving to EPS and PDF fails, so it should automatically work with
+% 3D plot objects. However, since |latex| does not support PNGs, when
+% using 3D plotting (and therefore a bitmap format like PNG), \ST will
+% always issue a warning about incompatible graphics if you use |latex|,
+% provided you've processed the |.sage| file and the PNG file exists.
+% The only exception is if you're using the |imagemagick| option below.
 %
 % \paragraph{The imagemagick option} As a response to the above issue,
 % the \ST package has an |imagemagick| option. If you specify this
