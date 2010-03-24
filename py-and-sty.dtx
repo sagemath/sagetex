@@ -472,7 +472,15 @@ except:^^J
 %       child {node [box] {Insert ``we're paused'' box}
 %         edge from parent node[left] {yes}}
 %       child {node [box] {Does EXT file exist?}
-%         child {node [box, text width = 2.125cm] {Warn user to rerun Sage}
+%         child {node [box] {Does a PNG file exist?}
+%           child {node [box] {Making a PDF?}
+%             child {node [box] {\texttt{includegraphics} PNG}
+%               edge from parent node[left] {yes}}
+%             child {node [box, text width=2cm] {Warning: DVI, latex incompatible}
+%               edge from parent node[left] {no}}
+%             edge from parent node[left] {yes}}
+%           child {node [box, text width = 2.125cm] {Warn user to rerun Sage}
+%             edge from parent node[left] {no}}
 %           edge from parent node[left] {no}}
 %         child {node [box] {Use \texttt{includegraphics}}
 %           edge from parent node[right] {yes}}
@@ -915,9 +923,9 @@ class SageTeXProcessor():
 % to |\sageplot| becomes |_p_| and |**kwargs| below.
 %    \begin{macrocode}
   def plot(self, counter, _p_, format='notprovided', **kwargs):
-    if not self.didinitplot:
-      self.initplot()
-    self.progress('Plot {0}'.format(counter))
+      if not self.didinitplot:
+          self.initplot()
+      self.progress('Plot {0}'.format(counter))
 %    \end{macrocode}
 % If the user says nothing about file formats, we default to producing
 % PDF and EPS. This allows the user to transparently switch between
@@ -927,47 +935,47 @@ class SageTeXProcessor():
 % \texttt{pdfsync}, but full support for that is still rare in Linux, so
 % producing EPS and PDF is the best solution for now.}
 %    \begin{macrocode}
-    if format == 'notprovided':
-      formats = ['eps', 'pdf']
-    else:
-      formats = [format]
-    for fmt in formats:
+      if format == 'notprovided':
+          formats = ['eps', 'pdf']
+      else:
+          formats = [format]
+      for fmt in formats:
 %    \end{macrocode}
 % If we're making a PDF and have been told to use |epstopdf|, do so,
 % then skip the rest of the loop.
 %    \begin{macrocode}
-      if fmt == 'pdf' and self.useepstopdf:
-        epsfile = os.path.join(self.plotdir, 'plot-{0}.eps'.format(counter))
-        self.progress('Calling epstopdf to convert plot-{0}.eps to PDF'.format(
-            counter))
-        subprocess.check_call(['epstopdf', epsfile])
-        continue
+          if fmt == 'pdf' and self.useepstopdf:
+              epsfile = os.path.join(self.plotdir, 'plot-{0}.eps'.format(counter))
+              self.progress('Calling epstopdf to convert plot-{0}.eps to PDF'.format(
+                            counter))
+              subprocess.check_call(['epstopdf', epsfile])
+              continue
 %    \end{macrocode}
 % Some plot objects (mostly 3-D plots) do not support saving to EPS or
 % PDF files (yet), but everything can be saved to a PNG file. For the
 % user's convenience, we catch the error when we run into such an
 % object, save it to a PNG file, then exit the loop.
 %    \begin{macrocode}
-      plotfilename = os.path.join(self.plotdir, 'plot-{0}.{1}'.format(counter, fmt))
-      try:
-        _p_.save(filename=plotfilename, **kwargs)
-      except ValueError as inst:
-        if 'filetype not supported by save' in str(inst):
-          newfilename = plotfilename[:-3] + 'png'
-          print '  saving {0} failed; saving to {1} instead.'.format(plotfilename,
-                                                                     newfilename)
-          _p_.save(filename=newfilename, **kwargs)
-          break
-        else:
-          raise
+          plotfilename = os.path.join(self.plotdir, 'plot-{0}.{1}'.format(counter, fmt))
+          try:
+              _p_.save(filename=plotfilename, **kwargs)
+          except ValueError as inst:
+              if 'filetype not supported by save' in str(inst):
+                  newfilename = plotfilename[:-3] + 'png'
+                  print '  saving {0} failed; saving to {1} instead.'.format(
+                                                    plotfilename, newfilename)
+                  _p_.save(filename=newfilename, **kwargs)
+                  break
+              else:
+                  raise
 %    \end{macrocode}
 % If the user provides a format \emph{and} specifies the |imagemagick|
 % option, we try to convert the newly-created file into EPS format.
 %    \begin{macrocode}
-      if format != 'notprovided' and self.useimagemagick:
-        self.progress('Calling Imagemagick to convert plot-{0}.{1} to EPS'.format(
-          counter, format))
-        self.toeps(counter, format)
+          if format != 'notprovided' and self.useimagemagick:
+              self.progress('Calling Imagemagick to convert plot-{0}.{1} to EPS'.format(
+                counter, format))
+              self.toeps(counter, format)
 %    \end{macrocode}
 % \end{macro}
 %
