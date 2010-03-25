@@ -29,10 +29,10 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>__version__ = """
 %<*latex|python>
-  [2010/03/14 v2.2.4 embedding Sage into LaTeX documents]
+  [2010/03/25 v2.2.5 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>""".strip()
-%<latex>\newcommand{\ST@ver}{2010/03/14 v2.2.4}
+%<latex>\newcommand{\ST@ver}{2010/03/25 v2.2.5}
 %<*driver>
 \documentclass{ltxdoc}
 \usepackage{sagetex}
@@ -138,7 +138,7 @@ suggestions.
 %</driver>
 % \fi
 %
-% \CheckSum{416}
+% \CheckSum{452}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -759,12 +759,15 @@ suggestions.
 % \end{quote}
 % in your document will be typeset with the Sage inputs in the usual
 % fixed-width font, and the outputs will be typeset as if given to a
-% |\sage| macro. When typesetting the document, there is no test of
-% the validity of the outputs (that is, typesetting with a typical
-% \LTX-Sage-\LTX cycle does not do doctesting), but you should be able
-% to doctest your document with ``|sage -t my_file.sage|''. (This does
-% not always work; if this fails for you, please contact the
-% sage-support group.)
+% |\sage| macro. When typesetting the document, there is no test of the
+% validity of the outputs (that is, typesetting with a typical
+% \LTX-Sage-\LTX cycle does not do doctesting), but when using the
+% |sageexample| environment, an extra file named
+% ``|myfile_doctest.sage|'' is created with the contents of all those
+% environments; it is formatted so that Sage can doctest that file. You
+% should be able to doctest your document with ``|sage -t myfile_doctest.sage|''.
+% (This does not always work; if this fails for you, please contact
+% the sage-support group.)
 %
 % If you would like to see both the original text input and the
 % typeset output, you can issue
@@ -778,7 +781,7 @@ suggestions.
 % used in a |sageexample| environment; instead, you can use
 % triple-quoted strings delimited by |'''|.
 %
-% The initial implementation of this environment is due to Nicolas
+% The initial implementation of this environment is due to Nicolas M.
 % Thi\'ery.\\
 %
 % \DescribeMacro{\sagetexindent} There is one final bit to our

@@ -4,10 +4,10 @@ setup(name='sagetex',
       long_description="""The SageTeX package allows you to embed code,
   results of computations, and plots from the Sage mathematics
   software suite (http://sagemath.org) into LaTeX documents.""",
-      version='2.2.4',
+      version='2.2.5',
       author='Dan Drake',
       author_email='ddrake@member.ams.org',
-      url='http://mathsci.kaist.ac.kr/~drake',
+      url='http://bitbucket.org/ddrake/sagetex/',
       license='GPLv2+',
       py_modules=['sagetex'],
       data_files = [('share/texmf/tex/generic/sagetex',
@@ -24,5 +24,3 @@ setup(name='sagetex',
          'sagetexpackage.pdf',
          'sagetexparse.py',
          'sagetex.sty'])])
-
-

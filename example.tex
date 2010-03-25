@@ -340,9 +340,6 @@ renew the \texttt{sageexampleincludetextoutput} command to True:
 \end{verbatim}
 \renewcommand{\sageexampleincludetextoutput}{True}
 This can be useful to check that the two outputs are consistent.
-% fiddle with spacing to demonstrate the kind of thing mentioned in the
-% next paragraph:
-\vspace{10mm}
 
 When this environment is near the bottom of the page, it may look like
 the page number is the output of a command, when in fact the real output
@@ -383,36 +380,21 @@ checked. In fact, the provided outputs are completely ignored:
 \renewcommand{\sageexampleincludetextoutput}{False}
 
 However, typesetting your document produces a file named
-\texttt{example\_test.sage} containing all the doctest-like examples,
+\texttt{example\_doctest.sage} containing all the doctest-like examples,
 and you can have Sage check them for you with:
 \begin{verbatim}
-> sage -t  example_test.sage
-sage -t  "example_test.sage"
-**********************************************************************
-File "/home/nthiery/Sage-Combinat/sagetex/example_test.sage", line 30:
-    sage: is_prime(57)
-Expected:
-    toothpaste
-Got:
-    False
-**********************************************************************
-1 items had failures:
-   1 of  11 in __main__.example_0
-***Test Failed*** 1 failures.
-For whitespace errors, see the file /.../.sage//tmp/.doctest_example_test.py
-         [3.7 s]
-----------------------------------------------------------------------
-The following tests failed:
-        sage -t  "example_test.sage"
-Total time for all tests: 3.7 seconds
+  $ sage -t  example_doctest.sage
 \end{verbatim}
+You should get one doctest failure from the ``toothpaste'' line above.
+
 Please look into this file for the original line numbers.
 
 Beware that \texttt{sage -t} does not handle well file names with
-special characters in them (even just \texttt{example-test.sage}).
-Also, running doctests on files outside the main Sage library does not
-always work, so contact \texttt{sage-support} if you run into
-troubles.
+special characters in them, particularly dashes, dots, and spaces---this
+ultimately comes from the way Python interprets \texttt{import}
+statements. Also, running doctests on files outside the main Sage
+library does not always work, so contact \texttt{sage-support} if you
+run into troubles.
 
 Some more examples. This environment is implemented a little bit
 differently than the other environments, so it's good to make sure that

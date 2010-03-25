@@ -40,11 +40,11 @@ remote-sagetex.py: remote-sagetex.dtx
 
 clean:
 	latexcleanup clean .
-	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py auto
+	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py auto example_doctest.sage
 
-# the following bit requires SHELL=bash
 auxclean:
 	/bin/bash -c "rm -f {$(pkg),example}.{glo,gls,aux,sout,out,toc,dvi,pdf,ps,log,ilg,ind,idx,sage,fdb_latexmk}"
+	rm -f example_doctest.sage
 
 # make a tarball suitable for CTAN uploads, or for someone who knows how
 # to handle .dtx files
