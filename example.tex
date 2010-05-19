@@ -213,6 +213,8 @@ lot of things and cannot be flexibly controlled in its current form.
   \sage{g}
 \end{center}
 
+\tikzstyle{every picture}=[]
+
 Here's some more graphs, plotted using the usual plot routines.
 
 \sageplot[scale=.5]{graphs.FlowerSnark().plot()}
@@ -415,5 +417,78 @@ that in future \texttt{sageexample} blocks:
   f called with a =  4
   1/5*x^5 - 1/4*x^4 + 1/3*x^3 - 1/2*x^2 + 5*x + 1
 \end{sageexample}
+
+\section{Plotting functions in Ti\emph{k}Z with Sage\TeX}
+
+The wonderful graphics package TikZ has the ability to plot functions by
+reading in a sequence of points from an external file---see chapter 18,
+page 193 of the TikZ manual. This facility is designed around files
+produced by Gnuplot, but the file format is so simple that it's very
+easy to use Sage\TeX to generate them. First you need a function that
+will evaluate functions and write the results into a file:
+
+
+% set up plotting stuff
+\begin{sageblock}
+  def gnuplot(x, y, tvals_, fn):
+      """
+      Write out a gnuplot-style file of points x(t), y(t).
+      """
+      tvals = list(tvals_)
+      lines = ['#This is a gnuplot-style file written by SageTeX.',
+               '#x: {0}'.format(x),
+               '#y: {0}'.format(y),
+               '#Curve 0, {0} points'.format(len(tvals)),
+               '#x y type']
+      fmt = lambda _: _.n().str(no_sci=2)
+      for t in tvals:
+          try:
+              lines.append('{0} {1}  i\n'.format(fmt(x(t)), fmt(y(t))))
+          except ValueError, ZeroDivisonError:
+              pass
+      with open(fn, 'w') as f:
+          f.write('\n'.join(lines) + '\n')
+\end{sageblock}
+
+There probably should be some more exceptions in that list, and the
+above code doesn't check to make sure it's writing real values, but then
+again, this is just a file of examples!
+
+Then you define callable functions x and y and pass them in, along with
+a sequence of values and a file name. Here's a plot that I used on a
+calculus exam:
+
+\begin{sageblock}
+  r(t) = 1 - 2*sin(3*t)
+  x(t) = r(t)*cos(t)
+  y(t) = r(t)*sin(t)
+  gnuplot(x, y, srange(0, 2*pi + .05, .05), 'example-tikz1.table')
+\end{sageblock}
+
+(Usually you would do that in sagesilent environments, I guess.)
+
+Then you call TikZ with your plot.
+
+\begin{tikzpicture}
+ \draw[very thin,->] (-3.25,0) -- (3.25,0);
+ \draw[very thin,->] (0,-3.25) -- (0,3.25);
+ \draw[smooth] plot file {example-tikz1.table};
+\end{tikzpicture}
+
+For regular Cartesian plots, just pass in the identity function for x:
+
+\begin{sageblock}
+  x = lambda t: t
+  y(t) = t*sin(1/t)
+  gnuplot(x, y, [0.01, 0.02..(0.5)] + [0.55, 0.6..2], 'example-tikz2.table')
+\end{sageblock}
+
+\begin{tikzpicture}
+ \draw[very thin,->] (-0.25,0) -- (2,0);
+ \draw[very thin,->] (0,-1/3) -- (0,1);
+ \draw[smooth, red] plot file {example-tikz2.table};
+\end{tikzpicture}
+
+
 
 \end{document}
