@@ -840,8 +840,33 @@ suggestions.
 % end of the environment; if you put the |\end{sageblock}| on the same
 % line as the last line of your code, it works properly. See section
 % 12.9, ``Verbatim and Fragile Text'', in the \textsc{beamer} manual.
+% (Thanks to Franco Saliola for reporting this.)
 %
-% Thanks to Franco Saliola for reporting this.
+% \textsc{beamer}'s overlays and |\sageplot| also need some help in
+% order to work together, as discussed in
+% \href{http://groups.google.com/group/sage-support/browse_thread/thread/9a0a2d60ef1126fd}{this
+%   sage-support thread}. If you want a plot to only appear in a certain
+% overlay, you might try something like this in your frame:
+% \begin{quote}
+% |\begin{itemize}|\\
+% |\item item 1|\\
+% |\item item 2|\\
+% |\item \sageplot[height=4cm][png]{(plot_slope_field(2*x,(x,-4,4),|\\
+% |     (y,-4,4))+(x^2-2).plot(-2,2))}|\\
+% |\end{itemize}|\\
+% \end{quote}
+% but the plot will appear on all the overlays, instead of the third.
+% The solution is to use the |\visible| macro:
+% \begin{quote}
+% |\begin{itemize}|\\
+% |\item item 1|\\
+% |\item item 2|\\
+% |\item \visible<3->{\sageplot[height=4cm][png]{(plot_slope_field(2*x,(x,-4,4),|\\
+% |     (y,-4,4))+(x^2-2).plot(-2,2))}}|\\
+% |\end{itemize}|\\
+% \end{quote}
+% Then the plot will only appear on the third (and later) overlays.
+% (Thanks to Robert Ma{\v r}{\'\i}k for this solution.)
 %
 % \subsection{Using the \texttt{rccol} package}
 %
