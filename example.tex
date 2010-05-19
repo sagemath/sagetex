@@ -443,7 +443,7 @@ will evaluate functions and write the results into a file:
       fmt = lambda _: _.n().str(no_sci=2)
       for t in tvals:
           try:
-              lines.append('{0} {1}  i\n'.format(fmt(x(t)), fmt(y(t))))
+              lines.append('{0} {1}  i'.format(fmt(x(t)), fmt(y(t))))
           except ValueError, ZeroDivisonError:
               pass
       with open(fn, 'w') as f:
