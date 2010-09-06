@@ -717,14 +717,16 @@ try:^^J
 % if you haven't run the Sage script---and for many \LTX users, myself
 % included, the warning ``there were undefined references'' is a signal
 % to run \LTX again. But to fix these particular undefined references,
-% you need to run \emph{Sage}. We also suppressed file-not-found errors
+% you need to run \emph{Sage}. We also suppress file-not-found errors
 % for graphics files, and need to tell the user what to do about that.
 %
 % At any rate, we tell the user to run Sage if it's necessary.
 %    \begin{macrocode}
-{\PackageWarningNoLine{sagetex}{There were undefined Sage formulas
-and/or plots.^^JRun Sage on \jobname.sage, and then run
-LaTeX on \jobname.tex again}}}
+{\typeout{*********************************************************************}
+\PackageWarningNoLine{sagetex}{there were undefined Sage formulas and/or
+plots.^^JRun Sage on \jobname.sage, and then run LaTeX on \jobname.tex
+again}}
+\typeout{*********************************************************************}}
 %    \end{macrocode}
 %
 %
