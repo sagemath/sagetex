@@ -138,7 +138,7 @@ suggestions.
 %</driver>
 % \fi
 %
-% \CheckSum{454}
+% \CheckSum{0}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -294,6 +294,62 @@ suggestions.
 % filename, including it into your document, and so on. In
 % \autoref{sec:usage}, we will see what what we can do with \ST.
 %
+% \subsection{Sage Command Line}
+%
+% Yet another way to use \ST{} is as a pretty-printing command line,
+% this is provided by the |sagecommandline| environment. For example,
+% you can write
+% \begin{quote}
+% |\begin{sagecommandline}|\\
+% |  sage: 1+1                       # difficult|\\
+% |  sage: ( x^2+2*x+1 ).factor()    #@\label{square}|\\
+% |  (x + 1)^2|\\
+% |\end{sagecommandline}|
+% \end{quote}
+% As you can see, you have a choice of either explicitly providing the
+% Sage output (in which case it will be turned into a doctest), or
+% leaving it up to the computer to fill in the blanks. Moreover, any
+% sage comment that starts with a ``at'' sign is escaped to \LTX. In
+% particular, you can use |\label| to mark line numbers in order to
+% |\ref|erence and |\pageref|erence them as usual. The output looks
+% like this:
+\begin{sagecommandline}
+  sage: 1+1                       # difficult
+  sage: ( x^2+2*x+1 ).factor()    #@\label{square}
+  (x + 1)^2
+\end{sagecommandline}
+% and the label is on Line~\ref{square}, Page~\pageref{square}. If you
+% prefer to typeset the output in \LTX, you can set
+% \begin{quote}
+% |\renewcommand{\sagecommandlinetextoutput}{False}|
+% \end{quote}
+% which produces
+\renewcommand{\sagecommandlinetextoutput}{False}
+\begin{sagecommandline}
+  sage: var('a, b, c');
+  sage: ( a*x^2+b*x+c ).solve(x)
+\end{sagecommandline}
+\renewcommand{\sagecommandlinetextoutput}{True}
+% The Sage input and output is typeset using the |listings| package
+% with the styles |SageInput| and |SageOutput|, respectively. If you
+% don't like the defaults you can change them. It is recommended to
+% derive from |DefaultSageInput| and |DefaultSageOutput|, for example
+% \begin{quote}
+%   |\lstdefinestyle{SageInput}{style=DefaultSageInput,|\\
+%   |                           basicstyle={\color{red}}}|\\
+%   |\lstdefinestyle{SageOutput}{style=DefaultSageOutput,|\\
+%   |                            basicstyle={\color{green}}}|
+% \end{quote}
+% makes things overly colorful:
+\lstdefinestyle{SageInput}{style=DefaultSageInput,basicstyle={\color{red}}}
+\lstdefinestyle{SageOutput}{style=DefaultSageOutput,basicstyle={\color{green}}}
+\begin{sagecommandline}
+  sage: pi.n(100)
+\end{sagecommandline}
+\lstdefinestyle{SageInput}{style=DefaultSageInput}
+\lstdefinestyle{SageOutput}{style=DefaultSageOutput}
+%
+%
 % \section{Installation}
 % \label{sec:installation}
 % \changes{v2.0}{2009/01/14}{Fixed up installation section, final
@@ -415,12 +471,16 @@ suggestions.
 % Let's begin with a rough description of how \ST works. Naturally the
 % very first step is to put |\usepackage{sagetex}| in the preamble of
 % your document. When you use macros from this package and run \LTX on
-% your file, along with the usual zoo of auxiliary files, a |.sage| file
-% is written with the same basename as your document. This is a Sage
-% source file that uses the Python module from this package and when you
-% run Sage on that file, it will produce a |.sout| file. That file
-% contains \LTX code that, when you run \LTX on your source file again,
-% will pull in all the results of Sage's computation.
+% your file, along with the usual zoo of auxiliary files, a |.sage|
+% file is written with the same basename as your document. This is a
+% Sage source file that uses the Python module from this package and
+% when you run Sage on that file, it will produce a |.sout| and a
+% |.scmd| file. That file contains \LTX code that, when you run \LTX
+% on your source file again, will pull in all the results of Sage's
+% computation.
+%
+% The |sagecommandline| environment additionally logs the plain sage
+% commands and output furthermore in a |.scmd| file.
 %
 % All you really need to know is that to typeset your document, you need
 % to run \LTX, then run Sage, then run \LTX again. You can even ``run
@@ -784,6 +844,22 @@ suggestions.
 % The initial implementation of this environment is due to Nicolas M.
 % Thi\'ery.\\
 %
+% \DescribeEnv{sagecommandline} This environment is similar to the
+% sageexample environment in that it allow you to include doctest-like
+% snippets in your document. The difference is that the output is
+% typeset as text, much like running Sage on the command line, using
+% the lstlisting environment. In particular, this environment provides
+% Python syntax highlighting and line numbers.
+% For example,
+% \begin{quote}
+% |\begin{sagecommandline}|\\
+% |  sage: 1+1|\\
+% |  2|\\
+% |  sage: factor(x^2 + 2*x + 1)|\\
+% |  (x + 1)^2|\\
+% |\end{sagecommandline}|
+% \end{quote}
+%
 % \DescribeMacro{\sagetexindent} There is one final bit to our
 % verbatim-like environments: the indentation. The \ST package defines a
 % length |\sagetexindent|, which controls how much the Sage code is
@@ -928,7 +1004,7 @@ suggestions.
 % following files:
 % \begin{enumerate}
 %   \item |sagetex.sty|
-%   \item the generated |.sout| file
+%   \item the generated |.sout| and |.scmd| files
 %   \item the \texttt{sage-plots-for-\meta{filename}.tex} directory and
 %     its contents
 % \end{enumerate}
@@ -955,14 +1031,16 @@ suggestions.
 % so, the results will be written to that file. If the file exists, it
 % won't be overwritten unless you also specify the |-o| switch.
 %
-% You will need to run this after you've compiled your document and run
-% Sage on the |.sage| file. The script reads in the |.sout| file and
-% replaces all the calls to |\sage| and |\sageplot| with their plain
-% \LTX equivalent, and turns the |sageblock| and |sageverbatim|
+% You will need to run this after you've compiled your document and
+% run Sage on the |.sage| file. The script reads in the |.sout| file
+% and replaces all the calls to |\sage| and |\sageplot| with their
+% plain \LTX equivalent, and turns the |sageblock| and |sageverbatim|
 % environments into |verbatim| environments. Any |sagesilent|
-% environment is turned into a |comment| environment. The resulting
-% document should compile to something identical, or very nearly so, to
-% the original file.
+% environment is turned into a |comment| environment. Any
+% |sagecommandline| environment is turned into a |lstlisting|
+% environment, typesetting the relevant part of the |.scmd| file. The
+% resulting document should compile to something identical, or very
+% nearly so, to the original file.
 %
 % One large limitation of this script is that it can't change anything
 % while \ST is paused, since Sage doesn't compute anything for such
