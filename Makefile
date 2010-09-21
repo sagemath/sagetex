@@ -11,15 +11,15 @@ all: sagetex.sty sagetex.py example.pdf $(pkg).pdf
 # just depend on the .ind file, since we'll make the .gls and .ind together
 $(pkg).pdf: $(dtxs) $(pkg).ind
 	latex $(pkg).dtx
-	sage $(pkg).sage
+	sage $(pkg).sagetex.sage
 	latex $(pkg).dtx
-	sage $(pkg).sage
+	sage $(pkg).sagetex.sage
 	latex $(pkg).dtx
 	pdflatex $(pkg).dtx
 
 example.pdf: example.tex sagetex.sty sagetex.py
 	pdflatex example.tex
-	sage example.sage
+	sage example.sagetex.sage
 	pdflatex example.tex
 	pdflatex example.tex
 
