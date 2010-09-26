@@ -555,4 +555,22 @@ makes things overly colorful:
 \lstdefinestyle{SageInput}{style=DefaultSageInput}
 \lstdefinestyle{SageOutput}{style=DefaultSageOutput}
 
+Plotting things doesn't automatically pull in the plot, just the text
+representation of the plot (the equivalent of applying \texttt{str()} to
+it):
+
+\begin{sagecommandline}
+  sage: plot(sin(x), (x, 0, 2*pi))
+\end{sagecommandline}
+
+You can include output, but it will be ignored. This is useful for
+doctesting, as all the \texttt{sagecommandline} environment things get
+put into the ``\texttt{\_doctest.sage}'' file.
+
+\begin{sagecommandline}
+  sage: factor(x^2 + 2*x + 1)
+  (x + 999)^2
+\end{sagecommandline}
+
+
 \end{document}
