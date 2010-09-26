@@ -1,5 +1,6 @@
 include example.pdf
 include example.tex
+include CONTRIBUTORS
 include extractsagecode.py
 include makestatic.py
 include sagetexpackage.dtx
