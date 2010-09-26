@@ -44,7 +44,7 @@ clean:
 
 auxclean:
 	/bin/bash -c "rm -f {$(pkg),example}.{glo,gls,aux,sout,out,toc,dvi,pdf,ps,log,ilg,ind,idx,sage,fdb_latexmk}"
-	rm -f example_doctest.sage
+	rm -f *_doctest.sage
 
 # make a tarball suitable for CTAN uploads, or for someone who knows how
 # to handle .dtx files
