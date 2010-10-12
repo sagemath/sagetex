@@ -302,14 +302,14 @@ except:^^J
 % a |NoHyper| environment.
 %    \begin{macrocode}
 \else
-  \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}
+  \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}%
 %    \end{macrocode}
 % Now check if the label has already been defined. (The internal
 % implementation of labels in \LTX involves defining a macro called
 % ``|r@@labelname|''.) If it hasn't, we set a flag so that we can tell
 % the user to run Sage on the |.sage| file at the end of the run.
 %    \begin{macrocode}
-  \@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}
+  \@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}%
 \fi
 %    \end{macrocode}
 % In any case, the last thing to do is step the counter.
