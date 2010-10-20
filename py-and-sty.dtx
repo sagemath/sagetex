@@ -705,8 +705,8 @@ try:^^J
 %
 %
 % \begin{environment}{sagecommandline}
-%   This environment is similar to the |sageexample| environment, but
-%   typesets the sage output as text with python syntax highlighting.
+% This environment is similar to the |sageexample| environment, but
+% typesets the sage output as text with python syntax highlighting.
 %    \begin{macrocode}
 \newcommand{\sagecommandlinetextoutput}{True}
 \newlength{\sagecommandlineskip}
@@ -1087,7 +1087,6 @@ class SageTeXProcessor():
 %   typesets Sage code and its output.
 %    \begin{macrocode}
   def commandline(self, counter, str, globals, locals, text_output):
-      print 'in commandline'
       current_statement = None
       current_lines = None
       line_iterator = (line.lstrip() for line in str.splitlines())

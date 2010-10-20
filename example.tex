@@ -424,7 +424,7 @@ The wonderful graphics package TikZ has the ability to plot functions by
 reading in a sequence of points from an external file---see chapter 18,
 page 193 of the TikZ manual. This facility is designed around files
 produced by Gnuplot, but the file format is so simple that it's very
-easy to use Sage\TeX to generate them. First you need a function that
+easy to use Sage\TeX{} to generate them. First you need a function that
 will evaluate functions and write the results into a file:
 
 
@@ -489,6 +489,11 @@ For regular Cartesian plots, just pass in the identity function for x:
  \draw[smooth, red] plot file {example-tikz2.table};
 \end{tikzpicture}
 
+This style of plotting will become even more useful and powerful when
+the new TikZ Data Visualization library is available---you will be able
+to feed TikZ a bunch of data points, and it automatically make a very
+nice plot for you, including axes, labels, and so on.
+
 \section{The \texttt{sagecommandline} environment}
 
 When writing a \TeX{} document about Sage, you may want to show some
@@ -522,12 +527,14 @@ One nice thing is that you can set labels by using an @ sign:
 \begin{sagecommandline}
   sage: l = matrix([[1,0,0],[3/5,1,0],[-2/5,-2,1]])
   sage: d = diagonal_matrix([15, -1, 4]) #@\label{diagonal}
-  sage: u = matrix([[1,0,1/3],[0,1,2],[0,0,1]])
+  sage: u = matrix([[1,0,1/3],[0,1,2],[0,0,1]]) #@\label{anotherlabel} \# foo
   sage: l*d*u   # this is a comment
 \end{sagecommandline}
 
 And then refer to that label: it was on line \ref{diagonal}, which is on
-page \pageref{diagonal}.
+page \pageref{diagonal}. Note that the other text after the hash mark on
+that line does not get typeset as a comment, and that you cannot have
+any space between the hash mark and the~@.
 
 You can also typeset the output:
 
@@ -571,6 +578,5 @@ put into the ``\texttt{\_doctest.sage}'' file.
   sage: factor(x^2 + 2*x + 1)
   (x + 999)^2
 \end{sagecommandline}
-
 
 \end{document}
