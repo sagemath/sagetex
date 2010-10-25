@@ -540,6 +540,13 @@ suggestions.
 % ``\percent'' inside such an environment will get written, uh, verbatim
 % to the |.sage| file.
 %
+% \paragraph{Arguments with side effects}
+%
+% Be careful when feeding |\sage| and |\sagestr| arguments that have
+% side effects, since in some situations they can get evaluated more
+% than once; see section \ref{sec:sage-inside-align}.
+%
+%
 % \subsection{Graphics and plotting}
 % \label{sec:graphics-plotting}
 %
@@ -888,6 +895,23 @@ suggestions.
 % \section{Other notes}
 %
 % Here are some other notes on using \ST.
+%
+% \subsection{Using the \texttt{sage} macro inside align environments}
+% \label{sec:sage-inside-align}
+%
+% The |align| and |align*| environments in the |amsmath| package do some
+% special processing---in particular, they evaluate everything inside
+% twice. This means that if you use |\sage| or |\sagestr| inside such an
+% environment, it will be evaluated twice, and its argument will be put
+% into the generated |.sage| file twice---and if that argument has side
+% effects, those side effects will be executed twice! Doing something
+% such as popping an element from a list will actually pop \emph{two}
+% elements and typeset the second. The solution is to do any processing
+% that has side effects before the |align| environment (in a
+% |sagesilent| environment, say) and to give |\sage| or |\sagestr| an
+% argument with no side effects.
+%
+% Thanks to Bruno Le Floch for reporting this.
 %
 % \subsection{Using Beamer}
 %
