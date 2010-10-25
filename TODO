@@ -4,8 +4,8 @@
 
 * work out "remote SageTeX"
 
-* implement a sagesession environment which prints the input and output.
-   Possibly use logging? will that work in a script?
-
 * syntax package for convenient typsetting of function names, etc   
 *   blah blah the function |euler_phi| is blah
+
+* make the #@ thing for sagecommandlinemore flexible; figure out what
+   happens if you happen to have #@ earlier in the line, etc.
