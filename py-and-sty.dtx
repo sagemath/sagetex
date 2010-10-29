@@ -79,10 +79,13 @@
 %    \end{macrocode}
 % The |makecmds| package gives us a |\provideenvironment| which we need,
 % and we use |ifpdf| and |ifthen| in |\sageplot| so we know what kind of
-% files to look for.
+% files to look for. Since |ifpdf| doesn't detect running under XeTeX
+% (which defaults to producing PDFs), we need |ifxetex|. Hopefully the
+% |ifpdf| package will get support for this and we can drop |ifxetex|.
 %    \begin{macrocode}
 \RequirePackage{makecmds}
 \RequirePackage{ifpdf}
+\RequirePackage{ifxetex}
 \RequirePackage{ifthen}
 %    \end{macrocode}
 %
@@ -464,18 +467,17 @@ except:^^J
 % If we are creating a PDF, we check to see if the user asked for a
 % different format, and use that if necessary:
 %    \begin{macrocode}
-\ifpdf
+\ifthenelse{\boolean{pdf} \or \boolean{xetex}}{
   \ifthenelse{\equal{#2}{notprovided}}%
     {\ST@inclgrfx{#1}{pdf}}%
-    {\ST@inclgrfx{#1}{#2}}%
+    {\ST@inclgrfx{#1}{#2}}}
 %    \end{macrocode}
 % Otherwise, we are creating a DVI file, which only supports EPS. If the
 % user provided a format anyway, don't include the file (since it won't
 % work) and warn the user about this. (Unless the file doesn't exist, in
 % which case we do the same thing that |\ST@inclgrfx| does.)
 %    \begin{macrocode}
-\else
-  \ifthenelse{\equal{#2}{notprovided}}%
+{ \ifthenelse{\equal{#2}{notprovided}}%
     {\ST@inclgrfx{#1}{eps}}%
 %    \end{macrocode}
 % If a format is provided, we check to see if we're using the
@@ -498,8 +500,7 @@ except:^^J
 % Otherwise, we are using Imagemagick, so try to include an EPS file
 % anyway.
 %    \begin{macrocode}
-    {\ST@inclgrfx{#1}{eps}}}%
-\fi
+    {\ST@inclgrfx{#1}{eps}}}}
 %    \end{macrocode}
 % Step the counter and we're done with the usual work.
 %    \begin{macrocode}
@@ -558,7 +559,7 @@ except:^^J
 %           child {node [box] {Making a PDF?}
 %             child {node [box] {\texttt{includegraphics} PNG}
 %               edge from parent node[left] {yes}}
-%             child {node [box, text width=2cm] {Warning: DVI, latex incompatible}
+%             child {node [box, text width=2cm] {Warning: DVI, PNG incompatible}
 %               edge from parent node[left] {no}}
 %             edge from parent node[left] {yes}}
 %           child {node [box, text width = 2.125cm] {Warn user to rerun Sage}
