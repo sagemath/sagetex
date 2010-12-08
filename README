@@ -9,20 +9,20 @@ SAGE_ROOT/local/share/texmf/tex/generic/sagetex, along with
 documentation and examples. See the Sage installation guide at
 http://sagemath.org/doc/installation/ for complete instructions and
 http://sagemath.org/doc/tutorial/sagetex.html for a quick usage
-introduction. The complete documentation is in sagetexpackage.pdf, in
+introduction. The complete documentation is in sagetex.pdf, in
 the SAGE_ROOT/... directory mentioned above.
 
 If you want to extract any of SageTeX's files from the .dtx sources, you
 can do
 
-  0. Run `latex sagetexpackage.ins'
+  0. Run `latex sagetex.ins'
 
 To regenerate the documentation, do
 
-  1. Run `latex sagetexpackage.dtx'
-  2. Run `sage sagetexpackage.sage'
+  1. Run `latex sagetex.dtx'
+  2. Run `sage sagetex.sage'
   3. Run the indexing commands that the .ins file told you about.
-  4. Run `latex sagetexpackage.dtx' again.
+  4. Run `latex sagetex.dtx' again.
 
 You can skip step 3 if you don't care about the index. You will need the
 pgf and tikz packages installed to typeset the figures.
