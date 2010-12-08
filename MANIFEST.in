@@ -3,9 +3,9 @@ include example.tex
 include CONTRIBUTORS
 include extractsagecode.py
 include makestatic.py
-include sagetexpackage.dtx
-include sagetexpackage.ins
-include sagetexpackage.pdf
+include sagetex.dtx
+include sagetex.ins
+include sagetex.pdf
 include sagetexparse.py
 include sagetex.sty
 include remote-sagetex.dtx

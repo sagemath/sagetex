@@ -1,8 +1,8 @@
-pkg=sagetexpackage
+pkg=sagetex
 dest=/home/drake/texmf/tex/latex/sagetex/
 dtxs=$(wildcard *.dtx)
 # the subdir stuff makes the tarball have the directory correct
-srcs=example.tex README sagetexpackage.ins
+srcs=example.tex README sagetex.ins
 
 .SUFFIXES:
 
@@ -25,7 +25,7 @@ example.pdf: example.tex sagetex.sty sagetex.py
 
 %.ind: $(dtxs)
 	latex $(pkg).dtx
-	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetexpackage.idx
+	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetex.idx
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
@@ -52,7 +52,7 @@ ctandist: all
 	@echo
 	@echo Did you turn off Imagemagick in example.tex?
 	@echo
-	tar zcf sagetex.tar.gz --transform "s|^|sagetex/|" $(srcs) $(dtxs) example.pdf sagetexpackage.pdf
+	tar zcf sagetex.tar.gz --transform "s|^|sagetex/|" $(srcs) $(dtxs) example.pdf sagetex.pdf
 
 # otherwise, make gets confused since there's a file named "test"
 .PHONY: test
