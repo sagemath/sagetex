@@ -38,6 +38,9 @@ sagetex.py: py-and-sty.dtx $(pkg).dtx
 remote-sagetex.py: remote-sagetex.dtx
 	yes | latex $(pkg).ins
 
+makestatic.py extractsagecode.py sagetexparse.py: scripts.dtx
+	yes | latex $(pkg).ins
+
 clean:
 	latexcleanup clean .
 	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetex.pyc sagetex.sty makestatic.py sagetexparse.py extractsagecode.py dist MANIFEST remote-sagetex.py auto *_doctest.sage example-*.table

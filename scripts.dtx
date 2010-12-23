@@ -71,11 +71,7 @@ desagetexed = DeSageTex(src)
 % percent signs) \emph{and} because \textsf{Docstrip} needs them (so the
 % line gets passed into the generated file). It's perfect!
 %    \begin{macrocode}
-header = """\
-%% SageTeX commands have been automatically removed from this file and
-%% replaced with plain LaTeX. Processed %s.
-
-""" % time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())
+header = "%% SageTeX commands have been automatically removed from this file and\n%% replaced with plain LaTeX. Processed %s.\n" % time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())
 
 if len(args) == 2:
   dest = open(args[1], 'w')
@@ -261,7 +257,7 @@ class DeSageTex():
     self.sagen = 0
     self.plotn = 0
     self.fn = fn
-    self.sout = SoutParser(fn + '.sout')
+    self.sout = SoutParser(fn + '.sagetex.sout')
 %    \end{macrocode}
 % Parse |\sage| macros. We just need to pull in the result from the
 % |.sout| file and increment the counter---that's what |self.sage| does.
