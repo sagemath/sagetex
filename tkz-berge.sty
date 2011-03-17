@@ -1,0 +1,1509 @@
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                                                               %
+    %              tkz-berge.sty      encodage : utf8               %
+    %                                                               %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %                                                               %
+    %           Créé par Alain Matthes le 08-05-2007.               %
+    %        contribution :  Rafael Villarroel 2007   (RV)          %
+    %                                                               %
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%% Objet :  Création de graphes
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tkz-berge}[13/01/2009 v 2.8 tkz-berge for named graphs]
+% modif Doyle form 1
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\RequirePackage{tkz-graph,tkz-arith}
+%                             NAMED GRAPHS
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                         Graphes cls
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\define@cmdkey  [GR] {cl} {L}{}
+\define@boolkey [GR] {cl} {Math}[true]{}
+\define@boolkey [GR] {cl} {inv}[true]{}
+\define@cmdkey  [GR] {cl} {RA}{}
+\define@cmdkey  [GR] {cl} {RB}{}
+\define@cmdkey  [GR] {cl} {RC}{}
+\define@cmdkey  [GR] {cl} {RD}{}
+\define@cmdkey  [GR] {cl} {RE}{}
+\define@cmdkey  [GR] {cl} {RS}{}
+\define@cmdkey  [GR] {cl} {prefix}{}
+\define@cmdkey  [GR] {cl} {prefixx}{}
+\define@cmdkey  [GR] {cl} {prefixxx}{}
+\define@cmdkey  [GR] {cl} {prefixxxx}{}
+\define@cmdkey  [GR] {cl} {prefixxxxx}{}
+\define@cmdkey  [GR] {cl} {form}{}
+\define@cmdkey  [GR] {cl} {num}{}
+\presetkeys     [GR] {cl} {RA         = 4,%
+                           RB         = 3,%
+                           RC         = 2,%
+                           RD         = 1,%
+                           RE         = 0.5,%
+                           RS         = 0,%
+                           form       = 1,%
+                           prefix     = a,%
+                           prefixx    = b,%
+                           prefixxx   = c,%
+                           prefixxxx  = d,%
+                           prefixxxxx = e,%
+                           num        = {},%
+                           Math       = false}{}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                      Tools Graphes particuliers
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                           Some tools
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\def\gr@math@sep{_}
+
+\newcommand*{\write@math}[3]{%
+            \Vertex[x = #1,y = #2,%
+                    L = \cmdGR@cl@prefix\gr@math@sep{#3}]{\cmdGR@cl@prefix#3}}
+\newcommand*{\write@nomath}[3]{%
+            \Vertex[x = #1,y = #2]{\cmdGR@cl@prefix#3}}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                           Empty graphs
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%
+\newcommand*{\grEmptyCycle}[2][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \pgfmathsetcounter{tkzb@temp}{#2-1}
+   \foreach \x in  {0,...,\thetkzb@temp}{%
+       \pgfmathparse{360/#2*\x}
+       \let\tkz@angle\pgfmathresult%
+       \ifGR@cl@Math%
+           \presetkeys [GR] {vertex} {Math = true}{}%
+           \Vertex[a = \tkz@angle,%
+                   d = \cmdGR@cl@RA,%
+                   L = \cmdGR@cl@prefix\gr@math@sep{\x}]{\cmdGR@cl@prefix\x}%
+       \else%
+           \Vertex[a = \tkz@angle,%
+                   d = \cmdGR@cl@RA]{\cmdGR@cl@prefix\x}%
+       \fi%
+       }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                         grEmptyPath  from (RV)
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+
+\newcommand*{\grEmptyPath}[2][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \pgfmathsetcounter{tkzb@ca}{#2-1} 
+    \ifcase\cmdGR@cl@form
+    \or
+      \def\tkzb@result{0}
+       \foreach \x in  {0,...,\thetkzb@ca}{%
+         \pgfmathparse{\cmdGR@cl@RA*(\x)}
+         \let\tkzb@result\pgfmathresult
+         \ifGR@cl@Math%
+           \presetkeys [GR] {vertex} {Math = true}{}%
+           \ifthenelse{\equal{\cmdGR@cl@num}{}}{%
+             \write@math{\tkzb@result}{\cmdGR@cl@RS}{\x}}{%
+             \write@math{\tkzb@result}{\cmdGR@cl@RS}{\x;\cmdGR@cl@num}}%
+         \else
+           \ifthenelse{\equal{\cmdGR@cl@num}{}}{%
+             \write@nomath{\tkzb@result}{\cmdGR@cl@RS}{\x}}{%
+             \write@nomath{\tkzb@result}{\cmdGR@cl@RS}{\x;\cmdGR@cl@num}}%
+         \fi}%
+    \or
+    \foreach \x in  {0,...,\thetkzb@ca}{%
+       \pgfmathparse{\cmdGR@cl@RA*(\x)}
+       \let\tkzb@result\pgfmathresult
+       \ifGR@cl@Math%
+           \presetkeys [GR] {vertex} {Math = true}{}%
+           \ifthenelse{\equal{\cmdGR@cl@num}{}}{%
+           \write@math{\cmdGR@cl@RS}{\tkzb@result}{\x}}{%
+           \write@math{\cmdGR@cl@RS}{\tkzb@result}{\cmdGR@cl@num;\x}}%
+       \else
+           \ifthenelse{\equal{\cmdGR@cl@num}{}}{%
+           \write@nomath{\cmdGR@cl@RS}{\tkzb@result}{\x}}{%
+           \write@nomath{\cmdGR@cl@RS}{\tkzb@result}{\cmdGR@cl@num;\x}}%
+       \fi}%
+    \fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grEmptyStar
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grEmptyStar}[2][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \pgfmathsetcounter{tkzb@ca}{#2-1}
+   \ifGR@cl@Math\presetkeys [GR] {vertex} {Math = true}{}%
+     \write@math{0}{0}{\thetkzb@ca}%
+   \else
+     \write@nomath{0}{0}{\thetkzb@ca}%
+   \fi
+   \grEmptyCycle[#1]{\thetkzb@ca}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grEmptyGrid
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand{\grEmptyGrid}[3][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \pgfmathsetcounter{tkzb@ca}{#2-1}
+   \pgfmathsetcounter{tkzb@cb}{#3-1}
+   \foreach \x in {0,...,\thetkzb@ca}{%
+      \foreach \y in {0,...,\thetkzb@cb}{%
+      \ifGR@cl@Math\presetkeys [GR] {vertex} {Math = true}{}%
+         \write@math{\cmdGR@cl@RA*\x}{\cmdGR@cl@RB*\y}{\x;\y}%
+      \else
+         \write@nomath{\cmdGR@cl@RA*\x}{\cmdGR@cl@RB*\y}{\x;\y}%
+      \fi}%
+   }
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                             grEmptyLadder
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grEmptyLadder}[2][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \grEmptyPath[#1,RS=0]{#2}
+  \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+  \edef\tkzb@rtemp{\cmdGR@cl@RB}
+  \grEmptyPath[#1,prefix=\tkzb@ptemp,RS=\tkzb@rtemp]{#2}
+\endgroup%
+}
+
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 Edges 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeInGraphFromOneToComp}[3]{% #4 
+\begingroup%
+   \pgfmathsetcounter{tkzb@ta}{#2-1}
+   \foreach \cx in  {0,...,\thetkzb@ta}{%
+        \ifthenelse{\equal{\cx}{#3}}{}{\Edge(#1#3)(#1\cx)}%
+        }%
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+% new tool EdgeInGraphLoop loop 0--1--2.........n--0
+% star 0--1--2.........n-
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeInGraphLoop}{\@ifstar%
+                              \EdgeInGraphLoopStar%
+                              \EdgeInGraphLoopNoStar}
+\newcommand*{\EdgeInGraphLoopNoStar}[2]{% #4 
+\begingroup%
+    \pgfmathsetcounter{tkzb@ta}{#2-1}
+    \setcounter{tkzb@next}{0}
+    \Edge(#1\thetkzb@ta)(#1\thetkzb@next)
+    \pgfmathaddtocounter{tkzb@ta}{-1}
+    \foreach \x in  {0,...,\thetkzb@ta}{%
+        \stepcounter{tkzb@next}
+        \Edge(#1\x)(#1\thetkzb@next)%
+       }%
+\endgroup%
+}
+\newcommand*{\EdgeInGraphLoopStar}[2]{% #4 
+\begingroup%
+    \pgfmathsetcounter{tkzb@ta}{#2-2}
+    \setcounter{tkzb@next}{0}
+    \foreach \x in  {0,...,\thetkzb@ta}{%
+        \stepcounter{tkzb@next}
+        \Edge(#1\x)(#1\thetkzb@next)%
+       }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+% new tool EdgeInGraphSeq sequence  i--i+1--.....--j
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeInGraphSeq}[3]{% #4 
+\begingroup%
+    \pgfmathsetcounter{tkzb@ta}{#2}
+    \pgfmathsetcounter{tkzb@tb}{#3-1}
+    \setcounter{tkzb@next}{#2}
+    \foreach \x in  {\thetkzb@ta,...,\thetkzb@tb}{%
+        \stepcounter{tkzb@next}
+        \Edge(#1\x)(#1\thetkzb@next)%
+       }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+% new tool EdgeInGraphMod replace nextmod
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeInGraphMod}{\@ifstar%
+                              \EdgeInGraphModStar%
+                              \EdgeInGraphModNoStar}
+\newcommand*{\EdgeInGraphModNoStar}[3]{% #2 order
+\begingroup%
+    \pgfmathsetcounter{tkzb@ta}{#2-1}
+    \foreach \x in  {0,...,\thetkzb@ta}{%
+        \pgfmathsetcounter{tkzb@tb}{modI(\x+#3,#2)}
+        \Edge(#1\thetkzb@tb)(#1\x)%
+        }%
+\endgroup%
+}
+%#1 prefix #2 order #3 add #4 start #5 décalage
+\newcommand*{\EdgeInGraphModStar}[5]{% 
+\begingroup%
+ \pgfmathsetcounter{tkzb@ta}{#4}
+  \whiledo{\value{tkzb@ta}<#2}{%
+     \pgfmathsetcounter{tkzb@next}{modI(\thetkzb@ta+#3,#2)}
+     \Edge(#1\thetkzb@ta)(#1\thetkzb@next)
+     \pgfmathaddtocounter{tkzb@ta}{#5}%
+    }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%             EdgeInGraphModLoop dep #4 add #3 mod #2 until #4
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand*{\EdgeInGraphModLoop}[4]{% #2 order
+\begingroup%
+    \setcounter{tkzb@ta}{#4}
+    \setcounter{tkzb@next}{#2}
+    \whiledo{\not\equal{\value{tkzb@next}}{#4}}{%
+        \pgfmathsetcounter{tkzb@next}{modI(\thetkzb@ta+#3,#2)}
+        \Edge(#1\thetkzb@ta)(#1\thetkzb@next)%
+        \setcounter{tkzb@ta}{\thetkzb@next}
+        }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               EdgeIdentity
+%  la version étoilée permet d'utliser une sélection
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeIdentity}{\@ifstar%
+                              \EdgeIdentityStar%
+                              \EdgeIdentityNoStar}
+\newcommand*{\EdgeIdentityNoStar}[3]{%
+\begingroup%
+ \pgfmathsetcounter{tkzb@v}{#3-1}
+    \foreach \x in  {0,...,\thetkzb@v}{%
+       \Edge(#1\x)(#2\x)%
+       }%
+\endgroup%
+}
+\newcommand*{\EdgeIdentityStar}[3]{%
+\begingroup%
+    \foreach \x in  {#3}{%
+       \Edge(#1\x)(#2\x)%
+       }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%  EdgeFromOneToAll  vertex #1#3 through #2 0...#2 n-1 #5 order of the graph
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeFromOneToAll}[4]{% #4  = order of the graph
+\begingroup%
+     \pgfmathsetcounter{tkzb@v}{#4-1}
+     \foreach \x in  {0,...,\thetkzb@v}{%
+        \Edge(#1#3)(#2\x)%
+        }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%  EdgeFromOneToSeq  vertex #1#3 through #2#4...#2#5
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeFromOneToSeq}[5]{% #4 
+\begingroup%
+    \foreach \x in  {#4,...,#5}{%
+        \Edge(#1#3)(#2\x)%
+        }%
+\endgroup%
+} %<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%  EdgeFromOneToSel vertex #1#3 through #2#4...#2#5
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeFromOneToSel}[4]{% #4 
+\begingroup%
+    \foreach \x in  {#4}{%
+        \Edge(#1#3)(#2\x)%
+        }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%  EdgeFromOneToComplement  vertex #1#3 through #2#4...#2#5
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeFromOneToComp}[4]{%
+\begingroup%
+   \pgfmathsetcounter{tkzb@v}{#4-1}
+   \foreach \cx in  {0,...,\thetkzb@v}{%
+        \ifthenelse{\equal{\cx}{#3}}{}{\Edge(#1#3)(#2\cx)}%
+        }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+% new tool EdgeMod replace nextmod
+% identity with step like nextmod ???
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeMod}{\@ifstar%
+                                 \EdgeModStar%
+                                 \EdgeModNoStar}
+\newcommand*{\EdgeModNoStar}[4]{%#3 order #4 step
+\begingroup%
+    \pgfmathsetcounter{tkzb@v}{#3-1}
+    \foreach \x in  {0,...,\thetkzb@v}{%
+        \pgfmathsetcounter{tkzb@tb}{modI(\x+#4,#3)}
+        \Edge(#1\x)(#2\thetkzb@tb)%
+        }%
+\endgroup%
+}
+%#1 prefix #2 prefix #3 order #4 order inf #5 step
+\newcommand*{\EdgeModStar}[5]{%
+\begingroup%
+     \setcounter{tkzb@ta}{0}
+     \whiledo{\value{tkzb@ta}<#3}{%
+        \pgfmathsetcounter{tkzb@tb}{modI(\thetkzb@ta+#4,#3)}
+        \Edge(#1\thetkzb@ta)(#2\thetkzb@tb)%
+        \pgfmathaddtocounter{tkzb@ta}{#5}}%
+\endgroup%
+}%
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     EdgeDoubleMod by RV
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\EdgeDoubleMod}[9]{
+ \begingroup%
+   \foreach \x in {0,...,#9}{%
+      \pgfmathsetcounter{tkzb@cc}{modI(#3+(#4*\x),#2)}
+      \pgfmathsetcounter{tkzb@next}{modI(#7+(#8*\x),#6)}
+      \Edge(#1\thetkzb@cc)(#5\thetkzb@next)
+    }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grPath
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grPath}[2][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+     \grEmptyPath[#1]{#2}
+     \ifthenelse{\equal{\cmdGR@cl@num}{}}{%
+      \ifthenelse{\equal{#2}{1}}{}{\EdgeInGraphLoop*{\cmdGR@cl@prefix}{#2}}}{%
+        \ifthenelse{\equal{#2}{1}}{}{%
+        \ifcase\cmdGR@cl@form
+        \or
+          \pgfmathsetcounter{tkzb@ta}{#2-2}
+          \setcounter{tkzb@next}{0}
+          \foreach \x in  {0,...,\thetkzb@ta}{%
+              \stepcounter{tkzb@next}
+              \Edge(\cmdGR@cl@prefix\x;\cmdGR@cl@num)%
+                   (\cmdGR@cl@prefix\thetkzb@next;\cmdGR@cl@num)%
+              }%
+           \or
+          \EdgeInGraphLoop*{\cmdGR@cl@prefix\cmdGR@cl@num;}{#2}
+          \fi%
+}}
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grGrid
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grGrid}[3][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+   \grEmptyGrid[#1]{#2}{#3}
+   \pgfmathsetcounter{tkzb@ca}{#2-2}
+   \pgfmathsetcounter{tkzb@cb}{#3-2}
+   \foreach \x in {0,...,\thetkzb@ca}{%
+       \foreach \y in {0,...,\thetkzb@cb}{%
+          \pgfmathsetcounter{tkzb@cc}{\x+1}
+          \pgfmathsetcounter{tkzb@cd}{\y+1}
+          \Edge(\cmdGR@cl@prefix\x;\y)%
+               (\cmdGR@cl@prefix\x;\thetkzb@cd)
+          \Edge(\cmdGR@cl@prefix\x;\y)%
+               (\cmdGR@cl@prefix\thetkzb@cc;\y)%
+          }%
+      }%
+   \pgfmathsetcounter{tkzb@ca}{#2-2}
+   \pgfmathsetcounter{tkzb@cb}{#3-1}
+
+  \foreach \x in {0,...,\thetkzb@ca}{%
+      \pgfmathsetcounter{tkzb@cc}{\x+1}
+      \Edge(\cmdGR@cl@prefix\x;\thetkzb@cb)%
+           (\cmdGR@cl@prefix\thetkzb@cc;\thetkzb@cb)%
+      }%
+   \pgfmathsetcounter{tkzb@ca}{#2-1}
+   \pgfmathsetcounter{tkzb@cb}{#3-2}
+  \foreach \y in {0,...,\thetkzb@cb}{%
+      \pgfmathsetcounter{tkzb@cd}{\y+1}
+      \Edge(\cmdGR@cl@prefix\thetkzb@ca;\y)%
+           (\cmdGR@cl@prefix\thetkzb@ca;\thetkzb@cd)%
+   }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                             grComplete  
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grComplete}[2][]{% #1 options #2 ordre du graphe
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \grEmptyCycle[#1]{#2}%
+  \pgfmathsetcounter{tkzb@ca}{#2-1}
+  \foreach \ia in {0,...,\thetkzb@ca}%
+     {\foreach \ib in {\ia,...,\thetkzb@ca}
+     {\Edge(\cmdGR@cl@prefix\ia)(\cmdGR@cl@prefix\ib)}%
+      }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grCycle
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grCycle}[2][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}
+   \grEmptyCycle[#1]{#2}
+   \EdgeInGraphLoop{\cmdGR@cl@prefix}{#2}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grLCF
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand{\grLCF}[3][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \setcounter{tkzb@ca}{#3}
+   \setcounter{tkzb@cb}{0} 
+   \foreach \x in {#2}{\stepcounter{tkzb@cb}}
+   \pgfmathsetcounter{tkzb@cc}{\thetkzb@ca * \thetkzb@cb}
+   \setcounter{tkzb@cb}{\thetkzb@cc}
+   \grCycle[#1]{\thetkzb@cc}
+%<––––––––––––––––––––––––– End   Vertex ––––––––––––––––––––––––––––––––––––>
+   \pgfmathsetcounter{tkzb@ca}{#3-1}
+   \setcounter{tkzb@v}{0}
+   \foreach \k in  {0,...,\thetkzb@ca}{%
+     \foreach \n in  {#2}{%
+         \ifthenelse{\n < 0}{%
+            \pgfmathsetcounter{tkzb@cb}{\n+\thetkzb@cc}}{%
+            \pgfmathsetcounter{tkzb@cb}{\n}}
+         \pgfmathsetcounter{tkzb@next}%
+                           {modI(\thetkzb@v+\thetkzb@cb,\thetkzb@cc)}
+         \Edge(\cmdGR@cl@prefix\thetkzb@v)(\cmdGR@cl@prefix\thetkzb@next)
+         \stepcounter{tkzb@v}%
+         }%
+      }%
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grStar
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grStar}[2][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \grEmptyStar[#1]{#2}
+   \pgfmathsetcounter{tkzb@temp}{#2-1}
+   \EdgeInGraphFromOneToComp{\cmdGR@cl@prefix}{#2}{\thetkzb@temp}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grWheel
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grWheel}[2][]{
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \grStar[#1]{#2}
+    \pgfmathsetcounter{tkzb@v}{#2-1}
+    \EdgeInGraphLoop{\cmdGR@cl@prefix}{\thetkzb@v}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                grSQCircle
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grSQCycle}[2][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \grCycle[#1]{#2}%
+    \EdgeInGraphMod{\cmdGR@cl@prefix}{#2}{2}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                             grLadder
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grLadder}[2][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \grPath[#1,RS=0]{#2}{0}
+  \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+  \edef\tkzb@rtemp{\cmdGR@cl@RS}
+  \grPath[#1,prefix=\tkzb@ptemp,RS=\tkzb@rtemp]{#2}
+  \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{#2}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grPrism
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grPrism}[2][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \begin{scope}[rotate=45]
+        \grCycle[#1]{#2}
+        \edef\tkzb@rtemp{\cmdGR@cl@RB}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \grCycle[#1,RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{#2}
+        \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{#2}
+    \end{scope}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grCompleteBipartite 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grCompleteBipartite}[3][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \pgfmathsetcounter{tkzb@ca}{#2-1} 
+  \pgfmathparse{(\cmdGR@cl@RA * \thetkzb@ca) /2}
+  \let\tkzRAxpos\pgfmathresult%
+  \pgfmathsetcounter{tkzb@ca}{#3-1} 
+  \pgfmathparse{(\cmdGR@cl@RB * \thetkzb@ca) /2}
+ \let\tkzRBxpos\pgfmathresult%
+  \ifdim\tkzRBxpos pt > \tkzRAxpos pt\relax%
+   \pgfmathadd{\tkzRBxpos}{-\tkzRAxpos}
+   \let\tkzaxpos\pgfmathresult%
+   \def\tkzbxpos{0}
+   \else%
+    \pgfmathadd{\tkzRAxpos}{-\tkzRBxpos}
+    \let\tkzbxpos\pgfmathresult%
+    \def\tkzaxpos{0}
+   \fi%
+   \begin{scope}[xshift=\tkzaxpos cm]
+     \grEmptyPath[#1,RS=0]{#2}
+   \end{scope}
+   \begin{scope}[xshift=\tkzbxpos cm]
+     \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+     \edef\tkzb@rtemp{\cmdGR@cl@RS}
+     \edef\tkzb@stemp{\cmdGR@cl@RB}
+     \grEmptyPath[#1,RA=\tkzb@stemp,prefix=\tkzb@ptemp,RS=\tkzb@rtemp]{#3}
+   \end{scope}
+   \pgfmathsetcounter{tkzb@temp}{#2-1}
+   \pgfmathsetcounter{tkzb@v}{#3-1}
+   \foreach \cpx in {0,...,\thetkzb@v}{%
+     \EdgeFromOneToAll{\cmdGR@cl@prefixx}{\cmdGR@cl@prefix}{\cpx}{#2}
+     }%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grTriangularGrid 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grTriangularGrid}[2][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}
+    \ifcase\cmdGR@cl@form
+      \or
+%<––––––––––––––––––––– form 1 equilateral triangle ––––––––––––––––––––––––>
+     \pgfmathsetcounter{tkzb@ca}{#2-1}
+     \pgfmathsetcounter{tkzb@cb}{#2}
+     \foreach \lg in {0,...,\thetkzb@ca}{%
+        \pgfmathsetcounter{tkzb@cb}{#2-\lg}
+        \setcounter{tkzb@cb}{\thetkzb@cb}
+        \edef\tkzb@rtemp{\cmdGR@cl@RA}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefix}
+        \pgfmathmultiply{\cmdGR@cl@RA}{\lg}
+        \let\myresult\pgfmathresult
+        \pgfmathparse{\cmdGR@cl@RA*\lg/2}
+        \let\tkzaxpos\pgfmathresult
+        \begin{scope}[xshift=\tkzaxpos cm]
+           \grPath[#1,%
+                   RA     = \tkzb@rtemp,%
+                   RS     = \myresult,%
+                   prefix = \tkzb@ptemp,%
+                   num    = \lg]{\thetkzb@cb}%
+        \end{scope}%
+     }
+    \or
+%<––––––––––––––––––––––––––– form 2 right triangle ––––––––––––––––––––––––>
+    \pgfmathsetcounter{tkzb@ca}{#2-1}
+    \pgfmathsetcounter{tkzb@cb}{#2}
+    \foreach \lg in {0,...,\thetkzb@ca}{%
+       \pgfmathsetcounter{tkzb@cb}{#2-\lg}
+       \setcounter{tkzb@cb}{\thetkzb@cb}
+       \edef\tkzb@rtemp{\cmdGR@cl@RA}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefix}
+       \pgfmathmultiply{\cmdGR@cl@RA}{\lg}
+       \let\myresult\pgfmathresult
+       \grPath[#1,%
+               RA     = \tkzb@rtemp,%
+               RS     = \myresult,%
+               prefix = \tkzb@ptemp,%
+               num    = \lg,form=1]{\thetkzb@cb}%
+    }
+    \or
+     \pgfmathsetcounter{tkzb@ca}{#2-1}
+     \pgfmathsetcounter{tkzb@cb}{#2}
+     \foreach \lg in {0,...,\thetkzb@ca}{%
+        \pgfmathsetcounter{tkzb@cb}{#2-\lg}
+        \setcounter{tkzb@cb}{\thetkzb@cb}
+        \edef\tkzb@rtemp{\cmdGR@cl@RA}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefix}
+        \pgfmathmultiply{\cmdGR@cl@RA}{\lg}
+        \let\myresult\pgfmathresult
+        \begin{scope}[xshift=\myresult cm]
+           \grPath[#1,%
+                   RA     = \tkzb@rtemp,%
+                   RS     = \myresult,%
+                   prefix = \tkzb@ptemp,%
+                   num    = \lg,form=1]{\thetkzb@cb}%
+        \end{scope}%
+     }
+  \fi%
+    \pgfmathsetcounter{tkzb@ca}{#2-2}
+    \foreach \x in  {0,...,\thetkzb@ca}{%
+       \pgfmathsetcounter{tkzb@v}{\thetkzb@ca-\x}
+       \foreach \y in  {0,...,\thetkzb@v}{%
+          \pgfmathsetcounter{tkzb@cb}{\y+1}
+          \Edge(\cmdGR@cl@prefix\x;\y)(\cmdGR@cl@prefix\x;\thetkzb@cb)
+          \pgfmathsetcounter{tkzb@temp}{\x+1}
+          \Edge(\cmdGR@cl@prefix\x;\thetkzb@cb)%
+               (\cmdGR@cl@prefix\thetkzb@temp;\y)
+       }%
+    }
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grHeawood
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grHeawood}[1][]{% #1 options #2 ordre du graphe
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \grCycle[#1]{14}
+  \EdgeInGraphMod*{\cmdGR@cl@prefix}{14}{5}{0}{2}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grCirculant #1 option #2 vertex #3 add k
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grCirculant}[3][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}
+    \grEmptyCycle[#1]{#2}%
+    \primality{#2}%
+    \ifthenelse{\boolean{tkzaIsAPrim}}{%
+       \foreach \kci in {#3}{%
+          \EdgeInGraphMod{\cmdGR@cl@prefix}{#2}{\kci}
+          }}{%
+       \foreach \kci in {#3}{%
+          \tkzFindFactor{#2}{\kci}%
+          \ifthenelse{\boolean{tkzaIsAFactor}}{%
+             \pgfmathsetcounter{tkzb@ca}{\kci-1}
+             \foreach \start in {0,...,\thetkzb@ca}{%
+                \setcounter{tkzb@int}{\start}%
+                \setcounter{tkzb@next}{#2}%
+                \whiledo{\not\equal{\value{tkzb@next}}{\start}}{%
+                  \pgfmathsetcounter{tkzb@next}{modI(\thetkzb@int+\kci,#2)}
+                  \Edge(\cmdGR@cl@prefix\thetkzb@int)%
+                       (\cmdGR@cl@prefix\thetkzb@next)%
+                  \pgfmathsetcounter{tkzb@int}{\thetkzb@next}%
+                  }%
+               }}{%
+       \EdgeInGraphMod{\cmdGR@cl@prefix}{#2}{\kci}}
+       }}%
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grPetersenG
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grGeneralizedPetersen}[3][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \grCycle[#1]{#2}
+   \edef\tkzb@rtemp{\cmdGR@cl@RB}
+   \edef\tkzb@pptemp{\cmdGR@cl@prefixx}
+   \edef\tkzb@ptemp{\cmdGR@cl@prefix}
+   \grCirculant[#1,RA=\tkzb@rtemp,prefix=\tkzb@pptemp]{#2}{#3}
+   \EdgeIdentity{\tkzb@ptemp}{\cmdGR@cl@prefixx}{#2}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grPetersen
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grStartwo}[2][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \pgfmathsetcounter{tkzb@v}{3*#2-2}
+   \pgfmathsetcounter{tkzb@ca}{3*#2-1}
+   \grEmptyCycle[#1]{\thetkzb@ca}
+   \EdgeInGraphMod{\cmdGR@cl@prefix}{\thetkzb@ca}{#2}%
+\endgroup%
+}
+
+\newcommand*{\grPetersen}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+      \or
+        \grCycle[#1]{5}%
+        \edef\tkzb@rtemp{\cmdGR@cl@RB}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \grStartwo[#1,RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{2}
+        \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{5}
+      \or
+         \grCycle[#1]{6}
+         \begin{scope}[rotate=30]
+            \edef\tkzb@rtemp{\cmdGR@cl@RB}
+            \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+            \grStar[#1,RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{4}
+          \end{scope}
+          \setcounter{tkzb@ca}{2}
+          \foreach \x in  {0,...,5}{%
+             \ifthenelse{\equal{\thetkzb@ca}{-1}}{%
+                \setcounter{tkzb@ca}{2}}{%
+                }%
+                \Edge(\cmdGR@cl@prefix\x)(\cmdGR@cl@prefixx\thetkzb@ca)
+                \addtocounter{tkzb@ca}{-1}%
+             }%
+     \or
+       \grEmptyStar[#1]{10}
+       \EdgeInGraphLoop{\cmdGR@cl@prefix}{9}
+       \EdgeInGraphMod*{\cmdGR@cl@prefix}{9}{4}{0}{3}
+       \foreach \x in  {2,5,8}{%
+         \Edge(\cmdGR@cl@prefix\x)(\cmdGR@cl@prefix 9)}%
+     \fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               grPlatonic
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grTetrahedral}[1][]{% 
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \begin{scope}[rotate=90]
+    \grWheel[#1]{4}%
+  \end{scope}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                       grOctahedral
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grOctahedral}[1][]{% 
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \grComplete[#1]{3}%
+   \begin{scope}[rotate=-60]
+          \edef\tkzb@rtemp{\cmdGR@cl@RB}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+          \grComplete[#1,RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{3}%
+   \end{scope}
+   \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{3}
+   \EdgeMod{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{3}{1}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                           grCubicalGraph
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grCubicalGraph}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+       \grCycle[#1]{4}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \grCycle[#1,RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{4}
+    \ifcase\cmdGR@cl@form
+      \or
+        \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{4}
+      \or
+        \EdgeMod*{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{4}{1}{2}
+        \EdgeMod*{\cmdGR@cl@prefixx}{\cmdGR@cl@prefix}{4}{1}{2}
+     \fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                         grIcosahedral
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grIcosahedral}[1][]{% 
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+      \or
+       \grCycle[#1]{6}%
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+       \grCirculant[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{6}{2}
+       \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{6}
+      \EdgeMod{\cmdGR@cl@prefixx}{\cmdGR@cl@prefix}{6}{1}
+       \EdgeMod{\cmdGR@cl@prefixx}{\cmdGR@cl@prefix}{6}{-1}
+      \or
+       \grCycle[#1]{3}
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+       \grCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{6}%
+       \begin{scope}[rotate=60]
+         \edef\tkzb@rtemp{\cmdGR@cl@RC}
+         \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+         \grCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{3}%
+       \end{scope}
+       \setcounter{tkzb@ca}{2}
+       \foreach \st in  {5,0,1}{%
+         \foreach \v in  {0,1,2}{%
+           \pgfmathsetcounter{tkzb@next}{modI((\thetkzb@ca*\v)+\st,6)}%
+           \Edge(\cmdGR@cl@prefix\v)(\cmdGR@cl@prefixx\thetkzb@next)
+           }%
+         }%
+       \setcounter{tkzb@ca}{2}
+       \foreach \v in  {0,1,2}{%
+         \foreach \st in  {0,1,2}{%
+           \pgfmathsetcounter{tkzb@next}{modI(\thetkzb@ca*\v+\st,6)}%
+           \Edge(\cmdGR@cl@prefixxx\v)(\cmdGR@cl@prefixx\thetkzb@next)
+           }%
+        }%
+    \fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                       grDodecahedral
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grDodecahedral}[1][]{% 
+\begingroup%
+\setkeys[GR]{cl}{#1}%
+   \ifcase\cmdGR@cl@form
+     \or
+       \grCycle[#1]{10}
+        \edef\tkzb@rtemp{\cmdGR@cl@RB}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \grCirculant[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{10}{2}
+        \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{10}
+      \or
+       \grCycle[#1]{5}
+       \begin{scope}[rotate=36]
+          \edef\tkzb@rtemp{\cmdGR@cl@RC}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+          \grEmptyCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{5}
+       \end{scope}
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \grEmptyCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{5}
+        \begin{scope}[rotate=36]
+          \edef\tkzb@rtemp{\cmdGR@cl@RD}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixxxx}
+          \grCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{5}%
+        \end{scope}
+        \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{5}
+        \EdgeIdentity{\cmdGR@cl@prefixxx}{\cmdGR@cl@prefixxxx}{5}
+        \EdgeIdentity{\cmdGR@cl@prefixx}{\cmdGR@cl@prefixxx}{5}
+        \EdgeMod{\cmdGR@cl@prefixx}{\cmdGR@cl@prefixxx}{5}{-1}
+     \or
+       \grCycle[#1]{5}
+       \begin{scope}[rotate=36]
+         \edef\tkzb@rtemp{\cmdGR@cl@RC}
+         \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+         \grEmptyCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{5}
+       \end{scope}
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+       \grCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{10}
+       \EdgeInGraphLoop{\cmdGR@cl@prefixxx}{5}
+       \EdgeDoubleMod{\cmdGR@cl@prefix}{5}{0}{1}%
+                     {\cmdGR@cl@prefixx}{10}{0}{2}{5}
+       \EdgeDoubleMod{\cmdGR@cl@prefixxx}{5}{0}{1}%
+                     {\cmdGR@cl@prefixx}{10}{1}{2}{5}
+     \or
+       \grLCF[#1]{10,7,4,-4,-7,10,-4,7,-7,4}{2}
+     \or
+        \grCycle[#1]{10}
+        \edef\tkzb@rtemp{\cmdGR@cl@RB}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \grEmptyCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{6}
+        \begin{scope}[rotate=45]
+          \edef\tkzb@rtemp{\cmdGR@cl@RC}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+          \grEmptyCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{4}%
+        \end{scope}
+       \setcounter{tkzb@ca}{0}
+       \foreach \v in  {1,4,6,9}{%
+           \Edge(\cmdGR@cl@prefix\v)(\cmdGR@cl@prefixxx\thetkzb@ca)
+           \stepcounter{tkzb@ca}
+           }%
+       \setcounter{tkzb@ca}{0}
+       \foreach \v in  {2,1,5,4}{%
+           \Edge(\cmdGR@cl@prefixx\v)(\cmdGR@cl@prefixxx\thetkzb@ca)
+           \stepcounter{tkzb@ca}
+           }%
+       \setcounter{tkzb@ca}{0}
+       \foreach \v in  {0,2,3,5,7,8}{%
+           \Edge(\cmdGR@cl@prefix\v)(\cmdGR@cl@prefixx\thetkzb@ca)
+           \stepcounter{tkzb@ca}
+           }%
+       \Edge(\cmdGR@cl@prefixxx0)(\cmdGR@cl@prefixxx3)
+       \Edge(\cmdGR@cl@prefixxx1)(\cmdGR@cl@prefixxx2)
+       \Edge(\cmdGR@cl@prefixx0)(\cmdGR@cl@prefixx1)
+       \Edge(\cmdGR@cl@prefixx0)(\cmdGR@cl@prefixx5)
+       \Edge(\cmdGR@cl@prefixx3)(\cmdGR@cl@prefixx2)
+       \Edge(\cmdGR@cl@prefixx3)(\cmdGR@cl@prefixx4)
+\fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grMobiusKantor
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grMobiusKantor}[1][]{% #1 options #2 ordre du graphe
+\begingroup%
+  \setkeys[GR]{cl}{#1}
+   \ifcase\cmdGR@cl@form
+     \or
+       \grCycle[#1]{16}
+       \EdgeInGraphMod*{\cmdGR@cl@prefix}{16}{5}{0}{2}
+     \or
+       \grCycle[#1]{8}
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+       \grCirculant[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{8}{3}
+       \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{8}
+     \or
+       \grCirculant[#1]{8}{3} 
+       \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+       \grCycle[#1,RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{8}
+       \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{8}
+     \fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grMoebiusLadder
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grMobiusLadder}[2][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}
+  \grEmptyCycle[#1]{#2}
+  \pgfmathsetcounter{tkzb@temp}{#2-1}
+  \edef\tkzb@rtemp{\cmdGR@cl@RB}
+  \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+  \grEmptyCycle[RA=\tkzb@rtemp,prefix=\tkzb@ptemp]{#2}%
+  \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{#2}
+  \EdgeInGraphLoop*{\cmdGR@cl@prefix}{#2}
+  \EdgeInGraphLoop*{\cmdGR@cl@prefixx}{#2}
+  \Edge(\cmdGR@cl@prefix0)(\cmdGR@cl@prefixx\thetkzb@temp)
+  \Edge(\cmdGR@cl@prefixx0)(\cmdGR@cl@prefix\thetkzb@temp)
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grCocktailParty 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grCocktailParty}[2][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \pgfmathsetcounter{tkzb@temp}{#2-1}
+  \grPath[#1,RS=0]{#2}
+  \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+  \edef\tkzb@rtemp{\cmdGR@cl@RS}
+  \grPath[#1,prefix=\tkzb@ptemp,RS=\tkzb@rtemp]{#2}
+  \foreach \cpx in {0,...,\thetkzb@temp}{%
+      \EdgeFromOneToComp{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{\cpx}{#2}
+      }
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grCrown 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grCrown}[2][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \pgfmathsetcounter{tkzb@temp}{#2-1}
+  \grEmptyPath[#1,RS=0]{#2}
+  \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+  \edef\tkzb@rtemp{\cmdGR@cl@RS}
+  \grEmptyPath[#1,prefix=\tkzb@ptemp,RS=\tkzb@rtemp]{#2}
+  \foreach \cpx in {0,...,\thetkzb@temp}{%
+      \EdgeFromOneToComp{\cmdGR@cl@prefix}{\cmdGR@cl@prefixx}{\cpx}{#2}
+      }
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grMcGee 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grMcGee}[1][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \grLCF[#1]{-12,7,-7}{8}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grRobertson 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grRobertson}[1][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \grLCF[#1]{8,4,7,4,8,5,7,4,7,8,4,5,7,8,4,8,4,8,4}{1}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grRobertsonWegner 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grRobertsonWegner}[1][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+    \grLCF[#1]{6,12}{15}
+    \EdgeInGraphMod{\cmdGR@cl@prefix}{30}{9}{1}{6}
+    \EdgeInGraphMod*{\cmdGR@cl@prefix}{30}{15}{2}{6}
+    \EdgeInGraphMod*{\cmdGR@cl@prefix}{30}{9}{3}{6}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grDoyle 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grDoyle}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+      \or
+        \grCycle[#1]{9}
+        \begin{scope}[rotate=18]
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RB}
+          \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{9}{2}
+        \end{scope}
+        \EdgeMod{\cmdGR@cl@prefixx}{\cmdGR@cl@prefix}{9}{1}
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+        \edef\tkzb@rtemp{\cmdGR@cl@RC}
+        \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{9}{4}
+        \EdgeIdentity{\cmdGR@cl@prefix}{\cmdGR@cl@prefixxx}{9}
+        \EdgeMod{\cmdGR@cl@prefixx}{\cmdGR@cl@prefixxx}{9}{1}
+      \or
+        \grCycle[#1]{27}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{0}{3}
+                      {\cmdGR@cl@prefix}{27}{13}{3}{9}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{1}{3}
+                      {\cmdGR@cl@prefix}{27}{5}{3}{9}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{0}{3}
+                      {\cmdGR@cl@prefix}{27}{20}{3}{9}
+      \or
+        \grCycle[#1]{27}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{17}{1}
+                      {\cmdGR@cl@prefix}{27}{10}{-2}{4}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{26}{1}
+                      {\cmdGR@cl@prefix}{27}{19}{-2}{4}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{8}{1}
+                      {\cmdGR@cl@prefix}{27}{1}{-2}{4}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{4}{1}
+                      {\cmdGR@cl@prefix}{27}{27}{-2}{3}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{8}{1}
+                      {\cmdGR@cl@prefix}{27}{1}{-2}{4}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{14}{1}
+                      {\cmdGR@cl@prefix}{27}{7}{-2}{2}
+        \EdgeDoubleMod{\cmdGR@cl@prefix}{27}{23}{1}
+                      {\cmdGR@cl@prefix}{27}{16}{-2}{2}
+        \Edge(\cmdGR@cl@prefix9)(\cmdGR@cl@prefix13)%
+        \Edge(\cmdGR@cl@prefix18)(\cmdGR@cl@prefix22)%
+    \fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grDesargues 
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grDesargues}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+      \or
+        \grLCF[#1]{5,-5,9,-9}{5}
+      \or
+         \grGeneralizedPetersen[#1]{10}{3}
+     \fi
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grKonisberg
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+% #1 prefix  #2 indice #2 prefix #3 indice choisie entre #4 et #5 ...
+\newcommand{\grKonisberg}[1][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+   \grCycle[#1]{4}
+   \Edge[style={bend left}](\cmdGR@cl@prefix1)(\cmdGR@cl@prefix2)
+   \Edge[style={bend left}](\cmdGR@cl@prefix2)(\cmdGR@cl@prefix3) 
+   \Edge(\cmdGR@cl@prefix0)(\cmdGR@cl@prefix2)
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grWong
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand{\grWong}[1][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+    \grLCF[#1]{8,4,12,4,8,4}{5}
+    \EdgeInGraphMod*{\cmdGR@cl@prefix}{30}{15}{0}{3}
+    \EdgeInGraphMod*{\cmdGR@cl@prefix}{30}{16}{1}{6}
+    \EdgeInGraphMod*{\cmdGR@cl@prefix}{30}{18}{4}{6}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grTutte
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand{\grTutteCoxeter}[1][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+    \grLCF[#1]{-13,-9,7,-7,9,13}{5}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grFoster
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand{\grFoster}[1][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+    \grLCF[#1]{17,-9,37,-37,9,-17}{15}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grFolkman
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand{\grFolkman}[1][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+  \grLCF[#1]{5,-7,-7,5}{5}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grFranklin
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand{\grFranklin}[1][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+  \grLCF[#1]{5,-5}{6}
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grAndrasfai
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+\newcommand{\grAndrasfai}[2][]{%
+\begingroup%
+   \setkeys[GR]{cl}{#1}%
+   \pgfmathsetcounter{tkza@int}{3*#2-1}
+   \grEmptyCycle[#1]{\thetkza@int}
+   \pgfmathsetcounter{tkza@tmp}{\thetkza@int/2}
+   \pgfmathsetcounter{tkza@tmp}{\thetkza@int+1}
+   \pgfmathsetcounter{tkzb@temp}{1}
+   \whiledo{\value{tkzb@temp} < \value{tkza@tmp}}{%
+      \EdgeInGraphMod*{\cmdGR@cl@prefix}{\thetkza@int}{\thetkzb@temp}{0}{1}
+      \pgfmathsetcounter{tkzb@temp}{\thetkzb@temp+3}
+      }
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grGrotzsch
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grGrotzsch}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+      \or
+     \begin{scope}[rotate=18]%
+       \grStar[#1]{6}%
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \grCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{5}%
+       \Edges(\cmdGR@cl@prefix0,\cmdGR@cl@prefixx1,%
+              \cmdGR@cl@prefix2,\cmdGR@cl@prefixx3,%
+              \cmdGR@cl@prefix4,\cmdGR@cl@prefixx0,%
+              \cmdGR@cl@prefix1,\cmdGR@cl@prefixx2,%
+              \cmdGR@cl@prefix3,\cmdGR@cl@prefixx4,\cmdGR@cl@prefix0)
+     \end{scope}
+      \or
+     \begin{scope}[rotate=18]%
+       \grStar[#1]{6}%
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RB}
+       \begin{scope}[rotate=-36]%
+          \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{5}{2}%
+       \end{scope}
+     \EdgeDoubleMod{a}{5}{0}{1}%
+                   {b}{5}{1}{1}{4}
+     \EdgeIdentity{a}{b}{5}
+     \end{scope}
+\fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grLevi
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grLevi}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+      \or
+         \grLCF[#1]{-13,-9,7,-7,9,13}{5}
+      \or
+    \grCycle[#1]{10}
+    \EdgeInGraphMod{\cmdGR@cl@prefix}{10}{5}
+    \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+    \edef\tkzb@rtemp{\cmdGR@cl@RB}
+    \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}
+    \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+    \edef\tkzb@rtemp{\cmdGR@cl@RC}
+    \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}
+    \EdgeInGraphMod{\cmdGR@cl@prefixxx}{10}{4}
+\fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grPappus
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grPappus}[1][]{%
+\begingroup%
+    \setkeys[GR]{cl}{#1}%
+    \ifcase\cmdGR@cl@form
+\or
+    \grLCF[#1]{5,7,-7,7,-7,-5}{3}
+\or
+ \begin{scope}[rotate=30]%
+   \grCycle[#1]{6}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RB}
+   \grCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{6}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RC}
+   \grCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{6}
+   \EdgeDoubleMod{\cmdGR@cl@prefixxx}{6}{0}{2}%
+                 {\cmdGR@cl@prefixx}{6}{5}{2}{2}
+   \EdgeDoubleMod{\cmdGR@cl@prefixxx}{6}{5}{2}%
+                 {\cmdGR@cl@prefix}{6}{1}{2}{2}
+   \EdgeDoubleMod{\cmdGR@cl@prefixx}{6}{0}{2}%
+                 {\cmdGR@cl@prefix}{6}{0}{2}{2}
+\end{scope}
+\or
+ \begin{scope}[rotate=30]
+   \grCycle[#1]{6}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RB}
+   \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{6}{2}
+          \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+          \edef\tkzb@rtemp{\cmdGR@cl@RC}
+   \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{6}
+   \EdgeIdentity{\cmdGR@cl@prefixx}{\cmdGR@cl@prefix}{6}
+   \EdgeInGraphMod{\cmdGR@cl@prefixxx}{6}{3}   
+\end{scope} 
+\fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grChvatal
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grChvatal}[1][]{%
+\begingroup%
+\setkeys[GR]{cl}{#1}%
+\ifcase\cmdGR@cl@form
+\or
+  \begin{scope}[rotate=45]
+    \grCycle[#1]{4}
+    \end{scope}
+    \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+    \edef\tkzb@rtemp{\cmdGR@cl@RB}
+  \begin{scope}[rotate=22.25]
+    \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{8}
+  \end{scope}
+  \EdgeInGraphMod{\cmdGR@cl@prefixx}{8}{4}
+  \EdgeInGraphMod*{\cmdGR@cl@prefixx}{8}{1}{1}{2}
+  \EdgeInGraphMod*{\cmdGR@cl@prefixx}{8}{3}{1}{2}
+   \EdgeDoubleMod{\cmdGR@cl@prefix}{4}{0}{1}%
+                 {\cmdGR@cl@prefixx}{8}{1}{2}{3}
+   \EdgeDoubleMod{\cmdGR@cl@prefix}{4}{0}{1}%
+                 {\cmdGR@cl@prefixx}{8}{0}{2}{3} 
+\or
+   \begin{scope}[rotate=18]
+     \grCycle[#1]{5}
+     \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+     \edef\tkzb@rtemp{\cmdGR@cl@RB}
+     \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{5}
+   \end{scope} 
+   \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+   \edef\tkzb@rtemp{\cmdGR@cl@RC} 
+   \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{2}
+   \EdgeDoubleMod{\cmdGR@cl@prefix}{5}{0}{1}%
+                 {\cmdGR@cl@prefixx}{5}{1}{1}{4}
+   \EdgeDoubleMod{\cmdGR@cl@prefix}{5}{0}{1}%
+                 {\cmdGR@cl@prefixx}{5}{4}{1}{4}
+   \EdgeFromOneToSel{\cmdGR@cl@prefixxx}{\cmdGR@cl@prefixx}{0}{4,0,1}
+   \EdgeFromOneToSel{\cmdGR@cl@prefixxx}{\cmdGR@cl@prefixx}{1}{1,2,3}
+   \Edge(\cmdGR@cl@prefixx3)(\cmdGR@cl@prefixx4)
+   \Edge(\cmdGR@cl@prefixx0)(\cmdGR@cl@prefixxx1)
+   \Edge(\cmdGR@cl@prefixx2)(\cmdGR@cl@prefixxx0)
+\or
+  \grCycle[#1]{12}
+  \Edges(\cmdGR@cl@prefix0,\cmdGR@cl@prefix6,\cmdGR@cl@prefix3,%
+         \cmdGR@cl@prefix8,\cmdGR@cl@prefix11,\cmdGR@cl@prefix5,%
+         \cmdGR@cl@prefix2,\cmdGR@cl@prefix9,\cmdGR@cl@prefix0)
+  \Edges(\cmdGR@cl@prefix1,\cmdGR@cl@prefix7,\cmdGR@cl@prefix10,%
+         \cmdGR@cl@prefix4,\cmdGR@cl@prefix1)  
+\fi  
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                 grBalaban
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\newcommand*{\grBalaban}[1][]{%
+\begingroup%
+\setkeys[GR]{cl}{#1}%
+\ifcase\cmdGR@cl@form
+\or
+     \grCycle[#1]{50}
+     \EdgeInGraphMod*{\cmdGR@cl@prefix}{50}{9}{3}{5}
+     \EdgeInGraphMod*{\cmdGR@cl@prefix}{50}{25}{0}{5}
+     \begin{scope}[rotate=12]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \edef\tkzb@rtemp{\cmdGR@cl@RB}
+        \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}{3}
+     \end{scope}
+     \begin{scope}[rotate=24]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+        \edef\tkzb@rtemp{\cmdGR@cl@RC}
+       \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}{3}
+     \end{scope}
+     \EdgeDoubleMod{\cmdGR@cl@prefix}{50}{1}{5}%
+                   {\cmdGR@cl@prefixx}{10}{0}{1}{10}
+     \EdgeDoubleMod{\cmdGR@cl@prefix}{50}{4}{5}%
+                   {\cmdGR@cl@prefixxx}{10}{0}{1}{10}
+\or
+ \begin{scope}[rotate=9]
+   \grCycle[#1]{10}
+ \end{scope}
+ \begin{scope}[rotate=-9]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+        \edef\tkzb@rtemp{\cmdGR@cl@RB}
+   \grCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}
+ \end{scope}
+ \begin{scope}[rotate=6]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+        \edef\tkzb@rtemp{\cmdGR@cl@RC}
+   \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{30}
+   \EdgeInGraphMod*{\cmdGR@cl@prefixxx}{30}{1}{0}{3}
+   \EdgeInGraphMod*{\cmdGR@cl@prefixxx}{30}{1}{1}{3}
+   \EdgeInGraphMod*{\cmdGR@cl@prefixxx}{30}{15}{1}{3}
+ \end{scope}
+ \begin{scope}[rotate=9]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxxx}
+        \edef\tkzb@rtemp{\cmdGR@cl@RD}
+   \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{20}
+   \EdgeInGraphMod*{\cmdGR@cl@prefixxxx}{20}{7}{0}{2}
+   \EdgeInGraphMod*{\cmdGR@cl@prefixxxx}{20}{5}{1}{2}
+ \end{scope}
+ \EdgeDoubleMod{\cmdGR@cl@prefix}{10}{0}{1}
+               {\cmdGR@cl@prefixxx}{30}{0}{3}{9}
+ \EdgeDoubleMod{\cmdGR@cl@prefixx}{10}{0}{1}%
+               {\cmdGR@cl@prefixxx}{30}{29}{3}{9}
+ \EdgeDoubleMod{\cmdGR@cl@prefixxx}{30}{0}{3}%
+               {\cmdGR@cl@prefixxxx}{20}{0}{2}{9}
+ \EdgeDoubleMod{\cmdGR@cl@prefixxx}{30}{2}{3}%
+               {\cmdGR@cl@prefixxxx}{20}{1}{2}{9}
+\or
+\grEmptyCycle[#1]{10}
+\begin{scope}[rotate=9]
+      \edef\tkzb@ptemp{\cmdGR@cl@prefixx}
+      \edef\tkzb@rtemp{\cmdGR@cl@RB}
+  \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{20}
+\end{scope}
+\begin{scope}[rotate=13]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxx}
+      \edef\tkzb@rtemp{\cmdGR@cl@RC}
+  \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}
+\end{scope}
+\begin{scope}[rotate=-13]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxxx}
+      \edef\tkzb@rtemp{\cmdGR@cl@RD}
+  \grEmptyCycle[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{10}
+\end{scope}
+\begin{scope}[rotate=9]
+        \edef\tkzb@ptemp{\cmdGR@cl@prefixxxxx}
+      \edef\tkzb@rtemp{\cmdGR@cl@RE}
+  \grCirculant[#1,prefix=\tkzb@ptemp,RA=\tkzb@rtemp]{20}{6}
+\end{scope}
+   \EdgeIdentity{\cmdGR@cl@prefixx}{\cmdGR@cl@prefixxxxx}{20}
+   \EdgeDoubleMod{\cmdGR@cl@prefix}{10}{0}{1}%
+                 {\cmdGR@cl@prefixx}{20}{0}{2}{10}
+   \EdgeDoubleMod{\cmdGR@cl@prefix}{10}{0}{1}%
+                 {\cmdGR@cl@prefixx}{20}{19}{2}{10}
+   \EdgeInGraphMod{\cmdGR@cl@prefix}{10}{5}
+   \EdgeDoubleMod{\cmdGR@cl@prefixxx}{10}{0}{1}%
+                 {\cmdGR@cl@prefixx}{20}{0}{2}{10}
+   \EdgeDoubleMod{\cmdGR@cl@prefixxxx}{10}{0}{1}%
+                 {\cmdGR@cl@prefixx}{20}{19}{2}{10}
+   \EdgeDoubleMod{\cmdGR@cl@prefixxxx}{10}{0}{1}%
+                 {\cmdGR@cl@prefixxx}{10}{1}{1}{10}
+   \EdgeDoubleMod{\cmdGR@cl@prefixxxx}{10}{1}{1}%
+                 {\cmdGR@cl@prefixxx}{10}{0}{1}{10}
+\fi
+\endgroup%
+}
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     Labels
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+
+% #2 label/prefix/num
+\define@cmdkey [GR] {WL} {color}[black]{}
+\define@cmdkey [GR] {WL} {labelstyle}{}
+\define@cmdkey [GR] {WL} {size}{}
+\define@cmdkey [GR] {WL} {style}{}
+\presetkeys    [GR] {WL} {color       = black,%
+                          labelstyle  = {},%
+                          size        = {},%
+                          style       = {}}{}
+\newcommand{\grWriteExplicitLabels}[2][]{%
+\begingroup%
+  \setkeys[GR]{WL}{#1}%
+  \foreach \text/\where in {#2}{%
+      \node at (\where) {\text};
+      }%
+\endgroup%
+}
+\newcommand{\grWriteExplicitLabel}[2][]{%
+\begingroup%
+  \setkeys[GR]{cl}{#1}%
+  \node at (\where) {\text};
+\endgroup%
+}%
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                               AssignVertexLabel
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\tikzset{AssignStyle/.style={}}
+\define@cmdkey [GR] {AVL} {color}{}
+\define@cmdkey [GR] {AVL} {size}{}
+\define@cmdkey [GR] {AVL} {pos}{}
+\define@boolkey[GR] {AVL} {Math}[true]{}
+\presetkeys    [GR] {AVL} {size       = \normalsize,%
+                           color      = black,%
+                           pos        = {},%
+                           Math       = false}{} \newcommand*{\AssignVertexLabel}[4][]{%
+\begingroup%
+  \setkeys[GR]{AVL}{#1}
+  \setcounter{tkzb@ta}{0}
+  \foreach \name in {#4}{%
+  \ifGR@AVL@Math%
+     \node at (#2\thetkzb@ta) {$\textcolor{\cmdGR@AVL@color}{\cmdGR@AVL@size\name}$};
+  \else%
+ \node[AssignStyle] at (#2\thetkzb@ta) {\textcolor{\cmdGR@AVL@color}{\cmdGR@AVL@size\name}};
+  \fi%
+     \stepcounter{tkzb@ta}}
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                     grEdgeForTree
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+% #1 prefix  #2 indice #2 prefix #3 indice choisie entre #4 et #5 ...
+\newcommand{\grEdgeForTree}[5]{%
+\begingroup%
+  \foreach \x in {#4,...,#5}{%
+      \Edge(#1#2)(#3\x)%
+      }%
+\endgroup%
+}
+
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+%                                  The End
+%<–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––>
+\endinput
