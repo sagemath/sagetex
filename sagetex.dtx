@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2008--2010 by Dan Drake <ddrake (at) member (dot) ams (dot) org>
+% Copyright (C) 2008--2011 by Dan Drake <ddrake (at) member (dot) ams (dot) org>
 % -------------------------------------------------------
 %
 % See the "Copying and licenses" section in this file for the terms
@@ -29,7 +29,7 @@
 %<latex>\ProvidesPackage{sagetex}
 %<python>__version__ = """
 %<*latex|python>
-  [2010/10/20 v2.3 embedding Sage into LaTeX documents]
+  [2011/02/02 v2.3.1 embedding Sage into LaTeX documents]
 %</latex|python>
 %<python>""".strip()
 %<latex>\newcommand{\ST@ver}{2010/10/20 v2.3}
@@ -458,6 +458,14 @@ suggestions.
 %   \emph{automatically overwritten} if it already exists. If you keep
 %   Sage scripts in the same directory as your \ST-ified \LTX documents,
 %   use a different file name!}
+%
+%   \noindent\warningbox{\textbf{WARNING!} Speaking of filenames, \ST
+%   really works best on files whose names don't have spaces or other
+%   ``funny'' characters in them. \ST \emph{should} work on such
+%   files---and you should let us know if it doesn't---but it's safest
+%   to stick to files with alphanumeric characters and ``safe''
+%   punctuation (i.e., nothing like |<|, |"|, |!|, |\| or other
+%   characters that would confuse a shell).}
 %
 % \paragraph{The final option} On a similar note, \ST, like many \LTX
 % packages, accepts the |final| option. When passed this option, either
