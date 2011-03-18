@@ -5,6 +5,12 @@
 %
 % Please read README and the documentation of the SageTeX package for
 % more information!
+%
+% If you'd like a prebuilt version of this file and your Sage
+% installation does not have one in SAGE_ROOT/local/share/doc/sagetex,
+% you can either build it by reinstalling this spkg with the environment
+% variable SAGE_SPKG_INSTALL_DOCS set to "yes" or download it from
+% http://bitbucket.org/ddrake/sagetex/downloads/example.pdf.
 
 \documentclass{article}
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
@@ -194,7 +200,7 @@ Now just do \verb|\sage{}| on it to plot it. You'll need to use the
 \href{http://altermundus.com/pages/graphtheory.html}{\texttt{tkz-berge}}
 package for this to work; that package in turn depends on
 \href{http://altermundus.com/pages/graph.html}{\texttt{tkz-graph}} and
-TikZ. See
+TikZ. Both of those files are distributed with Sage\TeX. See
 \href{http://sagemath.org/doc/reference/sage/graphs/graph_latex.html}{``\LaTeX{}
   Options for Graphs''} in the Sage reference manual for more details.
 
