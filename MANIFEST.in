@@ -12,3 +12,6 @@ include remote-sagetex.dtx
 include remote-sagetex.py
 include scripts.dtx
 include py-and-sty.dtx
+include tkz-berge.sty
+include tkz-graph.sty
+include Makefile
