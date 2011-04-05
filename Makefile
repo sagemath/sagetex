@@ -24,22 +24,22 @@ example.pdf: example.tex sagetex.sty sagetex.py
 	pdflatex $(TEXOPTS) example.tex
 
 %.ind: $(dtxs)
-	latex $(pkg).dtx
+	latex $(TEXOPTS) $(pkg).dtx
 	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetex.idx
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
 sagetex.sty: py-and-sty.dtx $(pkg).dtx
-	yes | latex $(pkg).ins
+	yes | latex $(TEXOPTS) $(pkg).ins
 
 sagetex.py: py-and-sty.dtx $(pkg).dtx
-	yes | latex $(pkg).ins
+	yes | latex $(TEXOPTS) $(pkg).ins
 
 remote-sagetex.py: remote-sagetex.dtx
-	yes | latex $(pkg).ins
+	yes | latex $(TEXOPTS) $(pkg).ins
 
 makestatic.py extractsagecode.py sagetexparse.py: scripts.dtx
-	yes | latex $(pkg).ins
+	yes | latex $(TEXOPTS) $(pkg).ins
 
 clean:
 	latexcleanup clean .
