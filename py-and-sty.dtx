@@ -1008,7 +1008,6 @@ class SageTeXProcessor():
 %   the newly-added output.
 %    \begin{macrocode}
   def savecmd(self, counter, s):
-    self.progress('Sage commandline {0}'.format(counter))
     self.scmdtmp.write(s.rstrip() + "\n")
     begin = self.scmdpos
     end = begin + len(s.splitlines()) - 1
@@ -1106,6 +1105,7 @@ class SageTeXProcessor():
 %   typesets Sage code and its output.
 %    \begin{macrocode}
   def commandline(self, counter, str, globals, locals, text_output):
+      self.progress('Sage commandline {0}'.format(counter)) 
       current_statement = None
       current_lines = None
       line_iterator = (line.lstrip() for line in str.splitlines())
