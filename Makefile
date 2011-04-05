@@ -7,20 +7,21 @@ srcs=example.tex README sagetex.ins
 
 all: sagetex.sty sagetex.py example.pdf $(pkg).pdf
 
-# just depend on the .ind file, since we'll make the .gls and .ind together
+# just depend on the .ind file, since we'll make the .gls and .ind together;
+# TEXOPTS is used by spkg-install to specify nonstopmode when building docs
 $(pkg).pdf: $(dtxs) $(pkg).ind
-	latex $(pkg).dtx
+	latex $(TEXOPTS) $(pkg).dtx
 	sage $(pkg).sagetex.sage
-	latex $(pkg).dtx
+	latex $(TEXOPTS) $(pkg).dtx
 	sage $(pkg).sagetex.sage
-	latex $(pkg).dtx
-	pdflatex $(pkg).dtx
+	latex $(TEXOPTS) $(pkg).dtx
+	pdflatex $(TEXOPTS) $(pkg).dtx
 
 example.pdf: example.tex sagetex.sty sagetex.py
-	pdflatex example.tex
-	sage example.sagetex.sage
-	pdflatex example.tex
-	pdflatex example.tex
+	pdflatex $(TEXOPTS) example.tex
+	sage $(TEXOPTS) example.sagetex.sage
+	pdflatex $(TEXOPTS) example.tex
+	pdflatex $(TEXOPTS) example.tex
 
 %.ind: $(dtxs)
 	latex $(pkg).dtx
