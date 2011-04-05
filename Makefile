@@ -1,5 +1,4 @@
 pkg=sagetex
-dest=/home/drake/texmf/tex/latex/sagetex/
 dtxs=$(wildcard *.dtx)
 # the subdir stuff makes the tarball have the directory correct
 srcs=example.tex README sagetex.ins
@@ -48,14 +47,6 @@ clean:
 auxclean:
 	/bin/bash -c "rm -f {$(pkg),example}.{glo,gls,aux,out,toc,dvi,pdf,ps,log,ilg,ind,idx,fdb_latexmk,sagetex.*}"
 	rm -f *_doctest.sage
-
-# make a tarball suitable for CTAN uploads, or for someone who knows how
-# to handle .dtx files
-ctandist: all
-	@echo
-	@echo Did you turn off Imagemagick in example.tex?
-	@echo
-	tar zcf sagetex.tar.gz --transform "s|^|sagetex/|" $(srcs) $(dtxs) example.pdf sagetex.pdf
 
 # otherwise, make gets confused since there's a file named "test"
 .PHONY: test
