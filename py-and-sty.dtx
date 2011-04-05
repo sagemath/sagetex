@@ -979,11 +979,11 @@ class SageTeXProcessor():
 %   |\newlabel{labelname}{{section number}{page number}}|
 % \end{center}
 % to the |.aux| file. When you use the |hyperref| package, there are
-% more fields in the second argument, but the first two are the same.
-% The |\ref| command just pulls in what's in the first field of the
-% second argument, so we can hijack this mechanism for our own nefarious
-% purposes. The function writes a |\newlabel| line with a label made
-% from a counter and the text from running Sage on |s|.
+% more fields in the second argument, but the first two fields are the
+% same. The |\ref| command just pulls in what's in the first field of
+% the second argument, so we can hijack this mechanism for our own
+% nefarious purposes. The function writes a |\newlabel| line with a
+% label made from a counter and the text from running Sage on |s|.
 %
 % We print out the line number so if something goes wrong, the user can
 % more easily track down the offending |\sage| command in the source
