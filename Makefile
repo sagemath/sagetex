@@ -19,7 +19,7 @@ $(pkg).pdf: $(dtxs) $(pkg).ind
 
 example.pdf: example.tex sagetex.sty sagetex.py
 	pdflatex $(TEXOPTS) example.tex
-	sage $(TEXOPTS) example.sagetex.sage
+	sage example.sagetex.sage
 	pdflatex $(TEXOPTS) example.tex
 	pdflatex $(TEXOPTS) example.tex
 
