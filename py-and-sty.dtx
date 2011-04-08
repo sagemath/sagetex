@@ -93,8 +93,10 @@
 %    \begin{macrocode}
 \newcounter{ST@inline}
 \newcounter{ST@plot}
+\newcounter{ST@cmdline}
 \setcounter{ST@inline}{0}
 \setcounter{ST@plot}{0}
+\setcounter{ST@cmdline}{0}
 \newlength{\sagetexindent}
 \setlength{\sagetexindent}{5ex}
 \newif\ifST@paused
@@ -333,7 +335,7 @@ except:^^J
 % \end{macro}
 %
 % \begin{macro}{\sagestr}
-% ilike above, but doesn't run latex
+% Like above, but doesn't run |latex()| on its argument.
 %    \begin{macrocode}
 \newcommand{\sagestr}[1]{\ST@sage{#1}}
 %    \end{macrocode}
@@ -718,7 +720,7 @@ try:^^J
 \newenvironment{sagecommandline}{%
    \ST@wsf{%
 try:^^J
- _st_.commandline(\theST@inline, r"""}%
+ _st_.commandline(\theST@cmdline, r"""}%
    \ST@dodfsetup%
    \ST@wdf{Sage commandline, line \the\inputlineno::^^J}%
    \begingroup%
@@ -740,11 +742,11 @@ try:^^J
   \ifST@paused%
     \mbox{(Sage\TeX{} is paused)}%
   \else%
-    \begin{NoHyper}\ref{@sageinline\theST@inline}\end{NoHyper}%
-    \@ifundefined{r@@sageinline\theST@inline}{\gdef\ST@rerun{x}}{}%
+    \begin{NoHyper}\ref{@sagecmdline\theST@cmdline}\end{NoHyper}%
+    \@ifundefined{r@@sagecmdline\theST@cmdline}{\gdef\ST@rerun{x}}{}%
   \fi%
   \ST@wdf{}%
-  \stepcounter{ST@inline}}
+  \stepcounter{ST@cmdline}}
 %    \end{macrocode}
 % \end{environment}
 %
@@ -985,34 +987,52 @@ class SageTeXProcessor():
 % nefarious purposes. The function writes a |\newlabel| line with a
 % label made from a counter and the text from running Sage on |s|.
 %
+% The |labelname| defaults to the the name used by the usual |\sage|
+% inline macro, but this function is also used by the |sagecommandline|
+% environment. It's important to keep the corresponding labels separate,
+% because |\sage| macros often (for example) appear inside math mode,
+% and the labels from |sagecommandline| contain a |lstlistings|
+% environment---pulling such an environment into math mode produces
+% strange, unrecoverable errors, and if you can't typeset your file, you
+% can't product an updated |.sagetex.sage| file to run Sage on to
+% produce a reasonable |.sagetext.sout| file that will fix the label
+% problem. So it works much better to use distinct labels for such
+% things.
+%
 % We print out the line number so if something goes wrong, the user can
 % more easily track down the offending |\sage| command in the source
 % file.
 %
 % That's a lot of explanation for a very short function:
 %    \begin{macrocode}
-  def inline(self, counter, s):
-    self.progress('Inline formula {0}'.format(counter))
-    self.souttmp.write('\\newlabel{@sageinline' + str(counter) + '}{{%\n' +
-                 s.rstrip() + '}{}{}{}{}}\n')
+  def inline(self, counter, s, labelname=None):
+      if labelname is None:
+          labelname = 'sageinline'
+          self.progress('Inline formula {0}'.format(counter))
+      elif labelname == 'sagecmdline':
+          pass # output message already printed
+      else:
+          raise ValueError, 'inline() got a bad labelname'
+      self.souttmp.write(r'\newlabel{@' + labelname + str(counter) + 
+                         '}{{%\n' + s.rstrip() + '}{}{}{}{}}\n')
 %    \end{macrocode}
 % We are using five fields, just like |hyperref| does, because that
 % works whether or not |hyperref| is loaded. Using two fields, as in
 % plain \LTX, doesn't work if |hyperref| is loaded.
 % \end{macro}
-
+%
 % \begin{macro}{savecmd}
-%   Analogous to |inline|, this method saves the input string |s| to
-%   the temporary |.scmd| file. As an added bonus, it returns a pair
-%   of line numbers in the |.scmd| file, the first and last line of
-%   the newly-added output.
+% Analogous to |inline|, this method saves the input string |s| to
+% the temporary |.scmd| file. As an added bonus, it returns a pair
+% of line numbers in the |.scmd| file, the first and last line of
+% the newly-added output.
 %    \begin{macrocode}
   def savecmd(self, counter, s):
-    self.scmdtmp.write(s.rstrip() + "\n")
-    begin = self.scmdpos
-    end = begin + len(s.splitlines()) - 1
-    self.scmdpos = end+1
-    return begin, end
+      self.scmdtmp.write(s.rstrip() + "\n")
+      begin = self.scmdpos
+      end = begin + len(s.splitlines()) - 1
+      self.scmdpos = end + 1
+      return begin, end
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1168,7 +1188,7 @@ class SageTeXProcessor():
           if line is None: break
           sage_block += 1
       latex_string += bottom_skip + r"\noindent" + "\n"
-      self.inline(counter, latex_string)
+      self.inline(counter, latex_string, labelname='sagecmdline')
 %    \end{macrocode}
 % \end{macro}
 %
