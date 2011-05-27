@@ -14,3 +14,5 @@ include tkz-berge.sty
 include tkz-graph.sty
 include tkz-arith.sty
 include Makefile
+include sagetex.pdf
+include example.pdf
