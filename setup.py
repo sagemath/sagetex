@@ -25,4 +25,7 @@ setup(name='sagetex',
          'sagetex.dtx',
          'sagetex.ins',
          'sagetexparse.py',
-         'sagetex.sty'])])
+         'sagetex.sty']),
+      ('share/doc/sagetex', [
+         'sagetex.pdf',
+         'example.pdf'])])
