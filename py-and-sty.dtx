@@ -399,13 +399,13 @@ except:^^J
 % Here's the wrapper command which does whatever magic we need to get
 % two optional arguments.
 %    \begin{macrocode}
-\newcommand{\sageplot}[1][width=.75\textwidth]{%
+\newcommand{\sageplot}[1][]{%
   \@ifnextchar[{\ST@sageplot[#1]}{\ST@sageplot[#1][notprovided]}}
 %    \end{macrocode}
+% \changes{v2.3.2}{2011/06/17}{Remove ``.75 textwidth'' default option}
 % The first optional argument |#1| will get shoved right into the
 % optional argument for |\includegraphics|, so the user has easy control
-% over the \LTX aspects of the plotting. We define a default size of
-% $3/4$ the textwidth, which seems reasonable. (Perhaps a future version
+% over the \LTX aspects of the plotting. (Perhaps a future version
 % of \ST will allow the user to specify in the package options a set of
 % default options to be used throughout.) The second optional argument
 % |#2| is the file format and allows us to tell what files to look for.
