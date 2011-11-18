@@ -2,27 +2,22 @@
 
 # this runs Sage on the generated .sage files to see if they work ok
 
-# typesetting the example file requires TikZ version 2.00, as well as
-# tkz-berge.sty and tkz-graph.sty.
-
 typeset()
 {
     latex -interaction=nonstopmode $1
     if [ $? -ne 0 ]
     then
-        echo "Error typesetting $1! To fully test SageTeX, make sure"
-        echo "LaTeX can find sagetex.sty, and that TikZ (version 2.00"
-        echo "or newer), tkz-berge.sty and tkz-graph.sty are installed."
+        echo "Error typesetting $1!"
         exit 1
     fi
 }
 
 checkdotsage()
 {
-    sage $1.sage
+    sage $1.sagetex.sage
     if [ $? -ne 0 ]
     then
-        echo "Error running Sage on $1.sage!"
+        echo "Error running Sage on $1.sagetex.sage!"
         exit 1
     else
         echo "No problem that spkg-check can detect running Sage on $1.sage."
@@ -33,13 +28,6 @@ latex -version
 if [ $? -ne 0 ]
 then
     echo "LaTeX isn't installed (or isn't in \$PATH). Skipping test of SageTeX spkg."
-    exit 0
-fi
-
-kpsewhich tkz-berge.sty
-if [ $? -ne 0 ]
-then
-    echo "Could not find tkz-berge.sty. Skipping test of SageTeX spkg."
     exit 0
 fi
 
