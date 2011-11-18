@@ -82,11 +82,17 @@
 % files to look for. Since |ifpdf| doesn't detect running under XeTeX
 % (which defaults to producing PDFs), we need |ifxetex|. Hopefully the
 % |ifpdf| package will get support for this and we can drop |ifxetex|.
+% We also work around ancient \TeX{} distributions that don't have
+% |ifxetex| and assume that they don't have \XeTeX{}.
 %    \begin{macrocode}
 \RequirePackage{makecmds}
 \RequirePackage{ifpdf}
-\RequirePackage{ifxetex}
 \RequirePackage{ifthen}
+\IfFileExists{ifxetex.sty}{
+  \RequirePackage{ifxetex}
+}{
+  \newboolean{xetex}
+  \setboolean{xetex}{false}}
 %    \end{macrocode}
 %
 % Next set up the counters, default indent, and flags.
