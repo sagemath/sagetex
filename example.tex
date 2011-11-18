@@ -16,7 +16,11 @@
 \title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
 \author{Dan Drake and others}
 \usepackage{hyperref}
-\usepackage{tkz-berge}
+% If you want to see the examples in the section "Plotting
+% (combinatorial) graphs with TikZ" remove the \begin{comment}
+% and \end{comment} in that section and uncomment the following line.
+%\usepackage{tkz-berge}
+
 
 \usepackage{sagetex}
 %
@@ -113,8 +117,8 @@ Here's a small plot of $f$ from $-5$ to $5$, which I've centered:
 
 \begin{center} \sageplot[scale=.2]{p} \end{center}
 
-On second thought, use the default size of $3/4$ the \verb|\textwidth|
-and don't use axes:
+On second thought, use a size of $3/4$ the \verb|\textwidth| and don't
+use axes:
 
 \sageplot{p, axes=False}
 
@@ -189,6 +193,18 @@ Sage now includes some nice support for plotting graphs using
 \href{http://www.texample.net/tikz/}{TikZ}. Here, we mean things with
 vertices and edges, not graphs of a function of one or two variables.
 
+The graphics in this section depends on the \texttt{tkz-berge} package,
+which is generally only available in newer \TeX{} distributions (for
+example, \TeX Live 2011 and newer). That package depends in turn on
+TikZ 2.0, which is also only available in newer \TeX{} distributions.
+Installing both of those is in some cases nontrivial, so this section is
+disabled by default.
+
+If you have TikZ and \texttt{tkz-berge} and friends, remove the
+\texttt{comment} environments below.
+
+\begin{comment}
+
 First define our graph:
 
 \begin{sageblock}
@@ -232,6 +248,8 @@ G4plot = G4.plot(layout='circular')
 \end{sageblock}
 
 \sageplot[scale=.5]{G4plot, axes=False}
+
+\end{comment}
 
 \subsection{3D plotting}
 
@@ -426,6 +444,15 @@ that in future \texttt{sageexample} blocks:
 
 \section{Plotting functions in Ti\emph{k}Z with Sage\TeX}
 
+(The code in this section should work with any reasonable version of
+Ti\emph{k}Z, which means it should work with all but the most terribly
+out-of-date \TeX{} installations---but to make sure we can accomodate
+everyone, the code here is commented out. You can almost certainly
+uncomment and run them. Make sure you do \verb|\usepackage{tikz}| in the
+preamble.)
+
+\begin{comment}
+
 The wonderful graphics package TikZ has the ability to plot functions by
 reading in a sequence of points from an external file---see chapter 18,
 page 193 of the TikZ manual. This facility is designed around files
@@ -499,6 +526,8 @@ This style of plotting will become even more useful and powerful when
 the new TikZ Data Visualization library is available---you will be able
 to feed TikZ a bunch of data points, and it automatically make a very
 nice plot for you, including axes, labels, and so on.
+
+\end{comment}
 
 \section{The \texttt{sagecommandline} environment}
 
