@@ -1026,7 +1026,7 @@ class SageTeXProcessor():
 % That's a lot of explanation for a very short function:
 %    \begin{macrocode}
   def inline(self, counter, s, labelname=None):
-      if counter == self.max_inline_counter_seen:
+      if counter <= self.max_inline_counter_seen:
           return
       else:
           self.max_inline_counter_seen += 1
