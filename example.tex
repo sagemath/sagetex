@@ -97,7 +97,7 @@ The Taylor Series of $f$ begins: $\sage{ f.taylor(x, 0, 10) }$.
 
 \section{Plotting}
 
-Here's a plot of the elliptic curve $E$.
+Here's a very large plot of the elliptic curve $E$.
 
 \sageplot{E.plot(-3,3)}
 
@@ -120,7 +120,7 @@ Here's a small plot of $f$ from $-5$ to $5$, which I've centered:
 On second thought, use a size of $3/4$ the \verb|\textwidth| and don't
 use axes:
 
-\sageplot{p, axes=False}
+\sageplot[width=.75\textwidth]{p, axes=False}
 
 Remember, you're using Sage, and can therefore call upon any of the
 software packages Sage is built out of.
@@ -180,7 +180,7 @@ Indentation and so on works fine.
 \end{sageblock}
 And here's the picture:
 
-\sageplot{matrixprogram}
+\sageplot[scale=.5]{matrixprogram}
 
 Reset \texttt{x} in Sage so that it's not a generator for the polynomial
 ring: \sage{var('x')}
