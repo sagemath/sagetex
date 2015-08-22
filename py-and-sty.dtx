@@ -854,27 +854,9 @@ again}}
 % a problem if you \emph{begin} the line with a (single) percent sign;
 % there are no troubles otherwise.\\
 %
-% On to the code: the |sagetex.py| file is intended to be used as a
-% module and doesn't do anything useful when called directly, so if
-% someone does that, warn them. We do this right away so that we print
-% this and exit before trying to import any Sage modules; that way, this
-% error message gets printed whether you run the script with Sage or
-% with Python. Since \ST is now distributed with Sage and |sagetex.py|
-% now lives almost exclusively deep within the Sage ecosystem, this
-% check is not so necessary and will be removed by the end of 2011.
-%    \begin{macrocode}
-import sys
-if __name__ == "__main__":
-  print("""This file is part of the SageTeX package.
-It is not meant to be called directly.
-
-This file will be automatically used by Sage scripts generated from a
-LaTeX document using the SageTeX package.""")
-  sys.exit()
-%    \end{macrocode}
-% Munge the version string (which we get from
-% \texttt{sagetex.dtx}) to extract what we want, then import what
-% we need:
+% On to the code. Munge the version string (which we get from
+% \texttt{sagetex.dtx}) to extract what we want, then import what we
+% need:
 %    \begin{macrocode}
 version = ' '.join(__version__.strip('[').split()[0:2])
 from sage.misc.latex import latex

@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-% Copyright (C) 2008--2011 by Dan Drake <ddrake (at) member (dot) ams (dot) org>
+% Copyright (C) 2008--2015 by Dan Drake <dr.dan.drake (at) gmail (dot) com>
 % -------------------------------------------------------
 %
 % See the "Copying and licenses" section in this file for the terms
@@ -34,7 +34,7 @@
 %<python>""".strip()
 %<latex>\newcommand{\ST@ver}{2011/05/27 v2.3.1}
 %<*driver>
-\documentclass[a4paper]{ltxdoc}
+\documentclass{ltxdoc}
 \usepackage{sagetex}
 \usepackage{xspace}
 \usepackage{tikz}
@@ -92,8 +92,8 @@ for the \texttt{sagecommandline} environment.
 \label{sec:copying-licenses}
 
 If you are unnaturally curious about the current state of the \ST
-package, you can visit \url{http://www.bitbucket.org/ddrake/sagetex/}.
-There is a Mercurial repository and other stuff there.
+package, you can visit \url{https://github.com/dandrake/sagetex}. (The
+old Bitbucket repository is deprecated.)
 
 As for the terms and conditions under which you can copy and modify \ST:
 
@@ -353,11 +353,11 @@ suggestions.
 %
 % \subsection{\ST and \TeX Live}
 %
-% \ST is included in \TeX Live, which is very nice, but because the Python
-% module and \LTX package for \ST need to be synchronized, if you use
-% the \LTX package from \TeX Live and the Python module from Sage, they
-% may not work together if they are from different versions of \ST.
-% Because of this, I strongly recommend using \ST only from what is
+% \ST was included in \TeX Live, which seemed nice, except that the Python
+% module and \LTX package for \ST need to be synchronized and the Python
+% module in Sage was much easier to update than the \LTX style file in
+% \TeX Live. If you are so unlucky as to be using a version of \TeX Live
+% that includes \ST, I strongly recommend using \ST only from what is
 % included with Sage and ignoring what's included with \TeX Live.
 %
 % \subsection{The noversioncheck option}
@@ -402,9 +402,12 @@ suggestions.
 % \label{sec:inst-other-scripts}
 %
 % \ST includes several Python files which may be useful for working with
-% ``\ST-ified'' documents. The |remote-sagetex.py| script allows you to
-% use \ST on a computer that doesn't have Sage installed; see
-% \autoref{sec:remote-sagetex} for more information.
+% ``\ST-ified'' documents. At this point they have likely bitrotted but
+% are, for now, included for archaeological purposes.
+%
+% The |remote-sagetex.py| script allows you to use \ST on a computer
+% that doesn't have Sage installed; see \autoref{sec:remote-sagetex} for
+% more information.
 %
 % Also included are |makestatic.py| and |extractsagecode.py|, which are
 % convenience scripts that you can use after you've written your
@@ -431,11 +434,7 @@ suggestions.
 % commands and output furthermore in a |.scmd| file.
 %
 % All you really need to know is that to typeset your document, you need
-% to run \LTX, then run Sage, then run \LTX again. You can even ``run
-% Sage'' on a computer that doesn't have Sage installed by using the
-% |remote-sagetex.py| script; see \autoref{sec:remote-sagetex}. Whenever
-% this manual says ``run Sage'', you can either directly run Sage, or
-% use the |remote-sagetex.py| script.
+% to run \LTX, then run Sage, then run \LTX again.
 %
 % Also keep in mind that everything you send to Sage is done within one
 % Sage session. This means you can define variables and reuse them
@@ -1012,18 +1011,24 @@ suggestions.
 % \subsection{Sending \ST files to others who don't use Sage}
 % \label{sec:makestatic-usage}
 %
-% What can you do when sending a \LTX document that uses \ST to a
-% colleague who doesn't use Sage?\footnote{Or who cannot use Sage, since
-% currently \ST is not very useful on Windows.} The best option is to
-% bring your colleague into the light and get him or her using Sage! But
-% this may not be feasible, because some (most?) mathematicians are
-% fiercely crotchety about their choice of computer algebra system, or
-% you may be sending a paper to a journal or the arXiv, and such places
-% will not run Sage just so they can typeset your paper---at least not
-% until Sage is much closer to its goal of world domination.
+% \subsubsection{The 21st century way}
 %
-% How can you send your \ST-enabled document to someone else who doesn't
-% use Sage? The easiest way is to simply include with your document the
+% The SageMathCloud
+% (\href{http://cloud.sagemath.com}{\texttt{cloud.sagemath.com}}) service has
+% full support for \ST, is free to use, and has many fantastic
+% collaboration features. If you somehow want to collaborate on a
+% \ST-enabled \TeX document with a colleague, using SageMathCloud is one
+% of the best and easiest ways to do it. You and your collaborators
+% simply create an account, then make a project for your collaboration,
+% and add all the collaborators to the project. Then you can all enjoy
+% realtime collaborative editing, PDF previews, chat, and more.
+%
+% \subsubsection{The $N$th century way, for $N < 21$}
+%
+% Using anything other than SageMathCloud, |git|, or similar tools these
+% days seems pretty primitive. If emailing |.tex| files back and forth
+% seems perfectly reasonable to you, or if you have to send a file to a
+% journal, the easiest way is to simply include with your document the
 % following files:
 % \begin{enumerate}
 %   \item |sagetex.sty|
@@ -1037,7 +1042,11 @@ suggestions.
 % always work. (In particular, it will work with arXiv submissions.)
 %
 % There is another option, and that is to use the |makestatic.py| script
-% included with \ST.
+% included with \ST. This script has been unmaintained for some time and
+% likely won't work. If you want or need to use it and run into trouble,
+% email the
+% \href{https://groups.google.com/forum/#!forum/sage-support}{\textt{sage-support}
+% group} and let us know.
 %
 % Use of the script is quite simple. Copy it and |sagetexparse.py| to
 % the directory with your document, and run
@@ -1082,6 +1091,9 @@ suggestions.
 % \subsection{Extracting the Sage code from a document}
 % \label{sec:extractsagecode}
 %
+% (This script has the same unmaintained-and-probably-doesn't-work
+% status as |makestatic.py|; see above.)
+%
 % This next script is probably not so useful, but having done the above,
 % this was pretty easy. The |extractsagecode.py| script does the
 % opposite of |makestatic.py|, in some sense: given a document, it
@@ -1097,6 +1109,9 @@ suggestions.
 %
 % \section{Using \ST without Sage installed}
 % \label{sec:remote-sagetex}
+%
+% (This script has the same unmaintained-and-probably-doesn't-work
+% status as |makestatic.py|; see above.)
 %
 % You may want to edit and typeset a \ST-ified file on a computer that
 % doesn't have Sage installed. How can you do that? We need to somehow
