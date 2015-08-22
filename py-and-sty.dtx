@@ -878,7 +878,7 @@ LaTeX document using the SageTeX package.""")
 %    \begin{macrocode}
 version = ' '.join(__version__.strip('[').split()[0:2])
 from sage.misc.latex import latex
-from sage.misc.preparser import preparse
+from sage.repl.preparse import preparse
 import os
 import os.path
 import hashlib
