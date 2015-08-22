@@ -170,7 +170,7 @@ Indentation and so on works fine.
  M     = matrix(parent(x),s2)
  for i in range(s2):
     p  = (1+x)^i
-    pc = p.coeffs()
+    pc = p.coefficients(sparse=False)
     a  = pc.count(1)
     for j in range(a):
         idx        = pc.index(1)
