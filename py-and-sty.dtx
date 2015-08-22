@@ -885,6 +885,7 @@ import hashlib
 import traceback
 import subprocess
 import shutil
+import re
 %    \end{macrocode}
 % We define a class so that it's a bit easier to carry around internal
 % state. We used to just have some global variables and a bunch of
@@ -1264,7 +1265,7 @@ class SageTeXProcessor():
           try:
               _p_.save(filename=plotfilename, **kwargs)
           except ValueError as inst:
-              if 'filetype not supported by save' in str(inst):
+              if re.match('filetype .*not supported by save', str(inst)):
                   newfilename = plotfilename[:-3] + 'png'
                   print '  saving {0} failed; saving to {1} instead.'.format(
                                                     plotfilename, newfilename)
