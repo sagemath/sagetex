@@ -291,7 +291,8 @@ document.^^J}%
 %    \begin{macrocode}
 \newcommand{\ST@sage}[1]{\ST@wsf{%
 try:^^J
- _st_.inline(\theST@inline, \the\inputlineno, #1)^^J%
+ _st_.current_tex_line = \the\inputlineno^^J
+ _st_.inline(\theST@inline, #1)^^J%
 except:^^J
  _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
@@ -421,7 +422,8 @@ except:^^J
 % argument; all this is wrapped in another try/except.
 %    \begin{macrocode}
 \def\ST@sageplot[#1][#2]#3{\ST@wsf{try:^^J
- _st_.plot(\theST@plot, \the\inputlineno, format='#2', _p_=#3)^^Jexcept:^^J
+ _st_.current_tex_line = \the\inputlineno^^J
+ _st_.plot(\theST@plot, format='#2', _p_=#3)^^Jexcept:^^J
  _st_.goboom(\the\inputlineno)}%
 %    \end{macrocode}
 % The Python |plot| function is documented on page~\pageref{plotfn}.
@@ -596,7 +598,8 @@ except:^^J
 %    \begin{macrocode}
 \newcommand{\ST@beginsfbl}{%
   \@bsphack\ST@wsf{%
-_st_.blockbegin(\the\inputlineno)^^Jtry:}%
+_st_.current_tex_line = \the\inputlineno^^J%
+_st_.blockbegin()^^Jtry:}%
   \let\do\@makeother\dospecials\catcode`\^^M\active}
 %    \end{macrocode}
 % \end{macro}
@@ -676,7 +679,8 @@ _st_.blockbegin(\the\inputlineno)^^Jtry:}%
 \newenvironment{sageexample}{%
    \ST@wsf{%
 try:^^J
- _st_.doctest(\theST@inline, \the\inputlineno, r"""}%
+ _st_.current_tex_line = \the\inputlineno^^J
+ _st_.doctest(\theST@inline, r"""}%
    \ST@dodfsetup%
    \ST@wdf{Sage example, line \the\inputlineno::^^J}%
    \begingroup%
@@ -719,7 +723,8 @@ try:^^J
 \newenvironment{sagecommandline}{%
    \ST@wsf{%
 try:^^J
- _st_.commandline(\theST@cmdline, \the\inputlineno, r"""}%
+ _st_.current_tex_line = \the\inputlineno^^J
+ _st_.commandline(\theST@cmdline, r"""}%
    \ST@dodfsetup%
    \ST@wdf{Sage commandline, line \the\inputlineno::^^J}%
    \begingroup%
@@ -1045,13 +1050,13 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 %
 % That's a lot of explanation for a short function:
 %    \begin{macrocode}
-  def inline(self, counter, line, s, labelname='sageinline'):
+  def inline(self, counter, s, labelname='sageinline'):
       if counter <= self.max_counter_seen[labelname]:
           return
       else:
           self.max_counter_seen.increment(labelname)
       if labelname == 'sageinline':
-          self.progress('Inline formula {0} (line {1})'.format(counter, line))
+          self.progress('Inline formula {0} (line {1})'.format(counter, self.current_tex_line))
       elif labelname == 'sagecmdline':
           pass # output message already printed
       else:
@@ -1087,8 +1092,8 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % code block. The verbatim-like environments of
 % \autoref{sec:verbatim-envs} use these functions.
 %    \begin{macrocode}
-  def blockbegin(self, line):
-    self.progress('Code block (line {}) begin...'.format(line), False)
+  def blockbegin(self):
+    self.progress('Code block (line {}) begin...'.format(self.current_tex_line), False)
   def blockend(self):
     self.progress('end')
 %    \end{macrocode}
@@ -1100,7 +1105,7 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % Sage code and its output. We call it doctest because the format is
 % just like that for doctests in the Sage library.
 %    \begin{macrocode}
-  def doctest(self, counter, texfileline, str, globals, locals, include_text_output):
+  def doctest(self, counter, str, globals, locals, include_text_output):
       print 'in doctest'
       current_statement = None
       current_lines = None
@@ -1158,7 +1163,7 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
           current_lines = current_statement = None
           if line is None: break
           sage_block += 1
-      self.inline(counter, texfileline, latex_string)
+      self.inline(counter, latex_string)
 %    \end{macrocode}
 % \changes{v2.2.5}{2010/03/25}{Fix up spacing in sageexample displaymath envs}
 % \end{macro}
@@ -1167,8 +1172,8 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 %   This function handles the |commandline| environment, which
 %   typesets Sage code and its output.
 %    \begin{macrocode}
-  def commandline(self, counter, texfileline, str, globals, locals, text_output):
-      self.progress('Sage commandline {0} (line {1})'.format(counter, texfileline)) 
+  def commandline(self, counter, str, globals, locals, text_output):
+      self.progress('Sage commandline {0} (line {1})'.format(counter, self.current_tex_line))
       current_statement = None
       current_lines = None
       line_iterator = (line.lstrip() for line in str.splitlines())
@@ -1231,7 +1236,7 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
           if line is None: break
           sage_block += 1
       latex_string += bottom_skip + r"\noindent" + "\n"
-      self.inline(counter, texfileline, latex_string, labelname='sagecmdline')
+      self.inline(counter, latex_string, labelname='sagecmdline')
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1245,10 +1250,10 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % functions) has nice support for keyword arguments. The |#3| argument
 % to |\sageplot| becomes |_p_| and |**kwargs| below.
 %    \begin{macrocode}
-  def plot(self, counter, line, _p_, format='notprovided', **kwargs):
+  def plot(self, counter, _p_, format='notprovided', **kwargs):
       if not self.didinitplot:
           self.initplot()
-      self.progress('Plot {0} (line {1})'.format(counter, line))
+      self.progress('Plot {0} (line {1})'.format(counter, self.current_tex_line))
 %    \end{macrocode}
 % If the user says nothing about file formats, we default to producing
 % PDF and EPS. This allows the user to transparently switch between
@@ -1366,11 +1371,12 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % a program to discover a ``genuine'' change to the |.sage| file?
 %
 % The answer is to only find the MD5 sum of \emph{part} of the |.sage|
-% file. By design, the source file line numbers only appear in calls to
-% |goboom| and pause/unpause lines, so we will strip those lines out.
-% What we do below is exactly equivalent to running
+% file. By design, the source file line numbers only appear in (1) calls
+% to |goboom|, (2) lines with |_st_.current_tex_line|, and (3)
+% pause/unpause lines, so we will strip those lines out. What we do
+% below is exactly equivalent to running
 % \begin{center}
-% \verb+egrep -v '^( _st_.goboom|print .SageT)' filename.sage | md5sum+
+% \verb+egrep -v '^( _st_.goboom| ?_st_.current_tex_line|print .SageT)' filename.sage | md5sum+
 % \end{center}
 % in a shell.
 %    \begin{macrocode}
@@ -1378,10 +1384,18 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
     sagef = open(self.filename + '.sagetex.sage', 'r')
     m = hashlib.md5()
     for line in sagef:
-      if line[0:12] != " _st_.goboom" and line[0:12] != "print 'SageT":
+      if not line.startswith((" _st_.goboom",
+                              "print 'SageT",
+                              "_st_.current_tex_line",
+                              " _st_.current_tex_line")):
         m.update(line)
+%    \end{macrocode}
+% (The |current_tex_line| thing appears twice because it may appear
+% indented one space or not, depending on whether it's used before
+% |blockbegin| or not.)
+%    \begin{macrocode}
     s = '%' + m.hexdigest() + '% md5sum of corresponding .sage file\
- (minus "goboom" and pause/unpause lines)\n'
+ (minus "goboom", "current_tex_line", and pause/unpause lines)\n'
     self.souttmp.write(s)
     self.scmdtmp.write(s)
 %    \end{macrocode}
