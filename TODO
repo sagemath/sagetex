@@ -1,26 +1,8 @@
-* What about graphs and TikZ?
-
-* http://groups.google.com/group/sage-devel/browse_thread/thread/f95dfbf6caea17cb/67c77a05bb567940
-
-* work out "remote SageTeX"
-
-* syntax package for convenient typsetting of function names, etc   
-*   blah blah the function |euler_phi| is blah
-
 * make the #@ thing for sagecommandlinemore flexible; figure out what
    happens if you happen to have #@ earlier in the line, etc.
-
-* update remote-sagetex for new names:
-   https://groups.google.com/d/topic/sage-support/Kv7cNrUvj_Q/discussion
-
-* problem with big files:
-   https://groups.google.com/d/topic/sage-support/eZpnsXfUxgU/discussion
 
 * Nicolas, 25 nov 2011: <20111125231142.GF12879@zephyr> (and other
    messages in that thread)
 
-* script for Texworks:
-  https://groups.google.com/forum/?fromgroups#!topic/sage-support/JsDCgKvAMWQ
-  also look into Cygwin stuff to see if we have that working
 
 

@@ -139,7 +139,7 @@ suggestions.
 %</driver>
 % \fi
 %
-% \CheckSum{576}
+% \CheckSum{575}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -921,6 +921,17 @@ suggestions.
 % |\sage| or |\sagestr| an argument with no side effects.
 %
 % Thanks to Bruno Le Floch for reporting this.
+%
+%
+% \subsection{Using \texttt{sage} inside \texttt{caption}}
+% \label{sec:sage-inside-caption}
+%
+% If you want to use |\sage| inside the |\caption| for a figure, you'll
+% need to prepend it with |\protect|, because (in \TeX{} parlance) the
+% |\sage| macro is not ``robust''. For example:
+% \begin{quote}
+% |\caption{this figure illustrates why $2 + 2 = \protect\sage{2 + 2}$.}|
+% \end{quote}
 %
 % \subsection{Using Beamer}
 %
