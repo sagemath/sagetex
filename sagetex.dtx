@@ -933,6 +933,29 @@ suggestions.
 % |\caption{this figure illustrates why $2 + 2 = \protect\sage{2 + 2}$.}|
 % \end{quote}
 %
+% \subsection{Using \ST with TeXworks}
+%
+% On Linux and OS X, it's easy to get the
+% \href{https://www.tug.org/texworks/}{\TeX works} editor to work with
+% \ST. You will define a new ``typesetting engine'' following
+% \href{https://github.com/TeXworks/texworks/wiki/AdvancedTypesettingTools#defining-new-typesetting-tools}{these
+%   directions}. First, in some convenient location, create a shell
+% script with these contents:
+% \begin{quote}
+% |#!/bin/sh|\\
+% |pdflatex $1.tex|\\
+% |sage $1.sagetex.sage|\\
+% |pdflatex $1.tex|
+% \end{quote}
+% Name it \texttt{sagetex-engine} or something similar. Then, in the
+% Edit $\to$ Preferences menu, click the $+$ button in the Processing
+% tools section. Give the new tool a good name, like ``SageTeX''. In the
+% Program space, browse to your script. Click the $+$ for the Arguments
+% and type \texttt{\$basename} in the resulting box.
+%
+% Then, back in your document, you should be able to select SageTex in
+% the typesetting engine dropdown menu and then typeset.
+%
 % \subsection{Using Beamer}
 %
 % The \textsc{beamer} package does not play nicely with verbatim-like
