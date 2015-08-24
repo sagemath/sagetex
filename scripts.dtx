@@ -1,17 +1,117 @@
 % \section{Included Python scripts}
 % \label{sec:included-scripts}
 %
-% Here we describe the Python code for |makestatic.py|, which removes
-% \ST commands to produce a ``static'' file, and |extractsagecode.py|,
-% which extracts all the Sage code from a |.tex| file.
+% Here we describe the Python code for |run-sagetex-if-necessary|, and
+% also |makestatic.py|, which removes \ST commands to produce a
+% ``static'' file, and |extractsagecode.py|, which extracts all the Sage
+% code from a |.tex| file.
+%
+% \subsection{run-sagetex-if-necessary}
+% \label{sec:run-sagetex-if-necessary}
+% \iffalse
+%<*ifnecessaryscript>
+% \fi
+%
+% When working on a document that uses \ST, running Sage every time you
+% typeset your document may take too long, especially since it often
+% won't be necessary. This script is a drop-in replacement for Sage:
+% instead of
+% \begin{center}
+% |sage document.sagetex.sage|
+% \end{center}
+% you can do
+% \begin{center}
+% |run-sagetex-if-necessary.py document.sagetex.sage|
+% \end{center}
+% and it will use the MD5 mechanism described in the |endofdoc| macro
+% (page~{\pageref{macro:endofdoc}). With this, you can set up your editor
+% (\TeX Shop, \TeX Works, etc) to typeset your document with a script
+% that does
+% \begin{quote}
+%   |pdflatex $1|\\
+%   |run-sagetex-if-necessary.py $1|
+% \end{quote}
+% which will only, of course, run Sage when necessary.
+%    \begin{macrocode}
+
+# given a filename f, examines f.sagetex.sage and f.sagetex.sout and
+# runs Sage if necessary.
+
+import hashlib
+import sys
+import os
+import re
+import subprocess
+
+# CHANGE THIS AS APPROPRIATE
+path_to_sage = os.path.expanduser('~/bin/sage')
+# or try to auto-find it:
+# path_to_sage = subprocess.check_output(['which', 'sage']).strip()
+# or just tell me:
+# path_to_sage = '/usr/local/bin/sage'
+
+if sys.argv[1].endswith('.sagetex.sage'):
+    src = sys.argv[1][:-13]
+else:
+    src = os.path.splitext(sys.argv[1])[0]
+
+commented_out = r'^\s*%'
+usepackage = r'\usepackage{sagetex}'
+uses_sagetex = False
+
+# if it doesn't use sagetex, obviously running sage is unnecessary
+with open(src + '.tex') as texf:
+    for line in texf:
+        if not re.search(commented_out, line) and re.search(usepackage, line):
+            uses_sagetex = True
+            break
+
+if not uses_sagetex:
+    print src + ".tex doesn't seem to use SageTeX, exiting."
+    sys.exit(0)
+
+# if something goes wrong, assume we need to run Sage
+run_sage = True
+ignore = r"^( _st_.goboom|print 'SageT| ?_st_.current_tex_line)"
+
+try:
+    with open(src + '.sagetex.sage', 'r') as sagef:
+        h = hashlib.md5()
+        for line in sagef:
+            if not re.search(ignore, line):
+                h.update(line)
+except IOError:
+    print '{0}.sagetex.sage not found, I think you need to typeset {0}.tex first.'.format(src)
+    sys.exit(1)
+
+try:
+    with open(src + '.sagetex.sout', 'r') as outf:
+        for line in outf:
+            m = re.match('%([0-9a-f]+)% md5sum', line)
+            if m:
+                print 'computed md5:', h.hexdigest()
+                print 'sagetex.sout md5:', m.group(1)
+                if h.hexdigest() == m.group(1):
+                    run_sage = False
+                    break
+except IOError:
+    pass
+
+if run_sage:
+    print 'Need to run Sage on {0}.'.format(src)
+    sys.exit(subprocess.call([path_to_sage, src + '.sagetex.sage']))
+else:
+    print 'Not necessary to run Sage on {0}.'.format(src)
+%    \end{macrocode}
 %
 % \subsection{makestatic.py}
 % \label{sec:makestatic}
 % \iffalse
+%</ifnecessaryscript>
 %<*staticscript>
 % \fi
 %
-% First, |makestatic.py| script. It's about the most basic, generic
+% Now the |makestatic.py| script. It's about the most basic, generic
 % Python script taking command-line arguments that you'll find. The
 % |#!/usr/bin/env python| line is provided for us by the |.ins| file's
 % preamble, so we don't put it here.

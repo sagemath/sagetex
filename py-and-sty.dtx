@@ -1356,6 +1356,7 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % \end{macro}
 %
 % \begin{macro}{endofdoc}
+% \phantomsection\label{macro:endofdoc}
 % When we're done processing, we have some cleanup tasks. We
 % want to put the MD5 sum of the |.sage| file that produced the |.sout|
 % file we're about to write into the |.sout| file, so that external
@@ -1378,7 +1379,9 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % \begin{center}
 % \verb+egrep -v '^( _st_.goboom| ?_st_.current_tex_line|print .SageT)' filename.sage | md5sum+
 % \end{center}
-% in a shell.
+% in a shell. The included |run-sagetex-if-necessary| uses this
+% mechanism to, well, only run Sage when necessary; see
+% \autoref{sec:run-sagetex-if-necessary}.
 %    \begin{macrocode}
   def endofdoc(self):
     sagef = open(self.filename + '.sagetex.sage', 'r')
