@@ -715,7 +715,7 @@ try:^^J
 %
 % \begin{environment}{sagecommandline}
 % This environment is similar to the |sageexample| environment, but
-% typesets the sage output as text with python syntax highlighting.
+% typesets the Sage output as text with Python syntax highlighting.
 %    \begin{macrocode}
 \newcommand{\sagecommandlinetextoutput}{True}
 \newlength{\sagecommandlineskip}
@@ -893,10 +893,48 @@ class MyDict(defaultdict):
     def increment(self, key):
         self[key] = self[key] + 1
 %    \end{macrocode}
-% We define a |SageTeXProcessor| class so that it's a bit easier to
-% carry around internal state. We used to just have some global
-% variables and a bunch of functions, but this seems a bit nicer and
-% easier.
+% Here's a helper function used by |doctest|; it works ike |j.join(xs)|,
+% but ensures exactly one copy of |j| between the strings in |xs|.
+% Intended for |j| to be a single character, particularly newline so
+% that you can join things with no extra blank lines.
+%    \begin{macrocode}
+def joinone(j, xs_):
+    if len(xs_) >= 2:
+        xs = ([xs_[0].rstrip(j)] +
+              [x.strip(j) for x in xs_[1:-1]] +
+              [xs_[-1].lstrip(j)])
+    else:
+        xs = xs_
+    return j.join(xs)
+%    \end{macrocode}
+% Another helper, used by |commandline| (and maybe, someday,
+% |doctest|?). In each line, we look for a possibly empty sequence of
+% spaces followed by a non-whitespace character, so we can distinguish
+% between whitespace-only lines (which we ignore) and lines that have no
+% leading spaces.
+%
+% One tiny possible problem: you might have a line of only, say, two
+% spaces, but perhaps the ``real'' lines all start with at least three
+% spaces. Then you would, for that line, do |line[2:]|. That seems like
+% it might raise an error, since the line only has indices 0 and 1, but
+% Python's indexing handles this perfectly: in that case, |line[2:]|
+% will be the empty string, which is fine for our purposes.
+%    \begin{macrocode}
+def strip_common_leading_spaces(s):
+    lines = s.splitlines()
+    lead = min(m.end() for m in
+                  [re.match(' *\S', line) for line in lines]
+                  if m is not None) - 1
+    return '\n'.join(line[lead:] for line in lines)
+%    \end{macrocode}
+%
+% \subsubsection{The \texttt{SageTeXProcessor} class}
+% \label{sec:sagetexprocessorclass}
+%
+% The star of the show, as it were. We define a |SageTeXProcessor| class
+% so that it's a bit easier to carry around internal state. We used to
+% just have some global variables and a bunch of functions, but this
+% seems a bit nicer and easier.
 %    \begin{macrocode}
 class SageTeXProcessor():
 %    \end{macrocode}
@@ -962,7 +1000,8 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 %    \end{macrocode}
 % In addition to the |.sout| file, the |sagecommandline| also needs a
 % |.scmd| file. As before, we use a |.scmd.tmp| file and rename it
-% later on. We store the file and position in the data members
+% later on. We store the position so that |commandline| can tell the
+% |listings| package what lines in the |.scmd| file to pull in.
 %    \begin{macrocode}
     self.scmdtmp = open(self.filename + '.sagetex.scmd.tmp', 'w')
     self.scmdtmp.write(autogenstr)
@@ -1070,12 +1109,12 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % \end{macro}
 %
 % \begin{macro}{savecmd}
-% Analogous to |inline|, this method saves the input string |s| to
-% the temporary |.scmd| file. As an added bonus, it returns a pair
-% of line numbers in the |.scmd| file, the first and last line of
-% the newly-added output.
+%   Analogous to |inline|, this method saves the input string |s| to the
+%   |souttmp| file. It returns the first and last line of the
+%   newly-added output so that |commandline| can tell the |listings|
+%   package where to get stuff.
 %    \begin{macrocode}
-  def savecmd(self, counter, s):
+  def savecmd(self, s):
       self.scmdtmp.write(s.rstrip() + "\n")
       begin = self.scmdpos
       end = begin + len(s.splitlines()) - 1
@@ -1100,143 +1139,233 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 % \end{macro}
 % \end{macro}
 %
-% \begin{macro}{doctest}
-% This function handles the |sageexample| environment, which typesets
-% Sage code and its output. We call it doctest because the format is
-% just like that for doctests in the Sage library.
+% \begin{macro}{splitsagecmds}
+%   Given a string |s| of doctest-like Sage code, this function returns
+%   a list of tuples |(i, j, cmd)|, where |cmd| is a string representing
+%   a Sage command, with the initial prompt and continuation lines
+%   stripped, |i| is the position in |s| where |cmd| starts, and |j| is
+%   the starting position in |s| of the purported output from the
+%   command that was included in |s|.
+%
+%   This is used by |doctest| and |commandline|, below.
+%
+%   For example, this turns the string
+%   \begin{quote}
+%   |'''|\\
+%   |    sage: 1+1|\\
+%   |    2|\\
+%   |    sage: y = 1729|\\
+%   |    sage: 10^3 + 9^3 == 12^3 + 1^3 == y|\\
+%   |    sage: gcd(9999999,|\\
+%   |    ....: 123456)|\\
+%   |    3|\\
+%   |    sage: factor(x^2 + 2*x + 1)|\\
+%   |    (x + 1)^2|\\
+%   |'''|
+%   \end{quote}
+%   into
+%   \begin{quote}
+%   |[(0, 18, '1+1'),|\\
+%   | (28, 51, 'y = 1729'),|\\
+%   | (51, 95, '10^3 + 9^3 == 12^3 + 1^3 == y'),|\\
+%   | (95, 144, 'gcd(9999999,\n123456)'),|\\
+%   | (154, 190, 'factor(x^2 + 2*x + 1)')]|
+%   \end{quote}
+%   You can reconstruct the sequence of commands and their output with
+%   something like
+%   \begin{quote}
+%   |splitup = split_sage_cmds(s)|\\
+%   |oldout = splitup[0][1]|\\
+%   |print '=' * 50|\\
+%   |print '==== Command:'|\\
+%   |print s[splitup[0][0]:oldout]|\\
+%   |for start, out, _ in splitup[1:]:|\\
+%   |    print '==== Given output:'|\\
+%   |    print s[oldout:start]|\\
+%   |    print '=' * 50|\\
+%   |    print '==== Command:'|\\
+%   |    print s[start:out]|\\
+%   |    oldout = out|\\
+%   |print '==== Given output:'|\\
+%   |print s[oldout:]|
+%   \end{quote}
 %    \begin{macrocode}
-  def doctest(self, counter, str, globals, locals, include_text_output):
-      print 'in doctest'
-      current_statement = None
-      current_lines = None
-      latex_string = ""
-      line_iterator = (line.lstrip() for line in str.splitlines())
-
-      # Gobbles everything until the first "sage: ..." block
-      for line in line_iterator:
-          if line.startswith("sage: "):
-              break
-      else:
-          return
-      sage_block = 0
-      while True:
-          # At each
-          assert line.startswith("sage: ")
-          current_statement  = line[6:]
-          current_lines = "  "+line
-          for line in line_iterator:
-              if line.startswith("sage: "):
-                  break
-              elif line.startswith("..."):
-                  current_statement +="\n"+line[6:]
-                  current_lines +="\n  "+line
-              elif include_text_output:
-                  current_lines +="\n  "+line
-          else:
-              line = None # we reached the last line
-          # Now we have digested everything from the current sage: ... to the next one or to the last line
-          # Let us handle it
-          verbatimboxname = "@sageinline%s-code%s"%(counter,sage_block)
-          self.souttmp.write("\\begin{SaveVerbatim}{%s}\n"%verbatimboxname)
-          self.souttmp.write(current_lines)
-          self.souttmp.write("\n\\end{SaveVerbatim}\n")
-          latex_string += "\UseVerbatim{%s}\n"%verbatimboxname
-          current_statement = preparse(current_statement)
-          try: # How to test whether the code is an Python expression or a statement?
-              # In the first case, we compute the result and include it in the latex
-              result = eval(current_statement, globals, locals)
+  def split_sage_cmds(self, s):
+      prompt = '\n' + r'\s*sage: '
+      cont = r'\s*\.\.\.\.: '
 %    \end{macrocode}
+% Prepending a newline to |s| ensures that the list from |re.split()|
+% begins with something we can ignore---and so that the |re.split()|
+% returns $n+1$ groups for $n$ matches, so therefore |split| and
+% |starts| match up.
+%    \begin{macrocode}
+      split = re.split(prompt, '\n' + s)[1:]
+      starts = [m.start() - 1 for m in re.finditer(prompt, '\n' + s)]
+%    \end{macrocode}
+% The prepended newline messes up the first element of |starts|, fix
+% that:
+%    \begin{macrocode}
+      starts[0] = re.search(prompt, s).start()
+%    \end{macrocode}
+% Now find where the outputs start. We need this because |doctest()| may
+% or may not print the outputs. The idea is: for each |start|ing
+% position, advance over the prompt that we know is there, then look for
+% the rightmost continuation marker between the current prompt and the
+% next one, and \emph{then} look for the newline following that. That
+% position is where the output begins.
+%    \begin{macrocode}
+      outputs = []
+      for i, j in zip(starts, starts[1:] + [len(s)]):
+          k = i + re.match(prompt, s[i:j]).end()
+          try:
+              k += [m.end() for m in re.finditer(cont, s[k:j])][-1]
+          except IndexError:
+              pass
+          end = s.find('\n', k)
+          outputs.append(end)
+%    \end{macrocode}
+% Now we take each command group, split it up, and look for all the
+% continuation lines. We append those, stripping off the continuation
+% marks.
+%    \begin{macrocode}
+      ret = []
+      for start, end, g in zip(starts, outputs, split):
+          lines = g.splitlines()
+          cmd = lines[:1]
+          for line in lines[1:]:
+              m = re.match(cont, line)
+              if m:
+                  cmd.append(line[m.end():])
+          ret.append((start, end, '\n'.join(cmd)))
+      return ret
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{doctest}
+%   This function handles the |sageexample| environment, which typesets
+%   Sage code and its output. We call it |doctest| because the format is
+%   just like that for doctests in the Sage library.
+%
+%  The idea is:
+% \begin{enumerate}
+% \item Get the literal text for each command, wrap that in
+%   |SaveVerbatim|, write that (possibly with its associated output from
+%   the |.tex| file) to the |sout| file.
+% \item Accumulate a corresponding |UseVerbatim| and typeset output so
+%   that we can call |inline()| at the end and pull in all this stuff.
+% \item For the output: try to |eval()| the processed command (the one
+%   with the prompts and continuation marks stripped). If that succeeds,
+%   we run |latex()| on it and display that below the verbatim text from
+%   above. If that fails, it's because you have a statement and not an
+%   expression---there's no output from such a thing (well, none that we
+%   can capture, anyway) so no need to typeset output.
+% \end{enumerate}
+%    \begin{macrocode}
+  def doctest(self, counter, s, globals, locals, include_text_output):
+      self.progress('Sage example {0} (line {1})'.format(counter, self.current_tex_line))
+      splitup = self.split_sage_cmds(s)
+      tex_strs = []
+      for i in range(len(splitup)):
+          boxname = '@sageinline{}-code{}'.format(counter, i)
+          to_tmp = [r'\begin{SaveVerbatim}{' + boxname + '}',
+                    s[splitup[i][0]:splitup[i][1]]]
+          if include_text_output:
+              try:
+                  to_tmp.append(s[splitup[i][1]:splitup[i+1][0]])
+              except IndexError:
+                  to_tmp.append(s[splitup[i][1]:])
+          to_tmp.append('\\end{SaveVerbatim}\n')
+          self.souttmp.write(joinone('\n', to_tmp))
+%    \end{macrocode}
+% Now we build up something that we can send to |inline()|, which will
+% pull it into the document using its usual label mechanism.
+%
 % The verbatim stuff seems to end with a bit of vertical space, so don't
 % start the displaymath environment with unnecessary vertical
 % space---the displayskip stuff is from \S 11.5 of Herbert Vo\ss's
 % ``\href{http://www.ctan.org/tex-archive/info/math/voss/mathmode/}{Math
-%   Mode}''. Be careful when using \TeX{} commands and Python 3 (or
-% 2.6+) curly brace string formatting; either double braces or separate
-% strings, as below.
+% Mode}''.
 %    \begin{macrocode}
-              latex_string += r"""\abovedisplayskip=0pt plus 3pt
-\abovedisplayshortskip=0pt plus 3pt
-\begin{displaymath}""" + "\n {0}\n".format(latex(result)) + r"\end{displaymath}" + "\n"
+          tex_strs.append(r'\UseVerbatim{' + boxname + '}')
+          try:
+              result = eval(preparse(splitup[i][2]), globals, locals)
+              tex_strs += [r'\abovedisplayskip=0pt plus 3pt ',
+                           r'\abovedisplayshortskip=0pt plus 3pt ',
+                           r'\begin{displaymath}',
+                           latex(result),
+                           r' \end{displaymath}']
           except SyntaxError:
-              # If this fails, we assume that the code was a statement, and just execute it
-              exec current_statement in globals, locals
-          current_lines = current_statement = None
-          if line is None: break
-          sage_block += 1
-      self.inline(counter, latex_string)
+              exec preparse(splitup[i][2]) in globals, locals
+      self.inline(counter, '\n'.join(tex_strs))
 %    \end{macrocode}
 % \changes{v2.2.5}{2010/03/25}{Fix up spacing in sageexample displaymath envs}
 % \end{macro}
 %
 % \begin{macro}{commandline}
-%   This function handles the |commandline| environment, which
-%   typesets Sage code and its output.
+%   This function handles the |commandline| environment, which typesets
+%   Sage code, computes its output, and typesets that too. This is very
+%   similar to |doctest| and I hope to someday combine them into one.
+%
+%   Even if I can't refactor these two functions (and their associated
+%   environments) into one, I would like to eliminate the |.scmd| file
+%   that this function uses, since exactly the same bits of Sage code
+%   get written to both the |.scmd| file and the |_doctest.sage| file.
+%   The reason this isn't trivial is because we need to keep track of
+%   which line number we're on so that we can give the |listings|
+%   package a start and end line to extract, and right now the
+%   |_doctest.sage| file is written to by \LaTeX{} and we can't track
+%   the line number.
+%
+%   In any case, here's what we do: after splitting up the provided
+%   string using |split_sage_cmds|, we iterate over each of the
+%   commands and:
+%   \begin{enumerate}
+%   \item Put the original input command into the |.scmd| file with
+%     |savecmd|.
+%   \item Use the |begin| and |end| line numbers to append a
+%     |lstinputlisting| command to the \TeX{} commands we'll eventually
+%     hand off to |inline|.
+%   \item Evaluate the command using |eval()| or |exec|, as necessary.
+%     If we're doing plain text format, we send the output to the
+%     |.scmd| file and add a \TeX{} command to pull that back in---if we
+%     need typeset output, then we just hit the output with |latex()|
+%     and add that to the list of \TeX{} commands.
+%   \end{enumerate}
+%   Observe that we detect spaces in the filename and quote that for
+%   \TeX{} if we need to.
 %    \begin{macrocode}
-  def commandline(self, counter, str, globals, locals, text_output):
+  def commandline(self, counter, s, globals, locals, text_output):
       self.progress('Sage commandline {0} (line {1})'.format(counter, self.current_tex_line))
-      current_statement = None
-      current_lines = None
-      line_iterator = (line.lstrip() for line in str.splitlines())
-      latex_string = r"\vspace{\sagecommandlineskip}" + "\n"
-      bottom_skip = ''
+      scmd_fn = self.name + '.sagetex.scmd'
+      if ' ' in scmd_fn:
+          scmd_fn = '"{}"'.format(scmd_fn)
 
-      # Gobbles everything until the first "sage: ..." block
-      for line in line_iterator:
-          if line.startswith("sage: "):
-              break
-      else:
-          return
-      sage_block = 0
-      while True:
-          # At each
-          assert line.startswith("sage: ")
-          current_statement  = line[6:]
-          current_lines = line
-          for line in line_iterator:
-              if line.startswith("sage: "):
-                  break
-              elif line.startswith("...   "):
-                  current_statement += "\n"+line[6:]
-                  current_lines += "\n"+line
-          else:
-              line = None # we reached the last line
-          # Now have everything from "sage:" to the next "sage:"
-
-          if current_lines.find('#@')>=0:
+      splitup = self.split_sage_cmds(s)
+      skip = r'\vspace{\sagecommandlineskip}'
+      tex_strs = [skip]
+      lstinput = r'\lstinputlisting[firstline={0},lastline={1},firstnumber={2},style=SageInput{escape}]{{{3}}}'
+      for i in range(len(splitup)):
+          orig_input = s[splitup[i][0]:splitup[i][1]]
+          begin, end = self.savecmd(strip_common_leading_spaces(orig_input.strip('\n')))
+          if '#@' in orig_input:
               escapeoption = ',escapeinside={\\#@}{\\^^M}'
           else:
               escapeoption = ''
-
-          begin, end = self.savecmd(counter,current_lines)
-%    \end{macrocode}
-% If there's a space in the filename, we need to quote it for \TeX.
-%    \begin{macrocode}
-          filename = self.name + '.sagetex.scmd'
-          if ' ' in filename:
-              filename = '"' + filename + '"'
-          latex_string += r"\lstinputlisting[firstline={0},lastline={1},firstnumber={2},style=SageInput{3}]{{{4}}}".format(begin, end, begin-2, escapeoption, filename)+"\n"
-
-          current_statement = preparse(current_statement)
-          try:  # is it an expression?
-              result = eval(current_statement, globals, locals)
-              resultstr = "{0}".format(result)
-              begin, end = self.savecmd(counter,resultstr)
+          tex_strs.append(lstinput.format(begin, end, begin - 2, scmd_fn, escape=escapeoption))
+          try:
+              result = eval(preparse(splitup[i][2]), globals, locals)
               if text_output:
-                latex_string += r"\lstinputlisting[firstline={0},lastline={1},firstnumber={2},style=SageOutput]{{{3}}}".format(begin, end, begin-2, filename)+"\n"
-                bottom_skip = r"\vspace{\sagecommandlineskip}" + "\n"
+                  begin, end = self.savecmd(str(result))
+                  tex_strs.append(lstinput.format(begin, end, begin - 2, scmd_fn, escape=''))
               else:
-                latex_string += (
-                  r"\begin{displaymath}" + "\n" +
-                  latex(result)          + "\n" +
-                  r"\end{displaymath}"   + "\n" )
-                bottom_skip = ''
-          except SyntaxError:  # must be a statement!
-              exec current_statement in globals, locals
-          current_lines = current_statement = None
-          if line is None: break
-          sage_block += 1
-      latex_string += bottom_skip + r"\noindent" + "\n"
-      self.inline(counter, latex_string, labelname='sagecmdline')
+                  tex_strs.append(r'\begin{displaymath}' +
+                                  latex(result) +
+                                  r'\end{displaymath}')
+          except SyntaxError:
+              exec preparse(splitup[i][2]) in globals, locals
+      if 'displaymath' not in tex_strs[-1]:
+          tex_strs.append(skip)
+      self.inline(counter, '\n'.join(tex_strs), labelname='sagecmdline')
 %    \end{macrocode}
 % \end{macro}
 %
@@ -1430,5 +1559,5 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 %</python>
 % Local Variables:
 % mode: doctex
-% TeX-master: "sagetex"
+% TeX-master: "sagetex.dtx"
 % End:

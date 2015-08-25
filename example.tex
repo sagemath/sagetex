@@ -424,40 +424,60 @@ size, while changing only one thing.
 
 Here are some examples of using the \texttt{sageexample} environment:
 \begin{sageexample}
-  sage: 1+1
-  2
+  sage: 2+2
+  4
+  sage: print 'middle'
+  middle
   sage: factor(x^2 + 2*x + 1)
   (x + 1)^2
 \end{sageexample}
-If you want to see the plain-text output as well as the typeset output,
-renew the \texttt{sageexampleincludetextoutput} command to True:
+Note above that no output from the \texttt{print} statement appears.
+That is because we have to use Python's \texttt{exec} to execute that
+statement (and not \texttt{eval()}), and we can't get the output from
+that.
+
+That said, if you want to see the plain-text output you put into your
+\verb|.tex| file as well as the Sage-computed typeset output, renew the
+\texttt{sageexampleincludetextoutput} command to True:
 \begin{verbatim}
   \renewcommand{\sageexampleincludetextoutput}{True}
 \end{verbatim}
 \renewcommand{\sageexampleincludetextoutput}{True}
-This can be useful to check that the two outputs are consistent.
-
-When this environment is near the bottom of the page, it may look like
-the page number is the output of a command, when in fact the real output
-is on the next page. If the output of a command below looks like
-\thepage, don't worry, that's just the page number.
-
+This can be useful to check that the two outputs are consistent. Here's
+the print statement with text output included:
 \begin{sageexample}
-  sage: 1+1
-  2
-  sage: factor(x^2 + 2*x + 1)
-  (x + 1)^2
+  sage: print 'middle'
+  middle
 \end{sageexample}
-Multiline statements are supported, as are triple-quoted strings
-delimited by single quotes:
-\renewcommand{\sageexampleincludetextoutput}{False}
+When typesetting your document, the validity of the outputs is not
+checked. In fact, the provided outputs are completely ignored:
+\renewcommand{\sageexampleincludetextoutput}{True}
 \begin{sageexample}
+  sage: is_prime(57)
+  toothpaste
+\end{sageexample}
+\renewcommand{\sageexampleincludetextoutput}{False}%
+Multiline statements with the ``\verb|....:|'' continuation marks are
+supported, as are triple-quoted strings delimited by single quotes
+(double quotes won't work):
+\begin{sageexample}
+  sage: gcd([5656565656,
+  ....:      4747474747,
+  ....:      123456789])
+  1
+  sage: mystr = '''my
+  ....: string
+  ....: has
+  ....: several
+  ....: lines.'''
+  sage: len(mystr)
+  28
   sage: def f(a):
-  ...       '''This function is really quite nice,
-  ...       although perhaps not very useful.'''
-  ...       print "f called with a = ", a
-  ...       y = integrate(SR(cyclotomic_polynomial(10)) + a, x)
-  ...       return y + 1
+  ....:     '''This function is really quite nice,
+  ....:     although perhaps not very useful.'''
+  ....:     print "f called with a = ", a
+  ....:     y = integrate(SR(cyclotomic_polynomial(10)) + a, x)
+  ....:     return y + 1
   sage: f(x)
   f called with a =  x
   1/5*x^5 - 1/4*x^4 + 1/3*x^3 + x + 1
@@ -466,26 +486,17 @@ Note that the ``$f$ called with\ldots'' stuff doesn't get typeset, since
 when running Sage on \texttt{example.sagetex.sage}, that gets printed to the
 terminal.
 
-When typesetting your document, the validity of the outputs is not
-checked. In fact, the provided outputs are completely ignored:
-\renewcommand{\sageexampleincludetextoutput}{True}
-\begin{sageexample}
-  sage: is_prime(57)
-  toothpaste
-\end{sageexample}
-\renewcommand{\sageexampleincludetextoutput}{False}
-
-However, typesetting your document produces a file named
+Typesetting your document produces a file named
 \texttt{example\_doctest.sage} containing all the doctest-like examples,
 and you can have Sage check them for you with:
 \begin{verbatim}
   $ sage -t  example_doctest.sage
 \end{verbatim}
-You should get one doctest failure from the ``toothpaste'' line above.
+You should get a doctest failure from the ``toothpaste'' line above. The
+line numbers from \texttt{sage -t} refer to the ``\verb|_doctest.sage|''
+file.
 
-Please look into this file for the original line numbers.
-
-Beware that \texttt{sage -t} does not handle well file names with
+Beware that \texttt{sage -t} does not really handle file names with
 special characters in them, particularly dashes, dots, and spaces---this
 ultimately comes from the way Python interprets \texttt{import}
 statements. Also, running doctests on files outside the main Sage
@@ -496,7 +507,8 @@ Some more examples. This environment is implemented a little bit
 differently than the other environments, so it's good to make sure that
 definitions are preserved across multiple uses. This will correctly
 define $a$, but not print its output because the statement is made up of
-a sequence of expressions.
+a sequence of expressions and we can't use Python's \texttt{eval()}; we
+have to use \texttt{exec} and we can't capture the output from that.
 \begin{sageexample}
   sage: 1; 2; a=4; 3; a
   1
@@ -504,8 +516,8 @@ a sequence of expressions.
   3
   4
 \end{sageexample}
-After that, Sage should remember that $a = \sage{a}$ and be able to use
-that in future \texttt{sageexample} blocks:
+However, after that, Sage should remember that $a = \sage{a}$ and be
+able to use that in future \texttt{sageexample} blocks:
 \begin{sageexample}
   sage: f(a)
   f called with a =  4
@@ -610,14 +622,19 @@ me?'' you may cry. Well, they \emph{can} cooperate:
 \begin{sagecommandline}
   sage: 1+1
   sage: is_prime(57)
+  sage: if is_prime(57):
+  ....:     print 'prime'
+  ....: else:
+  ....:     print 'composite'
 \end{sagecommandline}
 
 Note that the output of the commands is not included in the source file,
 but are included in the typeset output.
 
 Because of the way the environment is implemented, not everything is
-exactly like using Sage in a terminal: the two commands below would
-produce some output, but don't here:
+exactly like using Sage in a terminal: the two commands below (and the
+``if is prime'' one above, did you notice that?) would produce some
+output, but don't here:
 
 \begin{sagecommandline}
   sage: x = 2010; len(x.divisors())
@@ -625,7 +642,9 @@ produce some output, but don't here:
 \end{sagecommandline}
 
 The difference lies in the Python distinction between statements and
-expressions.
+expressions; we can use \texttt{eval()} for an expression and get its
+output, but we must use \texttt{exec} for a statement and can't get the
+output, if any.
 
 One nice thing is that you can set labels by using an @ sign:
 
@@ -639,12 +658,12 @@ One nice thing is that you can set labels by using an @ sign:
 And then refer to that label: it was on line \ref{diagonal}, which is on
 page \pageref{diagonal}. Note that the other text after the hash mark on
 that line does not get typeset as a comment, and that you cannot have
-any space between the hash mark and the~@.
+any space between the hash mark and the~@. You will also need to typeset
+your document \emph{twice}
 
-You can also typeset the output:
-
+You can also typeset the output by changing the value of
+\verb|\sagecommandlinetextoutput| to False:
 \renewcommand{\sagecommandlinetextoutput}{False}
-
 \begin{sagecommandline}
   sage: l*d*u
   sage: x = var('x')
@@ -677,8 +696,16 @@ it):
 
 You can include output, but it will be ignored. This is useful for
 doctesting, as all the \texttt{sagecommandline} environment things get
-put into the ``\texttt{\_doctest.sage}'' file.
+put into the ``\texttt{\_doctest.sage}'' file. However, note that if you
+don't include any output, then the corresponding doctest will fail if
+the command produces output. The doctest output from this file will have
+lots of failures because not many of the commands have output included
+in the source \texttt{.tex} file.
 
+The command below has incorrect output included in the \texttt{.tex}
+file; in the PDF, you see the correct Sage-computed answer, but if you
+do \texttt{sage -t example\_doctest.sage} you will get a genuine doctest
+failure.
 \begin{sagecommandline}
   sage: factor(x^2 + 2*x + 1)
   (x + 999)^2

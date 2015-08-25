@@ -139,7 +139,7 @@ suggestions.
 %</driver>
 % \fi
 %
-% \CheckSum{577}
+% \CheckSum{570}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -768,6 +768,12 @@ suggestions.
 % environment: |comment|. Another way to do this is to put stuff between
 % |\iffalse| and |\fi|.\\
 %
+% \DescribeMacro{\sagetexindent} There is one final bit to our
+% verbatim-like environments: the indentation. The \ST package defines a
+% length |\sagetexindent|, which controls how much the Sage code is
+% indented when typeset. You can change this length however you like
+% with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or whatever.
+%
 % \DescribeEnv{sageexample} This environment allow you to include
 % doctest-like snippets in your document that will be nicely typeset.
 % For example,
@@ -781,7 +787,14 @@ suggestions.
 % \end{quote}
 % in your document will be typeset with the Sage inputs in the usual
 % fixed-width font, and the outputs will be typeset as if given to a
-% |\sage| macro. When typesetting the document, there is no test of the
+% |\sage| macro, as you see below:
+\begin{sageexample}
+  sage: 1+1
+  2
+  sage: factor(x^2 + 2*x + 1)
+  (x + 1)^2
+\end{sageexample}
+% When typesetting the document, there is no test of the
 % validity of the outputs (that is, typesetting with a typical
 % \LTX-Sage-\LTX cycle does not do doctesting), but when using the
 % |sageexample| environment, an extra file named
@@ -802,6 +815,8 @@ suggestions.
 % limitation is that triple-quoted strings delimited by |"""| cannot be
 % used in a |sageexample| environment; instead, you can use
 % triple-quoted strings delimited by |'''|.
+%
+% See the |example.tex| file for many examples and more explanation.
 %
 % The initial implementation of this environment is due to Nicolas M.
 % Thi\'ery.\\
@@ -825,7 +840,7 @@ suggestions.
   sage: 1+1
   2
   sage: factor(x^2 + 2*x + 1)
-\end{sagecommandline}|
+\end{sagecommandline}
 % You have a choice of either explicitly providing the Sage output (in
 % which case it will be turned into a doctest), or leaving it up to the
 % computer to fill in the blanks. Above, the output for $1+1$ was
@@ -864,12 +879,6 @@ suggestions.
 \end{sagecommandline}
 \lstdefinestyle{SageInput}{style=DefaultSageInput}
 \lstdefinestyle{SageOutput}{style=DefaultSageOutput}
-%
-% \DescribeMacro{\sagetexindent} There is one final bit to our
-% verbatim-like environments: the indentation. The \ST package defines a
-% length |\sagetexindent|, which controls how much the Sage code is
-% indented when typeset. You can change this length however you like
-% with |\setlength|: do |\setlength{\sagetexindent}{6ex}| or whatever.
 %
 % \subsection{Pausing \ST}
 % \label{sec:pausing-st-usage}
