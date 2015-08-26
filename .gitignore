@@ -6,6 +6,7 @@
 *.pdf
 *.synctex.gz
 *_doctest.sage
+*_doctest.sage.py
 *.fdb_latexmk
 *.fls
 E2.sobj
@@ -15,6 +16,7 @@ extractsagecode.py
 makecmds.sty
 makestatic.py
 remote-sagetex.py
+run-sagetex-if-necessary.py
 sage-plots-for-*.tex/
 sagetex.glo
 sagetex.gls
@@ -27,3 +29,4 @@ sagetex.sty
 sagetexparse.py
 .*.sage-history
 .*.sage-chat
+MANIFEST
