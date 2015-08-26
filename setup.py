@@ -4,7 +4,7 @@ setup(name='sagetex',
       long_description="""The SageTeX package allows you to embed code,
   results of computations, and plots from the Sage mathematics
   software suite (http://sagemath.org) into LaTeX documents.""",
-      version='2.3.4',
+      version='3.0',
       author='Dan Drake',
       author_email='dr.dan.drake@gmail.com',
       url='https://github.com/dandrake/sagetex',
