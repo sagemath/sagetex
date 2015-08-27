@@ -1192,6 +1192,7 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 %    \begin{macrocode}
   def split_sage_cmds(self, s):
       prompt = '\n' + r'\s*sage: '
+      oldcont = r'\s*\.\.\.'
       cont = r'\s*\.\.\.\.: '
 %    \end{macrocode}
 % Prepending a newline to |s| ensures that the list from |re.split()|
@@ -1226,16 +1227,24 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
 %    \end{macrocode}
 % Now we take each command group, split it up, and look for all the
 % continuation lines. We append those, stripping off the continuation
-% marks.
+% marks. We also do some error checking so that users with documents
+% that use the old |...| continuation marks get a reasonable error
+% message.
 %    \begin{macrocode}
       ret = []
       for start, end, g in zip(starts, outputs, split):
           lines = g.splitlines()
           cmd = lines[:1]
           for line in lines[1:]:
-              m = re.match(cont, line)
-              if m:
-                  cmd.append(line[m.end():])
+              has_old_cont = re.match(oldcont, line)
+              has_cont = re.match(cont, line)
+              if has_old_cont and not has_cont:
+                  raise SyntaxError, """ SageTeX no longer supports "..." for line continuation in sagexample and
+sagecommandline environments. Use "....:", which matches what the Sage
+interpreter uses. See the documentation and example file in
+SAGE_ROOT/local/share/doc/sagetex."""
+              if has_cont:
+                  cmd.append(line[has_cont.end():])
           ret.append((start, end, '\n'.join(cmd)))
       return ret
 %    \end{macrocode}
