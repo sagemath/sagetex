@@ -5,7 +5,7 @@ computations, and plots from the Sage mathematics software suite
 
 SageTeX is included with Sage, so to use it, you only need to make the
 file sagetex.sty known to TeX; that file will be in
-SAGE_ROOT/local/share/texmf/tex/generic/sagetex, along with
+SAGE_ROOT/local/share/texmf/tex/latex/sagetex, along with
 documentation and examples. See the Sage installation guide at
 http://sagemath.org/doc/installation/ for complete instructions and
 http://sagemath.org/doc/tutorial/sagetex.html for a quick usage
