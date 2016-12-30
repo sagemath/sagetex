@@ -44,6 +44,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 \generate{\file{sagetex.sty}{\from{sagetex.dtx}{latex}
                              \from{py-and-sty.dtx}{latex}}}
 
+
+\usedir{PYTHONLIBDIR}
+
 % Define a new preamble with #'s as comment characters for the Python
 % files. I hate copying the same text, but defining a "\boilerplate"
 % macro requires me to manually do \MetaPrefix\space and ^^J everywhere
@@ -80,6 +83,9 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 \generate{\file{sagetex.py}{\from{sagetex.dtx}{python}
                             \from{py-and-sty.dtx}{python}}}
 \generate{\file{sagetexparse.py}{\from{scripts.dtx}{parsermod}}}
+
+
+\usedir{scripts/sagetex}
 
 % Now define a new preamble with the shebang line at the top.
 
