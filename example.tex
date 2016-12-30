@@ -143,7 +143,7 @@ When using \verb|\sageplot|, you can pass in just about anything that
 Sage can call \verb|.save()| on to produce a graphics file:
 
 \begin{center}
-\sageplot{plot1 + plot(f.sage(),x,-1,2*pi,rgbcolor=hue(0.4)), figsize=[1,2]}
+\sageplot[width=.7\textwidth]{plot1 + plot(f.sage(),x,-1,2*pi,rgbcolor=hue(0.4)), figsize=[5,3]}
 \end{center}
 
 To fiddle with aspect ratio, first save the plot object:
@@ -598,11 +598,13 @@ For regular Cartesian plots, just pass in the identity function for x:
   gnuplot(x, y, [0.01, 0.02..(0.5)] + [0.55, 0.6..2], 'example-tikz2.table')
 \end{sageblock}
 
-\begin{tikzpicture}
+\begin{center}
+\begin{tikzpicture}[scale=3]
  \draw[very thin,->] (-0.25,0) -- (2,0);
  \draw[very thin,->] (0,-1/3) -- (0,1);
  \draw[smooth, red] plot file {example-tikz2.table};
 \end{tikzpicture}
+\end{center}
 
 This style of plotting will become even more useful and powerful when
 the new TikZ Data Visualization library is available---you will be able
