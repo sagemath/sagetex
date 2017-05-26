@@ -963,8 +963,8 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
       if version_check:
         raise VersionError(errstr)
       else:
-        print '**** WARNING! Skipping version check for .sty and .py files, and'
-        print errstr
+        print('**** WARNING! Skipping version check for .sty and .py files, and')
+        print(errstr)
     if ' ' in jobname:
       jobname = jobname.strip('"')
     self.progress('Processing Sage code for {0}.tex...'.format(jobname))
