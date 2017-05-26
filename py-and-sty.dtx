@@ -961,7 +961,7 @@ from your current version of Sage; see
 http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
   version, pyversion)
       if version_check:
-        raise VersionError, errstr
+        raise VersionError(errstr)
       else:
         print '**** WARNING! Skipping version check for .sty and .py files, and'
         print errstr
@@ -1099,7 +1099,7 @@ http://www.sagemath.org/doc/installation/sagetex.html.""".format(jobname,
       elif labelname == 'sagecmdline':
           pass # output message already printed
       else:
-          raise ValueError, 'inline() got a bad labelname "{0}"'.format(labelname)
+          raise ValueError('inline() got a bad labelname "{0}"'.format(labelname))
       self.souttmp.write(r'\newlabel{@' + labelname + str(counter) + 
                          '}{{%\n' + s.rstrip() + '}{}{}{}{}}\n')
 %    \end{macrocode}
