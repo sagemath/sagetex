@@ -7,8 +7,8 @@ SageTeX is included with Sage, so to use it, you only need to make the
 file sagetex.sty known to TeX; that file will be in
 SAGE_ROOT/local/share/texmf/tex/latex/sagetex, along with
 documentation and examples. See the Sage installation guide at
-http://sagemath.org/doc/installation/ for complete instructions and
-http://sagemath.org/doc/tutorial/sagetex.html for a quick usage
+http://doc.sagemath.org/html/en/installation/ for complete instructions and
+http://doc.sagemath.org/html/en/tutorial/sagetex.html for a quick usage
 introduction. The complete documentation is in sagetex.pdf, in
 the SAGE_ROOT/... directory mentioned above.
 
