@@ -426,7 +426,7 @@ Here are some examples of using the \texttt{sageexample} environment:
 \begin{sageexample}
   sage: 2+2
   4
-  sage: print 'middle'
+  sage: print('middle')
   middle
   sage: factor(x^2 + 2*x + 1)
   (x + 1)^2
@@ -446,7 +446,7 @@ That said, if you want to see the plain-text output you put into your
 This can be useful to check that the two outputs are consistent. Here's
 the print statement with text output included:
 \begin{sageexample}
-  sage: print 'middle'
+  sage: print('middle')
   middle
 \end{sageexample}
 When typesetting your document, the validity of the outputs is not
@@ -475,7 +475,7 @@ supported, as are triple-quoted strings delimited by single quotes
   sage: def f(a):
   ....:     '''This function is really quite nice,
   ....:     although perhaps not very useful.'''
-  ....:     print "f called with a = ", a
+  ....:     print("f called with a = {}".format(a))
   ....:     y = integrate(SR(cyclotomic_polynomial(10)) + a, x)
   ....:     return y + 1
   sage: f(x)
@@ -623,9 +623,9 @@ me?'' you may cry. Well, they \emph{can} cooperate:
   sage: 1+1
   sage: is_prime(57)
   sage: if is_prime(57):
-  ....:     print 'prime'
+  ....:     print('prime')
   ....: else:
-  ....:     print 'composite'
+  ....:     print('composite')
 \end{sagecommandline}
 
 Note that the output of the commands is not included in the source file,
@@ -638,7 +638,7 @@ output, but don't here:
 
 \begin{sagecommandline}
   sage: x = 2010; len(x.divisors())
-  sage: print 'Hola, mundo!'
+  sage: print('Hola, mundo!')
 \end{sagecommandline}
 
 The difference lies in the Python distinction between statements and
