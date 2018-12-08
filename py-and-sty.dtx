@@ -778,7 +778,7 @@ try:^^J
 % skip over any commands issued while \ST is paused.
 %    \begin{macrocode}
 \newcommand{\sagetexpause}{\ifST@paused\relax\else
-\ST@wsf{print 'SageTeX paused on \jobname.tex line \the\inputlineno'^^J"""}
+\ST@wsf{print('SageTeX paused on \jobname.tex line \the\inputlineno')^^J"""}
 \ST@pausedtrue
 \fi}
 %    \end{macrocode}
@@ -788,7 +788,7 @@ try:^^J
 % This is the obvious companion to |\sagetexpause|.
 %    \begin{macrocode}
 \newcommand{\sagetexunpause}{\ifST@paused
-\ST@wsf{"""^^Jprint 'SageTeX unpaused on \jobname.tex line \the\inputlineno'}
+\ST@wsf{"""^^Jprint('SageTeX unpaused on \jobname.tex line \the\inputlineno')}
 \ST@pausedfalse
 \fi}
 %    \end{macrocode}
@@ -804,7 +804,7 @@ try:^^J
 % the |.sage| file.
 %    \begin{macrocode}
 \AtEndDocument{\ifST@paused
-\ST@wsf{"""^^Jprint 'SageTeX unpaused at end of \jobname.tex'}
+\ST@wsf{"""^^Jprint('SageTeX unpaused at end of \jobname.tex')}
 \fi
 \ST@wsf{_st_.endofdoc()}%
 \@ifundefined{ST@rerun}{}%
@@ -1176,18 +1176,18 @@ http://doc.sagemath.org/html/en/tutorial/sagetex.html.""".format(jobname,
 %   \begin{quote}
 %   |splitup = split_sage_cmds(s)|\\
 %   |oldout = splitup[0][1]|\\
-%   |print '=' * 50|\\
-%   |print '==== Command:'|\\
-%   |print s[splitup[0][0]:oldout]|\\
+%   |print('=' * 50)|\\
+%   |print('==== Command:')|\\
+%   |print(s[splitup[0][0]:oldout])|\\
 %   |for start, out, _ in splitup[1:]:|\\
-%   |    print '==== Given output:'|\\
-%   |    print s[oldout:start]|\\
-%   |    print '=' * 50|\\
-%   |    print '==== Command:'|\\
-%   |    print s[start:out]|\\
+%   |    print('==== Given output:')|\\
+%   |    print(s[oldout:start])|\\
+%   |    print('=' * 50)|\\
+%   |    print('==== Command:')|\\
+%   |    print(s[start:out])|\\
 %   |    oldout = out|\\
-%   |print '==== Given output:'|\\
-%   |print s[oldout:]|
+%   |print('==== Given output:')|\\
+%   |print(s[oldout:])|
 %   \end{quote}
 %    \begin{macrocode}
   def split_sage_cmds(self, s):
@@ -1431,8 +1431,8 @@ SAGE_ROOT/local/share/doc/sagetex."""
           except ValueError as inst:
               if re.match('filetype .*not supported by save', str(inst)):
                   newfilename = plotfilename[:-3] + 'png'
-                  print '  saving {0} failed; saving to {1} instead.'.format(
-                                                    plotfilename, newfilename)
+                  print('  saving {0} failed; saving to {1} instead.'.format(
+                                                    plotfilename, newfilename))
                   _p_.save(filename=newfilename, **kwargs)
                   break
               else:
@@ -1518,7 +1518,7 @@ SAGE_ROOT/local/share/doc/sagetex."""
 % pause/unpause lines, so we will strip those lines out. What we do
 % below is exactly equivalent to running
 % \begin{center}
-% \verb+egrep -v '^( _st_.goboom| ?_st_.current_tex_line|print .SageT)' filename.sage | md5sum+
+% \verb+egrep -v '^( _st_.goboom| ?_st_.current_tex_line|print(.SageT)' filename.sage | md5sum+
 % \end{center}
 % in a shell. The included |run-sagetex-if-necessary| uses this
 % mechanism to, well, only run Sage when necessary; see
@@ -1529,7 +1529,7 @@ SAGE_ROOT/local/share/doc/sagetex."""
     m = hashlib.md5()
     for line in sagef:
       if not line.startswith((" _st_.goboom",
-                              "print 'SageT",
+                              "print('SageT",
                               "_st_.current_tex_line",
                               " _st_.current_tex_line")):
         m.update(line)
