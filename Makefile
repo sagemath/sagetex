@@ -55,4 +55,4 @@ test:
 
 # make a source distribution, used for building the spkg
 dist: sagetex.sty
-	python setup.py sdist --formats=tar
+	python setup.py sdist --formats=gztar
