@@ -1532,7 +1532,7 @@ SAGE_ROOT/local/share/doc/sagetex.""")
                               "print('SageT",
                               "_st_.current_tex_line",
                               " _st_.current_tex_line")):
-        m.update(line)
+          m.update(bytearray(line,'utf8'))
 %    \end{macrocode}
 % (The |current_tex_line| thing appears twice because it may appear
 % indented one space or not, depending on whether it's used before

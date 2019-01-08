@@ -9,8 +9,10 @@
 *_doctest.sage.py
 *.fdb_latexmk
 *.fls
+*.swp
 E2.sobj
 auto/
+dist/
 example.synctex.gz
 extractsagecode.py
 makecmds.sty
