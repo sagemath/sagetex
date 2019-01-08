@@ -1239,10 +1239,10 @@ http://doc.sagemath.org/html/en/tutorial/sagetex.html.""".format(jobname,
               has_old_cont = re.match(oldcont, line)
               has_cont = re.match(cont, line)
               if has_old_cont and not has_cont:
-                  raise SyntaxError, """ SageTeX no longer supports "..." for line continuation in sagexample and
+                  raise SyntaxError(""" SageTeX no longer supports "..." for line continuation in sagexample and
 sagecommandline environments. Use "....:", which matches what the Sage
 interpreter uses. See the documentation and example file in
-SAGE_ROOT/local/share/doc/sagetex."""
+SAGE_ROOT/local/share/doc/sagetex.""")
               if has_cont:
                   cmd.append(line[has_cont.end():])
           ret.append((start, end, '\n'.join(cmd)))
@@ -1304,7 +1304,7 @@ SAGE_ROOT/local/share/doc/sagetex."""
                            latex(result),
                            r' \end{displaymath}']
           except SyntaxError:
-              exec preparse(splitup[i][2]) in globals, locals
+              exec(preparse(splitup[i][2]), globals, locals)
       self.inline(counter, '\n'.join(tex_strs))
 %    \end{macrocode}
 % \changes{v2.2.5}{2010/03/25}{Fix up spacing in sageexample displaymath envs}
@@ -1374,7 +1374,7 @@ SAGE_ROOT/local/share/doc/sagetex."""
                                   latex(result) +
                                   r'\end{displaymath}')
           except SyntaxError:
-              exec preparse(splitup[i][2]) in globals, locals
+              exec(preparse(splitup[i][2]), globals, locals)
       if 'displaymath' not in tex_strs[-1]:
           tex_strs.append(skip)
       self.inline(counter, '\n'.join(tex_strs), labelname='sagecmdline')
