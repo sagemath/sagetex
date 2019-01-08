@@ -79,7 +79,7 @@ try:
         h = hashlib.md5()
         for line in sagef:
             if not re.search(ignore, line):
-                h.update(line)
+                h.update(bytearray(line,'utf8'))
 except IOError:
     print('{0}.sagetex.sage not found, I think you need to typeset {0}.tex first.'.format(src))
     sys.exit(1)

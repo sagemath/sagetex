@@ -411,7 +411,7 @@ with open(jobname + '.sage', 'r') as sagef:
     for line in sagef:
         if (not line.startswith(' _st_.goboom') and
             not line.startswith("print('SageT")):
-            h.update(line)
+            h.update(bytearray(line,'utf8'))
 %    \end{macrocode}
 % Putting the |{1}| in the string, just to replace it with |%|, seems a
 % bit weird, but if I put a single percent sign there, Docstrip won't
