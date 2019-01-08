@@ -6,10 +6,13 @@ computations, and plots from the Sage mathematics software suite
 SageTeX is included with Sage, so to use it, you only need to make the
 file sagetex.sty known to TeX; that file will be in
 SAGE_ROOT/local/share/texmf/tex/latex/sagetex, along with
-documentation and examples. See the Sage installation guide at
-http://doc.sagemath.org/html/en/installation/ for complete instructions and
-http://doc.sagemath.org/html/en/tutorial/sagetex.html for a quick usage
-introduction. The complete documentation is in sagetex.pdf, in
+documentation and examples. See the Sage tutorial at
+http://doc.sagemath.org/html/en/tutorial/sagetex.html 
+for a quick usage introduction, and for complete installation
+instructions later on the same page at
+http://doc.sagemath.org/html/en/tutorial/sagetex.html#sec-sagetex-install
+
+The complete documentation is in sagetex.pdf, in
 the SAGE_ROOT/... directory mentioned above.
 
 If you want to extract any of SageTeX's files from the .dtx sources, you
