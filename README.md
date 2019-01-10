@@ -1,10 +1,10 @@
-This is the SageTeX package. It allows you to embed code, results of
+# This is the SageTeX package. 
+
+It allows you to embed code, results of
 computations, and plots from the Sage mathematics software suite
 (http://sagemath.org) into LaTeX documents.
-====================================================================
 
-Using SageTeX
-_____________
+## Using SageTeX
 
 SageTeX is included with Sage, so to use it, you only need to make the
 file sagetex.sty known to TeX; that file will be in
@@ -18,8 +18,7 @@ http://doc.sagemath.org/html/en/tutorial/sagetex.html#sec-sagetex-install
 The complete documentation is in sagetex.pdf, in
 the SAGE_ROOT/... directory mentioned above.
 
-Generating SageTeX
-__________________
+## Generating SageTeX
 
 If you want to extract any of SageTeX's files from the .dtx sources, you
 can do
@@ -46,8 +45,7 @@ the documentation.)
 To use the SageTeX package with your own documents, see the
 "Installation" section of the documentation.
 
-Contributing to SageTeX
-_______________________
+## Contributing to SageTeX
 
 Please let us know your experience with SageTeX, especially bug
 reports or feature requests, at 
