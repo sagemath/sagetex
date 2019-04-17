@@ -2,7 +2,7 @@
 
 It allows you to embed code, results of
 computations, and plots from the Sage mathematics software suite
-(http://sagemath.org) into LaTeX documents.
+(https://www.sagemath.org) into LaTeX documents.
 
 ## Using SageTeX
 
@@ -10,10 +10,10 @@ SageTeX is included with Sage, so to use it, you only need to make the
 file sagetex.sty known to TeX; that file will be in
 SAGE_ROOT/local/share/texmf/tex/latex/sagetex, along with
 documentation and examples. See the Sage tutorial at
-http://doc.sagemath.org/html/en/tutorial/sagetex.html 
+https://doc.sagemath.org/html/en/tutorial/sagetex.html 
 for a quick usage introduction, and for complete installation
 instructions later on the same page at
-http://doc.sagemath.org/html/en/tutorial/sagetex.html#sec-sagetex-install
+https://doc.sagemath.org/html/en/tutorial/sagetex.html#sec-sagetex-install
 
 The complete documentation is in sagetex.pdf, in
 the SAGE_ROOT/... directory mentioned above.
