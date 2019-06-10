@@ -56,7 +56,7 @@ else:
     src = os.path.splitext(sys.argv[1])[0]
 
 commented_out = r'^\s*%'
-usepackage = r'\usepackage{sagetex}'
+usepackage = r'\usepackage(\[.*\])?{sagetex}'
 uses_sagetex = False
 
 # if it doesn't use sagetex, obviously running sage is unnecessary
