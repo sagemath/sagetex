@@ -42,6 +42,7 @@ import sys
 import os
 import re
 import subprocess
+from six import PY3
 
 # CHANGE THIS AS APPROPRIATE
 path_to_sage = os.path.expanduser('~/bin/sage')
@@ -79,7 +80,10 @@ try:
         h = hashlib.md5()
         for line in sagef:
             if not re.search(ignore, line):
-                h.update(bytearray(line,'utf8'))
+                if PY3:
+                    h.update(bytearray(line,'utf8'))
+                else:
+                    h.update(bytearray(line))
 except IOError:
     print('{0}.sagetex.sage not found, I think you need to typeset {0}.tex first.'.format(src))
     sys.exit(1)
