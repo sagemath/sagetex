@@ -859,6 +859,7 @@ again}}
 pyversion = ' '.join(__version__.strip('[').split()[0:2])
 from sage.misc.latex import latex
 from sage.repl.preparse import preparse
+from six import PY3
 import sys
 import os
 import os.path
@@ -1532,7 +1533,10 @@ SAGE_ROOT/local/share/doc/sagetex.""")
                               "print('SageT",
                               "_st_.current_tex_line",
                               " _st_.current_tex_line")):
-          m.update(bytearray(line,'utf8'))
+          if PY3:
+              m.update(bytearray(line,'utf8'))
+          else:
+              m.update(bytearray(line))
 %    \end{macrocode}
 % (The |current_tex_line| thing appears twice because it may appear
 % indented one space or not, depending on whether it's used before
