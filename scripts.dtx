@@ -62,7 +62,7 @@ uses_sagetex = False
 # if it doesn't use sagetex, obviously running sage is unnecessary
 with open(src + '.tex') as texf:
     for line in texf:
-        if re.search(usepackage, line.split('%')[0]):
+        if re.search(usepackage, line.replace(r'\%', '').split('%')[0]):
             uses_sagetex = True
             break
 
