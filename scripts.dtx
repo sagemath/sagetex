@@ -56,13 +56,13 @@ if sys.argv[1].endswith('.sagetex.sage'):
 else:
     src = os.path.splitext(sys.argv[1])[0]
 
-usepackage = r'\usepackage(\[.*\])?{sagetex}'
+usepackage = r'usepackage(\[.*\])?{sagetex}'
 uses_sagetex = False
 
-# if it doesn't use sagetex, obviously running sage is unnecessary
+# if it does not use sagetex, obviously running sage is unnecessary
 with open(src + '.tex') as texf:
     for line in texf:
-        if re.search(usepackage, line.replace(r'\%', '').split('%')[0]):
+        if line.strip().startswith(r'\usepackage') and re.search(usepackage, line):
             uses_sagetex = True
             break
 
