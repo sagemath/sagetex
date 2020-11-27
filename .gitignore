@@ -16,7 +16,6 @@ dist/
 example.synctex.gz
 extractsagecode.py
 makecmds.sty
-makestatic.py
 remote-sagetex.py
 run-sagetex-if-necessary.py
 sage-plots-for-*.tex/
@@ -28,7 +27,6 @@ sagetex.ind
 sagetex.py
 sagetex.pyc
 sagetex.sty
-sagetexparse.py
 .*.sage-history
 .*.sage-chat
 MANIFEST
