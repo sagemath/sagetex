@@ -281,8 +281,7 @@ from pyparsing import *
 %    \begin{macrocode}
 def skipToMatching(opener, closer):
   nest = nestedExpr(opener, closer)
-  nest.setParseAction(lambda l, s, t: l[s:getTokensEndLoc()])
-  return nest
+  return originalTextFor(nest)
 
 curlybrackets = skipToMatching('{', '}')
 squarebrackets = skipToMatching('[', ']')
@@ -290,6 +289,7 @@ squarebrackets = skipToMatching('[', ']')
 % Next, parser for |\sage|, |\sageplot|, and pause/unpause calls:
 %    \begin{macrocode}
 sagemacroparser = r'\sage' + curlybrackets('code')
+sagestrmacroparser = r'\sagestr' + curlybrackets('code')
 sageplotparser = (r'\sageplot'
                  + Optional(squarebrackets)('opts')
                  + Optional(squarebrackets)('format')
@@ -365,8 +365,10 @@ class DeSageTex():
 % Parse |\sage| macros. We just need to pull in the result from the
 % |.sout| file and increment the counter---that's what |self.sage| does.
 %    \begin{macrocode}
+    strmacro = sagestrmacroparser
     smacro = sagemacroparser
     smacro.setParseAction(self.sage)
+    strmacro.setParseAction(self.sage)
 %    \end{macrocode}
 % Parse the |\usepackage{sagetex}| line. Right now we don't support
 % comma-separated lists of packages.
@@ -410,7 +412,7 @@ class DeSageTex():
 % looks for any one of the above bits, while ignoring anything that
 % should be ignored.
 %    \begin{macrocode}
-    doit = smacro | senv | ssilent | usepackage | splot | stexindent
+    doit = smacro | senv | ssilent | usepackage | splot | stexindent |strmacro
     doit.ignore('%' + restOfLine)
     doit.ignore(r'\begin{verbatim}' + SkipTo(r'\end{verbatim}'))
     doit.ignore(r'\begin{comment}' + SkipTo(r'\end{comment}'))
@@ -496,7 +498,7 @@ class SageCodeExtractor():
 
   def plotout(self, s, l, t):
     self.result += '# \\sageplot{} from line %s:\n' % lineno(l, s)
-    if t.format is not '':
+    if t.format != '':
       self.result += '# format: %s' % t.format[0][1:-1] + '\n'
     self.result += t.code[1:-1] + '\n\n'
 
