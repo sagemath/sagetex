@@ -235,6 +235,8 @@ def argparser():
     p.add_argument('outputfile', nargs='?', default=None, help="Output file name")
     p.add_argument('-o', '--overwrite', action="store_true", default=False,
                    help="Overwrite output file if it exists")
+    p.add_argument('--no-inline', action="store_true", default=False,
+                   help="Extract code only from Sage environments")
     return p
 
 def run(args):
@@ -246,9 +248,9 @@ def run(args):
         sys.exit(1)
 
     src, ext = os.path.splitext(src)
-    sagecode = SageCodeExtractor(src + '.tex')
-    header = ("# This file contains Sage code extracted from %s%s.\n"
-              "# Processed %s.\n"
+    sagecode = SageCodeExtractor(src + '.tex', inline=not args.no_inline)
+    header = ("#> This file contains Sage code extracted from %s%s.\n"
+              "#> Processed %s.\n"
               "" % (src, ext, time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())))
 
     if dst is not None:
@@ -280,6 +282,7 @@ if __name__ == "__main__":
 %    \begin{macrocode}
 import sys
 import os
+import textwrap
 from pyparsing import *
 %    \end{macrocode}
 % First, we define this very helpful parser: it finds the matching
@@ -467,7 +470,7 @@ class DeSageTex():
 % Sage.
 %    \begin{macrocode}
 class SageCodeExtractor():
-  def __init__(self, texfn):
+  def __init__(self, texfn, inline=True):
     smacro = sagemacroparser
     smacro.setParseAction(self.macroout)
 
@@ -494,7 +497,10 @@ class SageCodeExtractor():
     sunpause = sagetexunpause
     sunpause.setParseAction(self.unpause)
 
-    doit = smacro | splot | senv | spause | sunpause
+    if inline:
+        doit = smacro | splot | senv | spause | sunpause
+    else:
+        doit = senv | spause | sunpause
     doit.ignore('%' + restOfLine)
 
     str = ''.join(open(texfn, 'r').readlines())
@@ -503,26 +509,26 @@ class SageCodeExtractor():
     doit.transformString(str)
 
   def macroout(self, s, l, t):
-    self.result += '# \\sage{} from line %s\n' % lineno(l, s)
-    self.result += t.code[1:-1] + '\n\n'
+    self.result += '#> \\sage{} from line %s\n' % lineno(l, s)
+    self.result += textwrap.dedent(t.code[1:-1]) + '\n\n'
 
   def plotout(self, s, l, t):
-    self.result += '# \\sageplot{} from line %s:\n' % lineno(l, s)
+    self.result += '#> \\sageplot{} from line %s:\n' % lineno(l, s)
     if t.format != '':
-      self.result += '# format: %s' % t.format[0][1:-1] + '\n'
-    self.result += t.code[1:-1] + '\n\n'
+      self.result += '#> format: %s' % t.format[0][1:-1] + '\n'
+    self.result += textwrap.dedent(t.code[1:-1]) + '\n\n'
 
   def envout(self, s, l, t):
-    self.result += '# %s environment from line %s:' % (t.env,
+    self.result += '#> %s environment from line %s:' % (t.env,
       lineno(l, s))
-    self.result += ''.join(t.code) + '\n'
+    self.result += textwrap.dedent(''.join(t.code)) + '\n'
 
   def pause(self, s, l, t):
-    self.result += ('# SageTeX (probably) paused on input line %s.\n\n' %
+    self.result += ('#> SageTeX (probably) paused on input line %s.\n\n' %
                     (lineno(l, s)))
 
   def unpause(self, s, l, t):
-    self.result += ('# SageTeX (probably) unpaused on input line %s.\n\n' %
+    self.result += ('#> SageTeX (probably) unpaused on input line %s.\n\n' %
                     (lineno(l, s)))
 %    \end{macrocode}
 % \end{macro}
