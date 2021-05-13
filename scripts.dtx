@@ -495,6 +495,7 @@ class SageCodeExtractor():
     sunpause.setParseAction(self.unpause)
 
     doit = smacro | splot | senv | spause | sunpause
+    doit.ignore('%' + restOfLine)
 
     str = ''.join(open(texfn, 'r').readlines())
     self.result = ''
@@ -514,7 +515,7 @@ class SageCodeExtractor():
   def envout(self, s, l, t):
     self.result += '# %s environment from line %s:' % (t.env,
       lineno(l, s))
-    self.result += t.code[0] + '\n'
+    self.result += ''.join(t.code) + '\n'
 
   def pause(self, s, l, t):
     self.result += ('# SageTeX (probably) paused on input line %s.\n\n' %
