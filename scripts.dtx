@@ -64,15 +64,24 @@ def run(args):
     else:
         src = os.path.splitext(src)[0]
 
+    # Ensure results are output in the same directory as the source files
+    os.chdir(os.path.dirname(src))
+    src = os.path.basename(src)
+
     usepackage = r'usepackage(\[.*\])?{sagetex}'
     uses_sagetex = False
 
-    # if it does not use sagetex, obviously running sage is unnecessary
-    with open(src + '.tex') as texf:
-        for line in texf:
-            if line.strip().startswith(r'\usepackage') and re.search(usepackage, line):
-                uses_sagetex = True
-                break
+    # If it does not use sagetex, obviously running sage is unnecessary.
+    if os.path.isfile(src + '.tex'):
+        with open(src + '.tex') as texf:
+            for line in texf:
+                if line.strip().startswith(r'\usepackage') and re.search(usepackage, line):
+                    uses_sagetex = True
+                    break
+    else:
+        # The .tex file might not exist if LaTeX output was put to a different
+        # directory, so in that case just assume we need to build.
+        uses_sagetex = True
 
     if not uses_sagetex:
         print(src + ".tex doesn't seem to use SageTeX, exiting.", file=sys.stderr)
@@ -150,6 +159,8 @@ def argparser():
     p.add_argument('outputfile', nargs='?', default=None, help="Output file name")
     p.add_argument('-o', '--overwrite', action="store_true", default=False,
                    help="Overwrite output file if it exists")
+    p.add_argument('-s', '--sout', action="store", default=None,
+                   help="Location of the .sagetex.sout file")
     return p
 
 def run(args):
@@ -161,11 +172,13 @@ def run(args):
         sys.exit(1)
 
     src, ext = os.path.splitext(src)
+    texfn = src + '.tex'
+    soutfn = args.sout if args.sout is not None else src + '.sagetex.sout'
 %    \end{macrocode}
 % All the real work gets done in the line below. Sorry it's not more
 % exciting-looking.
 %    \begin{macrocode}
-    desagetexed = DeSageTex(src)
+    desagetexed = DeSageTex(texfn, soutfn)
 %    \end{macrocode}
 % This part is cool: we need double percent signs at the beginning of
 % the line because Python needs them (so they get turned into single
@@ -233,7 +246,7 @@ def run(args):
         sys.exit(1)
 
     src, ext = os.path.splitext(src)
-    sagecode = SageCodeExtractor(src)
+    sagecode = SageCodeExtractor(src + '.tex')
     header = ("# This file contains Sage code extracted from %s%s.\n"
               "# Processed %s.\n"
               "" % (src, ext, time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())))
@@ -266,6 +279,7 @@ if __name__ == "__main__":
 % over the screen.
 %    \begin{macrocode}
 import sys
+import os
 from pyparsing import *
 %    \end{macrocode}
 % First, we define this very helpful parser: it finds the matching
@@ -351,11 +365,11 @@ class SoutParser():
 % that the provided |fn| is just a basename.
 %    \begin{macrocode}
 class DeSageTex():
-  def __init__(self, fn):
+  def __init__(self, texfn, soutfn):
     self.sagen = 0
     self.plotn = 0
-    self.fn = fn
-    self.sout = SoutParser(fn + '.sagetex.sout')
+    self.fn = os.path.basename(texfn)
+    self.sout = SoutParser(soutfn)
 %    \end{macrocode}
 % Parse |\sage| macros. We just need to pull in the result from the
 % |.sout| file and increment the counter---that's what |self.sage| does.
@@ -417,7 +431,7 @@ class DeSageTex():
 % |transformString| on it, since that will just pick out the interesting
 % bits and munge them according to the above definitions.
 %    \begin{macrocode}
-    str = ''.join(open(fn + '.tex', 'r').readlines())
+    str = ''.join(open(texfn, 'r').readlines())
     self.result = doit.transformString(str)
 %    \end{macrocode}
 % That's the end of the class constructor, and it's all we need to do
@@ -451,7 +465,7 @@ class DeSageTex():
 % Sage.
 %    \begin{macrocode}
 class SageCodeExtractor():
-  def __init__(self, fn):
+  def __init__(self, texfn):
     smacro = sagemacroparser
     smacro.setParseAction(self.macroout)
 
@@ -480,7 +494,7 @@ class SageCodeExtractor():
 
     doit = smacro | splot | senv | spause | sunpause
 
-    str = ''.join(open(fn + '.tex', 'r').readlines())
+    str = ''.join(open(texfn, 'r').readlines())
     self.result = ''
 
     doit.transformString(str)
