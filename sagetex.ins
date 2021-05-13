@@ -84,7 +84,6 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
                             \from{py-and-sty.dtx}{python}}}
 \generate{\file{sagetexparse.py}{\from{scripts.dtx}{parsermod}}}
 
-
 \usedir{scripts/sagetex}
 
 % Now define a new preamble with the shebang line at the top.
@@ -92,10 +91,10 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 \def\envpypreamble{\hash!/usr/bin/env python^^J\pypreamble}
 \usepreamble\envpypreamble
 
-\generate{\file{run-sagetex-if-necessary.py}{\from{scripts.dtx}{ifnecessaryscript}}}
-\generate{\file{makestatic.py}{\from{scripts.dtx}{staticscript}}}
-\generate{\file{extractsagecode.py}{\from{scripts.dtx}{extractscript}}}
-\generate{\file{remote-sagetex.py}{\from{remote-sagetex.dtx}{remotesagetex}}}
+\generate{\file{sagetex-run.py}{\from{scripts.dtx}{ifnecessaryscript}}}
+\generate{\file{sagetex-makestatic.py}{\from{scripts.dtx}{staticscript}}}
+\generate{\file{sagetex-extract.py}{\from{scripts.dtx}{extractscript}}}
+\generate{\file{sagetex-remote.py}{\from{remote-sagetex.dtx}{remotesagetex}}}
 
 \obeyspaces
 \Msg{******************************************************************}
