@@ -1,27 +1,26 @@
 % \section{Included Python scripts}
 % \label{sec:included-scripts}
 %
-% Here we describe the Python code for |run-sagetex-if-necessary|, and
-% also |makestatic.py|, which removes \ST commands to produce a
-% ``static'' file, and |extractsagecode.py|, which extracts all the Sage
-% code from a |.tex| file.
+% Here we describe the Python code for \ST scripts, for running
+% Sage only if necessary, substituting in Sage outputs to produce
+% a ``static'' file, and extracting all Sage code from a |.tex| file.
 %
-% \subsection{run-sagetex-if-necessary}
-% \label{sec:run-sagetex-if-necessary}
+% \subsection{\texttt{sagetex-run}}
+% \label{sec:sagetex-run}
 % \iffalse
 %<*ifnecessaryscript>
 % \fi
 %
 % When working on a document that uses \ST, running Sage every time you
 % typeset your document may take too long, especially since it often
-% won't be necessary. This script is a drop-in replacement for Sage:
+% is not necessary. This script is a drop-in replacement for Sage:
 % instead of
 % \begin{center}
 % |sage document.sagetex.sage|
 % \end{center}
 % you can do
 % \begin{center}
-% |run-sagetex-if-necessary.py document.sagetex.sage|
+% |sagetex-run document.sagetex.sage|
 % \end{center}
 % and it will use the MD5 mechanism described in the |endofdoc| macro
 % (page~{\pageref{macro:endofdoc}). With this, you can set up your editor
@@ -29,105 +28,114 @@
 % that does
 % \begin{quote}
 %   |pdflatex $1|\\
-%   |run-sagetex-if-necessary.py $1|
+%   |sagetex-run $1|
 % \end{quote}
 % which will only, of course, run Sage when necessary.
 %    \begin{macrocode}
-
-# given a filename f, examines f.sagetex.sage and f.sagetex.sout and
-# runs Sage if necessary.
+"""
+Given a filename f, examines f.sagetex.sage and f.sagetex.sout and
+runs Sage if necessary.
+"""
 
 import hashlib
 import sys
 import os
 import re
 import subprocess
-from six import PY3
+import shutil
+import argparse
 
-# CHANGE THIS AS APPROPRIATE
-path_to_sage = os.path.expanduser('~/bin/sage')
-# or try to auto-find it:
-# path_to_sage = subprocess.check_output(['which', 'sage']).strip()
-# or just tell me:
-# path_to_sage = '/usr/local/bin/sage'
+def argparser():
+    p = argparse.ArgumentParser(description=__doc__.strip())
+    p.add_argument('--sage', action='store', default=find_sage(),
+                   help="Location of the Sage executable")
+    p.add_argument('src', help="Input file name (basename or .sagetex.sage)")
+    return p
 
-if sys.argv[1].endswith('.sagetex.sage'):
-    src = sys.argv[1][:-13]
-else:
-    src = os.path.splitext(sys.argv[1])[0]
+def find_sage():
+    return shutil.which('sage') or 'sage'
 
-usepackage = r'usepackage(\[.*\])?{sagetex}'
-uses_sagetex = False
+def run(args):
+    src = args.src
+    path_to_sage = args.sage
 
-# if it does not use sagetex, obviously running sage is unnecessary
-with open(src + '.tex') as texf:
-    for line in texf:
-        if line.strip().startswith(r'\usepackage') and re.search(usepackage, line):
-            uses_sagetex = True
-            break
+    if src.endswith('.sagetex.sage'):
+        src = src[:-13]
+    else:
+        src = os.path.splitext(src)[0]
 
-if not uses_sagetex:
-    print(src + ".tex doesn't seem to use SageTeX, exiting.")
-    sys.exit(0)
+    # Ensure results are output in the same directory as the source files
+    os.chdir(os.path.dirname(src))
+    src = os.path.basename(src)
 
-# if something goes wrong, assume we need to run Sage
-run_sage = True
-ignore = r"^( _st_.goboom|print\('SageT| ?_st_.current_tex_line)"
+    usepackage = r'usepackage(\[.*\])?{sagetex}'
+    uses_sagetex = False
 
-try:
-    with open(src + '.sagetex.sage', 'r') as sagef:
-        h = hashlib.md5()
-        for line in sagef:
-            if not re.search(ignore, line):
-                if PY3:
-                    h.update(bytearray(line,'utf8'))
-                else:
-                    h.update(bytearray(line))
-except IOError:
-    print('{0}.sagetex.sage not found, I think you need to typeset {0}.tex first.'.format(src))
-    sys.exit(1)
-
-try:
-    with open(src + '.sagetex.sout', 'r') as outf:
-        for line in outf:
-            m = re.match('%([0-9a-f]+)% md5sum', line)
-            if m:
-                print('computed md5:', h.hexdigest())
-                print('sagetex.sout md5:', m.group(1))
-                if h.hexdigest() == m.group(1):
-                    run_sage = False
+    # If it does not use sagetex, obviously running sage is unnecessary.
+    if os.path.isfile(src + '.tex'):
+        with open(src + '.tex') as texf:
+            for line in texf:
+                if line.strip().startswith(r'\usepackage') and re.search(usepackage, line):
+                    uses_sagetex = True
                     break
-except IOError:
-    pass
+    else:
+        # The .tex file might not exist if LaTeX output was put to a different
+        # directory, so in that case just assume we need to build.
+        uses_sagetex = True
 
-if run_sage:
-    print('Need to run Sage on {0}.'.format(src))
-    sys.exit(subprocess.call([path_to_sage, src + '.sagetex.sage']))
-else:
-    print('Not necessary to run Sage on {0}.'.format(src))
+    if not uses_sagetex:
+        print(src + ".tex doesn't seem to use SageTeX, exiting.", file=sys.stderr)
+        sys.exit(1)
+
+    # if something goes wrong, assume we need to run Sage
+    run_sage = True
+    ignore = r"^( _st_.goboom|print\('SageT| ?_st_.current_tex_line)"
+
+    try:
+        with open(src + '.sagetex.sage', 'r') as sagef:
+            h = hashlib.md5()
+            for line in sagef:
+                if not re.search(ignore, line):
+                    h.update(bytearray(line,'utf8'))
+    except IOError:
+        print('{0}.sagetex.sage not found, I think you need to typeset {0}.tex first.'
+              ''.format(src), file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        with open(src + '.sagetex.sout', 'r') as outf:
+            for line in outf:
+                m = re.match('%([0-9a-f]+)% md5sum', line)
+                if m:
+                    print('computed md5:', h.hexdigest())
+                    print('sagetex.sout md5:', m.group(1))
+                    if h.hexdigest() == m.group(1):
+                        run_sage = False
+                        break
+    except IOError:
+        pass
+
+    if run_sage:
+        print('Need to run Sage on {0}.'.format(src))
+        sys.exit(subprocess.call([path_to_sage, src + '.sagetex.sage']))
+    else:
+        print('Not necessary to run Sage on {0}.'.format(src))
+
+if __name__ == "__main__":
+    run(argparser().parse_args())
 %    \end{macrocode}
 %
-% \subsection{makestatic.py}
-% \label{sec:makestatic}
+% \subsection{\texttt{sagetex-makestatic}}
+% \label{sec:sagetex-makestatic}
 % \iffalse
 %</ifnecessaryscript>
 %<*staticscript>
 % \fi
 %
-% Now the |makestatic.py| script. It's about the most basic, generic
-% Python script taking command-line arguments that you'll find. The
-% |#!/usr/bin/env python| line is provided for us by the |.ins| file's
-% preamble, so we don't put it here.
+% Now the |sagetex-makestatic|:
+%
 %    \begin{macrocode}
-import sys
-import time
-import getopt
-import os.path
-from sagetexparse import DeSageTex
-
-def usage():
-  print("""Usage: %s [-h|--help] [-o|--overwrite] inputfile [outputfile]
-
+"""
 Removes SageTeX macros from `inputfile' and replaces them with the
 Sage-computed results to make a "static" file. You'll need to have run
 Sage on `inputfile' already.
@@ -136,53 +144,61 @@ Sage on `inputfile' already.
 `outputfile', the results will be written to a file of that name.
 Specify `-o' or `--overwrite' to overwrite the file if it exists.
 
-See the SageTeX documentation for more details.""" % sys.argv[0])
+See the SageTeX documentation for more details.
+"""
+import sys
+import time
+import os.path
+import argparse
 
-try:
-  opts, args = getopt.getopt(sys.argv[1:], 'ho', ['help', 'overwrite'])
-except getopt.GetoptError as err:
-  print(str(err))
-  usage()
-  sys.exit(2)
+from sagetexparse import DeSageTex
 
-overwrite = False
-for o, a in opts:
-  if o in ('-h', '--help'):
-    usage()
-    sys.exit()
-  elif o in ('-o', '--overwrite'):
-    overwrite = True
+def argparser():
+    p = argparse.ArgumentParser(description=__doc__.strip())
+    p.add_argument('inputfile', help="Input file name (basename or .tex)")
+    p.add_argument('outputfile', nargs='?', default=None, help="Output file name")
+    p.add_argument('-o', '--overwrite', action="store_true", default=False,
+                   help="Overwrite output file if it exists")
+    p.add_argument('-s', '--sout', action="store", default=None,
+                   help="Location of the .sagetex.sout file")
+    return p
 
-if len(args) == 0 or len(args) > 2:
-  print('Error: wrong number of arguments. Make sure to specify options first.\n')
-  usage()
-  sys.exit(2)
+def run(args):
+    src, dst, overwrite = args.inputfile, args.outputfile, args.overwrite
 
-if len(args) == 2 and (os.path.exists(args[1]) and not overwrite):
-  print('Error: %s exists and overwrite option not specified.' % args[1])
-  sys.exit(1)
+    if dst is not None and (os.path.exists(dst) and not overwrite):
+        print('Error: %s exists and overwrite option not specified.' % dst,
+              file=sys.stderr)
+        sys.exit(1)
 
-src, ext = os.path.splitext(args[0])
+    src, ext = os.path.splitext(src)
+    texfn = src + '.tex'
+    soutfn = args.sout if args.sout is not None else src + '.sagetex.sout'
 %    \end{macrocode}
 % All the real work gets done in the line below. Sorry it's not more
 % exciting-looking.
 %    \begin{macrocode}
-desagetexed = DeSageTex(src)
+    desagetexed = DeSageTex(texfn, soutfn)
 %    \end{macrocode}
 % This part is cool: we need double percent signs at the beginning of
 % the line because Python needs them (so they get turned into single
 % percent signs) \emph{and} because \textsf{Docstrip} needs them (so the
 % line gets passed into the generated file). It's perfect!
 %    \begin{macrocode}
-header = "%% SageTeX commands have been automatically removed from this file and\n%% replaced with plain LaTeX. Processed %s.\n" % time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())
+    header = ("%% SageTeX commands have been automatically removed from this file and\n"
+              "%% replaced with plain LaTeX. Processed %s.\n"
+              "" % time.strftime('%a %d %b %Y %H:%M:%S', time.localtime()))
 
-if len(args) == 2:
-  dest = open(args[1], 'w')
-else:
-  dest = sys.stdout
+    if dst is not None:
+        dest = open(dst, 'w')
+    else:
+        dest = sys.stdout
 
-dest.write(header)
-dest.write(desagetexed.result)
+    dest.write(header)
+    dest.write(desagetexed.result)
+
+if __name__ == "__main__":
+    run(argparser().parse_args())
 %    \end{macrocode}
 %
 % \iffalse
@@ -190,20 +206,12 @@ dest.write(desagetexed.result)
 %<*extractscript>
 % \fi
 %
-% \subsection{extractsagecode.py}
+% \subsection{\texttt{sagetex-extract}}
 %
-% Same idea as |makestatic.py|, except this does basically the opposite
+% Same idea as |sagetex-makestatic|, except this does basically the opposite
 % thing.
 %    \begin{macrocode}
-import sys
-import time
-import getopt
-import os.path
-from sagetexparse import SageCodeExtractor
-
-def usage():
-  print("""Usage: %s [-h|--help] [-o|--overwrite] inputfile [outputfile]
-
+"""
 Extracts Sage code from `inputfile'.
 
 `inputfile' can include the .tex extension or not. If you provide
@@ -212,47 +220,49 @@ otherwise the result will be printed to stdout.
 
 Specify `-o' or `--overwrite' to overwrite the file if it exists.
 
-See the SageTeX documentation for more details.""" % sys.argv[0])
+See the SageTeX documentation for more details.
+"""
+import sys
+import time
+import os.path
+import argparse
 
-try:
-  opts, args = getopt.getopt(sys.argv[1:], 'ho', ['help', 'overwrite'])
-except getopt.GetoptError as err:
-  print(str(err))
-  usage()
-  sys.exit(2)
+from sagetexparse import SageCodeExtractor
 
-overwrite = False
-for o, a in opts:
-  if o in ('-h', '--help'):
-    usage()
-    sys.exit()
-  elif o in ('-o', '--overwrite'):
-    overwrite = True
+def argparser():
+    p = argparse.ArgumentParser(description=__doc__.strip())
+    p.add_argument('inputfile', help="Input file name (basename or .tex)")
+    p.add_argument('outputfile', nargs='?', default=None, help="Output file name")
+    p.add_argument('-o', '--overwrite', action="store_true", default=False,
+                   help="Overwrite output file if it exists")
+    p.add_argument('--no-inline', action="store_true", default=False,
+                   help="Extract code only from Sage environments")
+    return p
 
-if len(args) == 0 or len(args) > 2:
-  print('Error: wrong number of arguments. Make sure to specify options first.\n')
-  usage()
-  sys.exit(2)
+def run(args):
+    src, dst, overwrite = args.inputfile, args.outputfile, args.overwrite
 
-if len(args) == 2 and (os.path.exists(args[1]) and not overwrite):
-  print('Error: %s exists and overwrite option not specified.' % args[1])
-  sys.exit(1)
+    if dst is not None and (os.path.exists(dst) and not overwrite):
+        print('Error: %s exists and overwrite option not specified.' % dst,
+              file=sys.stderr)
+        sys.exit(1)
 
-src, ext = os.path.splitext(args[0])
-sagecode = SageCodeExtractor(src)
-header = """\
-# This file contains Sage code extracted from %s%s.
-# Processed %s.
+    src, ext = os.path.splitext(src)
+    sagecode = SageCodeExtractor(src + '.tex', inline=not args.no_inline)
+    header = ("#> This file contains Sage code extracted from %s%s.\n"
+              "#> Processed %s.\n"
+              "" % (src, ext, time.strftime('%a %d %b %Y %H:%M:%S', time.localtime())))
 
-""" % (src, ext, time.strftime('%a %d %b %Y %H:%M:%S', time.localtime()))
+    if dst is not None:
+        dest = open(dst, 'w')
+    else:
+        dest = sys.stdout
 
-if len(args) == 2:
-  dest = open(args[1], 'w')
-else:
-  dest = sys.stdout
+    dest.write(header)
+    dest.write(sagecode.result)
 
-dest.write(header)
-dest.write(sagecode.result)
+if __name__ == "__main__":
+    run(argparser().parse_args())
 %    \end{macrocode}
 %
 % \iffalse
@@ -271,6 +281,8 @@ dest.write(sagecode.result)
 % over the screen.
 %    \begin{macrocode}
 import sys
+import os
+import textwrap
 from pyparsing import *
 %    \end{macrocode}
 % First, we define this very helpful parser: it finds the matching
@@ -281,8 +293,7 @@ from pyparsing import *
 %    \begin{macrocode}
 def skipToMatching(opener, closer):
   nest = nestedExpr(opener, closer)
-  nest.setParseAction(lambda l, s, t: l[s:getTokensEndLoc()])
-  return nest
+  return originalTextFor(nest)
 
 curlybrackets = skipToMatching('{', '}')
 squarebrackets = skipToMatching('[', ']')
@@ -290,6 +301,7 @@ squarebrackets = skipToMatching('[', ']')
 % Next, parser for |\sage|, |\sageplot|, and pause/unpause calls:
 %    \begin{macrocode}
 sagemacroparser = r'\sage' + curlybrackets('code')
+sagestrmacroparser = r'\sagestr' + curlybrackets('code')
 sageplotparser = (r'\sageplot'
                  + Optional(squarebrackets)('opts')
                  + Optional(squarebrackets)('format')
@@ -356,17 +368,19 @@ class SoutParser():
 % that the provided |fn| is just a basename.
 %    \begin{macrocode}
 class DeSageTex():
-  def __init__(self, fn):
+  def __init__(self, texfn, soutfn):
     self.sagen = 0
     self.plotn = 0
-    self.fn = fn
-    self.sout = SoutParser(fn + '.sagetex.sout')
+    self.fn = os.path.basename(texfn)
+    self.sout = SoutParser(soutfn)
 %    \end{macrocode}
 % Parse |\sage| macros. We just need to pull in the result from the
 % |.sout| file and increment the counter---that's what |self.sage| does.
 %    \begin{macrocode}
+    strmacro = sagestrmacroparser
     smacro = sagemacroparser
     smacro.setParseAction(self.sage)
+    strmacro.setParseAction(self.sage)
 %    \end{macrocode}
 % Parse the |\usepackage{sagetex}| line. Right now we don't support
 % comma-separated lists of packages.
@@ -410,7 +424,7 @@ class DeSageTex():
 % looks for any one of the above bits, while ignoring anything that
 % should be ignored.
 %    \begin{macrocode}
-    doit = smacro | senv | ssilent | usepackage | splot | stexindent
+    doit = smacro | senv | ssilent | usepackage | splot | stexindent |strmacro
     doit.ignore('%' + restOfLine)
     doit.ignore(r'\begin{verbatim}' + SkipTo(r'\end{verbatim}'))
     doit.ignore(r'\begin{comment}' + SkipTo(r'\end{comment}'))
@@ -422,7 +436,7 @@ class DeSageTex():
 % |transformString| on it, since that will just pick out the interesting
 % bits and munge them according to the above definitions.
 %    \begin{macrocode}
-    str = ''.join(open(fn + '.tex', 'r').readlines())
+    str = ''.join(open(texfn, 'r').readlines())
     self.result = doit.transformString(str)
 %    \end{macrocode}
 % That's the end of the class constructor, and it's all we need to do
@@ -456,7 +470,7 @@ class DeSageTex():
 % Sage.
 %    \begin{macrocode}
 class SageCodeExtractor():
-  def __init__(self, fn):
+  def __init__(self, texfn, inline=True):
     smacro = sagemacroparser
     smacro.setParseAction(self.macroout)
 
@@ -483,34 +497,38 @@ class SageCodeExtractor():
     sunpause = sagetexunpause
     sunpause.setParseAction(self.unpause)
 
-    doit = smacro | splot | senv | spause | sunpause
+    if inline:
+        doit = smacro | splot | senv | spause | sunpause
+    else:
+        doit = senv | spause | sunpause
+    doit.ignore('%' + restOfLine)
 
-    str = ''.join(open(fn + '.tex', 'r').readlines())
+    str = ''.join(open(texfn, 'r').readlines())
     self.result = ''
 
     doit.transformString(str)
 
   def macroout(self, s, l, t):
-    self.result += '# \\sage{} from line %s\n' % lineno(l, s)
-    self.result += t.code[1:-1] + '\n\n'
+    self.result += '#> \\sage{} from line %s\n' % lineno(l, s)
+    self.result += textwrap.dedent(t.code[1:-1]) + '\n\n'
 
   def plotout(self, s, l, t):
-    self.result += '# \\sageplot{} from line %s:\n' % lineno(l, s)
-    if t.format is not '':
-      self.result += '# format: %s' % t.format[0][1:-1] + '\n'
-    self.result += t.code[1:-1] + '\n\n'
+    self.result += '#> \\sageplot{} from line %s:\n' % lineno(l, s)
+    if t.format != '':
+      self.result += '#> format: %s' % t.format[0][1:-1] + '\n'
+    self.result += textwrap.dedent(t.code[1:-1]) + '\n\n'
 
   def envout(self, s, l, t):
-    self.result += '# %s environment from line %s:' % (t.env,
+    self.result += '#> %s environment from line %s:' % (t.env,
       lineno(l, s))
-    self.result += t.code[0] + '\n'
+    self.result += textwrap.dedent(''.join(t.code)) + '\n'
 
   def pause(self, s, l, t):
-    self.result += ('# SageTeX (probably) paused on input line %s.\n\n' %
+    self.result += ('#> SageTeX (probably) paused on input line %s.\n\n' %
                     (lineno(l, s)))
 
   def unpause(self, s, l, t):
-    self.result += ('# SageTeX (probably) unpaused on input line %s.\n\n' %
+    self.result += ('#> SageTeX (probably) unpaused on input line %s.\n\n' %
                     (lineno(l, s)))
 %    \end{macrocode}
 % \end{macro}
