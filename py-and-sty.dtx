@@ -1243,7 +1243,7 @@ http://doc.sagemath.org/html/en/tutorial/sagetex.html.""".format(jobname,
                   raise SyntaxError(""" SageTeX no longer supports "..." for line continuation in sagexample and
 sagecommandline environments. Use "....:", which matches what the Sage
 interpreter uses. See the documentation and example file in
-SAGE_ROOT/local/share/doc/sagetex.""")
+SAGE_ROOT/venv/share/doc/sagetex.""")
               if has_cont:
                   cmd.append(line[has_cont.end():])
           ret.append((start, end, '\n'.join(cmd)))
