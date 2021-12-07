@@ -29,7 +29,7 @@
 % and |listings| for the |sagecommandline| environment.
 %    \begin{macrocode}
 \RequirePackage{listings}
-\RequirePackage{color}
+\RequirePackage{xcolor}
 \lstdefinelanguage{Sage}[]{Python}
   {morekeywords={False,sage,True},sensitive=true}
 \lstdefinelanguage{SageOutput}[]{}
@@ -68,9 +68,9 @@
 \lstdefinestyle{SageOutput}{
   style=DefaultSageOutput,
 }
-\definecolor{dbluecolor}{rgb}{0.01,0.02,0.7}
-\definecolor{dgreencolor}{rgb}{0.2,0.4,0.0}
-\definecolor{dgraycolor}{rgb}{0.30,0.3,0.30}
+\providecolor{dbluecolor}{rgb}{0.01,0.02,0.7}
+\providecolor{dgreencolor}{rgb}{0.2,0.4,0.0}
+\providecolor{dgraycolor}{rgb}{0.30,0.3,0.30}
 %    \end{macrocode}
 % Unsurprisingly, the |\sageplot| command works poorly without graphics
 % support.
