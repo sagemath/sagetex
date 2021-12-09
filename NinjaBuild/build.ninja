@@ -70,7 +70,7 @@ rule rule14
 build auxclean: rule14 _kati_always_build_
 rule rule15
  description = build $out
- command = /bin/sh -c "python setup.py sdist --formats=gztar"
+ command = /bin/sh -c "python3 setup.py sdist --formats=gztar"
 build dist: rule15 _kati_always_build_ sagetex.sty sagetex-run sagetex-extract sagetex-makestatic sagetex-remote
 rule rule16
  description = build $out
