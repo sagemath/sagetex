@@ -12,42 +12,27 @@ rule rule0
  description = build $out
  command = /bin/sh -c "yes | latex  sagetex.ins"
 build sagetex.sty: rule0 py-and-sty.dtx sagetex.dtx
-rule rule1
- description = build $out
- command = /bin/sh -c "yes | latex  sagetex.ins"
-build sagetex.py: rule1 py-and-sty.dtx sagetex.dtx
+build sagetex.py: rule0 py-and-sty.dtx sagetex.dtx
 rule rule2
  description = build $out
  command = /bin/sh -c "(cp -f sagetex-run.py sagetex-run ) && (chmod +x sagetex-run )"
 build sagetex-run: rule2 sagetex-run.py
-rule rule3
- description = build $out
- command = /bin/sh -c "yes | latex  sagetex.ins"
-build sagetex-run.py: rule3 scripts.dtx
+build sagetex-run.py: rule0 scripts.dtx
 rule rule4
  description = build $out
  command = /bin/sh -c "(cp -f sagetex-extract.py sagetex-extract ) && (chmod +x sagetex-extract )"
 build sagetex-extract: rule4 sagetex-extract.py
-rule rule5
- description = build $out
- command = /bin/sh -c "yes | latex  sagetex.ins"
-build sagetex-extract.py: rule5 scripts.dtx
+build sagetex-extract.py: rule0 scripts.dtx
 rule rule6
  description = build $out
  command = /bin/sh -c "(cp -f sagetex-makestatic.py sagetex-makestatic ) && (chmod +x sagetex-makestatic )"
 build sagetex-makestatic: rule6 sagetex-makestatic.py
-rule rule7
- description = build $out
- command = /bin/sh -c "yes | latex  sagetex.ins"
-build sagetex-makestatic.py: rule7 scripts.dtx
+build sagetex-makestatic.py: rule0 scripts.dtx
 rule rule8
  description = build $out
  command = /bin/sh -c "(cp -f sagetex-remote.py sagetex-remote ) && (chmod +x sagetex-remote )"
 build sagetex-remote: rule8 sagetex-remote.py
-rule rule9
- description = build $out
- command = /bin/sh -c "yes | latex  sagetex.ins"
-build sagetex-remote.py: rule9 remote-sagetex.dtx
+build sagetex-remote.py: rule0 remote-sagetex.dtx
 rule rule10
  description = build $out
  command = /bin/sh -c "(latex  sagetex.dtx ) && (sage sagetex.sagetex.sage ) && (latex  sagetex.dtx ) && (sage sagetex.sagetex.sage ) && (latex  sagetex.dtx ) && (pdflatex  sagetex.dtx )"
@@ -72,10 +57,7 @@ rule rule15
  description = build $out
  command = /bin/sh -c "python3 setup.py sdist --formats=gztar"
 build dist: rule15 _kati_always_build_ sagetex.sty sagetex-run sagetex-extract sagetex-makestatic sagetex-remote
-rule rule16
- description = build $out
- command = /bin/sh -c "yes | latex  sagetex.ins"
-build sagetexparse.py: rule16 scripts.dtx
+build sagetexparse.py: rule0 scripts.dtx
 rule rule17
  description = build $out
  command = /bin/sh -c "./test"

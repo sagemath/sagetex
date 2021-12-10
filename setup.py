@@ -5,28 +5,24 @@ from setuptools import setup, find_packages
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 from setuptools.command.build_py import build_py
-# from subprocess import check_call, call
 import ninja
 
 class pre_develop(develop):
     """Pre-installation for development mode."""
     def run(self):
-        # call("./NinjaBuild/ninja.sh")
         ninja.subprocess.run(['ninja'],check=True)
+        # ninja.subprocess.run(['make'],check=True)
         develop.run(self)
 
 class pre_install(install):
     """Pre-installation for installation mode."""
     def run(self):
-        # call("./NinjaBuild/ninja.sh")
-        # check_call("./NinjaBuild/ninja.sh")
         ninja.subprocess.run(['ninja'],check=True)
         install.run(self)
 
 class pre_build(build_py):
     """Pre-installation for build mode."""
     def run(self):
-        # call("./NinjaBuild/ninja.sh")
         ninja.subprocess.run(['ninja'],check=True)
         build_py.run(self)
 
