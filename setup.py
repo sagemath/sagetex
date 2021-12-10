@@ -1,4 +1,34 @@
+import site
+import sys
+site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 from setuptools import setup, find_packages
+from setuptools.command.develop import develop
+from setuptools.command.install import install
+from setuptools.command.build_py import build_py
+# from subprocess import check_call, call
+import ninja
+
+class pre_develop(develop):
+    """Pre-installation for development mode."""
+    def run(self):
+        # call("./NinjaBuild/ninja.sh")
+        ninja.subprocess.run(['ninja'],check=True)
+        develop.run(self)
+
+class pre_install(install):
+    """Pre-installation for installation mode."""
+    def run(self):
+        # call("./NinjaBuild/ninja.sh")
+        # check_call("./NinjaBuild/ninja.sh")
+        ninja.subprocess.run(['ninja'],check=True)
+        install.run(self)
+
+class pre_build(build_py):
+    """Pre-installation for build mode."""
+    def run(self):
+        # call("./NinjaBuild/ninja.sh")
+        ninja.subprocess.run(['ninja'],check=True)
+        build_py.run(self)
 
 setup(
       name='sagetex',
@@ -18,6 +48,11 @@ setup(
       packages=find_packages(),
       scripts=['sagetex-run', 'sagetex-extract', 'sagetex-makestatic', 'sagetex-remote'],
       install_requires=['pyparsing'],
+      cmdclass={
+          'develop': pre_develop,
+          'install': pre_install,
+          'build_py': pre_build,
+      },
       classifiers=[
         "Programming Language :: Python :: 3",
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
@@ -32,6 +67,7 @@ setup(
          'sagetex.dtx',
          'sagetex.ins',
          'sagetex.sty']),
+      ('', ['build.ninja']),  
       ('share/doc/sagetex', [
          'example.tex',
          'sagetex.pdf',
