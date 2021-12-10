@@ -18,7 +18,7 @@ https://doc.sagemath.org/html/en/tutorial/sagetex.html#sec-sagetex-install
 The complete documentation is in sagetex.pdf, in
 the SAGE_ROOT/... directory mentioned above.
 
-## Generating SageTeX
+## Generating SageTeX (old)
 
 If you want to extract any of SageTeX's files from the .dtx sources, you
 can do
@@ -44,6 +44,12 @@ the documentation.)
 
 To use the SageTeX package with your own documents, see the
 "Installation" section of the documentation.
+
+## Generating SageTeX (new)
+
+Run `python3 -m build .`
+
+This produces source and a wheel in `dist/`.
 
 ## Contributing to SageTeX
 
