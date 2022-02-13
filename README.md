@@ -23,14 +23,14 @@ the SAGE_ROOT/... directory mentioned above.
 If you want to extract any of SageTeX's files from the .dtx sources, you
 can do
 
-  0. Run `latex sagetex.ins'
+  0. Run `latex sagetex.ins`
 
 To regenerate the documentation, do
 
-  1. Run `latex sagetex.dtx'
-  2. Run `sage sagetex.sage'
+  1. Run `latex sagetex.dtx`
+  2. Run `sage sagetex.sage`
   3. Run the indexing commands that the .ins file told you about.
-  4. Run `latex sagetex.dtx' again.
+  4. Run `latex sagetex.dtx` again.
 
 You can skip step 3 if you don't care about the index. You will need the
 pgf and tikz packages installed to typeset the figures.
