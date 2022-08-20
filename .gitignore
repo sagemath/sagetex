@@ -1,5 +1,6 @@
 *.sagetex.*
 *.aux
+*.bak
 *.dvi
 *.log
 *.out
@@ -37,3 +38,4 @@ __pycache__
 .*.sage-history
 .*.sage-chat
 MANIFEST
+*.egg-info

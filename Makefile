@@ -59,5 +59,5 @@ test:
 	./test
 
 # make a source distribution, used for building the spkg
-dist: sagetex.sty $(pypkg) $(pyscripts)
+dist: sagetex.sty $(pypkg) $(pyscripts) $(pkg).pdf example.pdf
 	python setup.py sdist --formats=gztar
