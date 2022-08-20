@@ -26,7 +26,7 @@ example.pdf: example.tex sagetex.sty sagetex.py
 
 %.ind: $(dtxs)
 	latex $(TEXOPTS) $(pkg).dtx
-	sed -e 's/usage|hyperpage/usagehyperpage/g' -i sagetex.idx
+	sed -e 's/usage|hyperpage/usagehyperpage/g' -i.bak sagetex.idx
 	makeindex -s gglo.ist -o $(pkg).gls $(pkg).glo
 	makeindex -s gind.ist -o $(pkg).ind $(pkg).idx
 
