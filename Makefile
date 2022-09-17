@@ -50,7 +50,7 @@ clean: auxclean
 	rm -fr sage-plots-for-* E2.sobj *.pyc sagetex.tar.gz sagetex.py sagetexparse.py $(pyscripts) $(addsuffix .py,$(pyscripts)) sagetex.sty dist MANIFEST remote-sagetex.py auto *_doctest.sage *_doctest.sage.py example-*.table __pycache__
 
 auxclean:
-	/bin/bash -c "rm -f {$(pkg),example}.{glo,gls,aux,out,toc,dvi,pdf,ps,log,ilg,ind,idx,fdb_latexmk,sagetex.*}"
+	/bin/bash -c "rm -f {$(pkg),example}.{glo,gls,aux,out,toc,dvi,pdf,ps,log,ilg,ind,idx,hd,fdb_latexmk,sagetex.*}"
 	rm -f *_doctest.sage
 
 # otherwise, make gets confused since there's a file named "test"
