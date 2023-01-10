@@ -1,7 +1,7 @@
 % \iffalse meta-comment
 %
 % Copyright (C) 2008--2015 by Dan Drake <dr.dan.drake (at) gmail (dot) com>
-% Copyright (C) 2016--2020 by SageMath Developers <sage-devel (at) googlegroups (dot) com>
+% Copyright (C) 2016--2023 by SageMath Developers <sage-devel (at) googlegroups (dot) com>
 % -------------------------------------------------------
 %
 % See the "Copying and licenses" section in this file for the terms
@@ -524,7 +524,10 @@ suggestions.
 % pulls the result into your \LTX file. This is useful for calling
 % functions that return \LTX code; see the example file distributed
 % along with \ST for a demonstration of using this command to easily
-% produce a table.
+% produce a table. A limitation of this macro is that the \LTX code
+% it consumes on the 2nd run of \LTX must be in a single paragraph,
+% otherwise one will get a \LTX error  
+% |! Paragraph ended before \@newl@bel was complete|.
 %
 % \DescribeMacro{\percent} If you are doing modular arithmetic or string
 % formatting and need a percent sign in a call to |\sage| (or
