@@ -1521,9 +1521,9 @@ SAGE_ROOT/venv/share/doc/sagetex.""")
 % \begin{center}
 % \verb+egrep -v '^( _st_.goboom| ?_st_.current_tex_line|print(.SageT)' filename.sage | md5sum+
 % \end{center}
-% in a shell. The included |run-sagetex-if-necessary| uses this
+% in a shell. The included |sagetex-run| uses this
 % mechanism to, well, only run Sage when necessary; see
-% \autoref{sec:run-sagetex-if-necessary}.
+% \autoref{sec:sagetex-run}.
 %    \begin{macrocode}
   def endofdoc(self):
     sagef = open(self.filename + '.sagetex.sage', 'r')
