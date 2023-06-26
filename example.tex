@@ -8,7 +8,7 @@
 %
 
 \documentclass{article}
-\title{Examples of embedding Sage in \LaTeX{} with \textsf{Sage\TeX}}
+\title{Examples of embedding Sage in \LaTeX{} with \ST}% \ST typesets the SageTeX name
 \author{Dan Drake and others}
 \usepackage{hyperref}
 % If you want to see the examples in the section "Plotting
@@ -282,7 +282,7 @@ Here's the (perhaps-not-so-) famous Sage cube graph in 3D.
 % passing an option to includegraphics
 \sageplot[][png]{G.plot3d()}
 
-\section{Pausing Sage\TeX}
+\section{Pausing \ST}
 \label{sec:pausing-sagetex}
 
 Sometimes you want to ``pause'' for a bit while writing your document if
@@ -306,7 +306,7 @@ Graphics are also skipped: \sageplot{plot(2*sin(x^2) + x^2, (x, 0, 5))}
 
 \section{Make Sage write your \LaTeX{} for you}
 
-With \textsf{Sage\TeX}, you can not only have Sage do your math for you,
+With \ST, you can not only have Sage do your math for you,
 it can write parts of your \LaTeX{} document for you! For example, I
 hate writing \texttt{tabular} environments; there's too many fiddly
 little bits of punctuation and whatnot\ldots and what if you want to add
@@ -452,7 +452,7 @@ able to use that in future \texttt{sageexample} blocks:
   1/5*x^5 - 1/4*x^4 + 1/3*x^3 - 1/2*x^2 + 5*x + 1
 \end{sageexample}
 
-\section{Plotting functions in Ti\emph{k}Z with Sage\TeX}
+\section{Plotting functions in Ti\emph{k}Z with \ST}
 
 (The code in this section should work with any reasonable version of
 Ti\emph{k}Z, which means it should work with all but the most terribly
@@ -467,7 +467,7 @@ The wonderful graphics package TikZ has the ability to plot functions by
 reading in a sequence of points from an external file---see chapter 18,
 page 193 of the TikZ manual. This facility is designed around files
 produced by Gnuplot, but the file format is so simple that it's very
-easy to use Sage\TeX{} to generate them. First you need a function that
+easy to use \ST{} to generate them. First you need a function that
 will evaluate functions and write the results into a file:
 
 
